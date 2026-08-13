@@ -30,22 +30,29 @@
       <div class="login-avatar" title="Identificação de Avatar">
         🧙‍♂️
       </div>
-      <h1 class="login-title">ANORAK OASIS</h1>
-      <p class="login-subtitle">Identificação de Acesso ao Painel Privado</p>
+      <h1 class="login-title" id="cardTitle">ANORAK OASIS</h1>
+      <p class="login-subtitle" id="cardSubtitle">Identificação de Acesso ao Painel Privado</p>
     </div>
 
     <!-- Alert Box -->
     <div id="loginAlert" class="login-alert" role="alert"></div>
 
+    <!-- ================================================================= -->
+    <!-- 1. FORMULÁRIO DE LOGIN -->
+    <!-- ================================================================= -->
     <form id="loginForm" autocomplete="off">
       <div class="login-input-wrap">
         <label for="inputUsername">Usuário ou E-mail</label>
         <input type="text" id="inputUsername" name="username" placeholder="usuario ou email@exemplo.com" required autofocus>
       </div>
 
-      <div class="login-input-wrap">
+      <div class="login-input-wrap" style="margin-bottom: 0.5rem;">
         <label for="inputPassword">Chave de Acesso / Senha</label>
         <input type="password" id="inputPassword" name="password" placeholder="••••••••" required>
+      </div>
+
+      <div style="text-align: right; margin-bottom: 1.25rem;">
+        <a href="#recuperar" id="btnShowRecover" style="font-size: 0.8rem; color: var(--primary-cyan); text-decoration: none;">Recuperar senha</a>
       </div>
 
       <button type="submit" id="btnLoginSubmit" class="btn-login-submit">
@@ -53,29 +60,75 @@
       </button>
     </form>
 
+    <!-- ================================================================= -->
+    <!-- 2. FORMULÁRIO DE RECUPERAÇÃO DE SENHA -->
+    <!-- ================================================================= -->
+    <form id="recoverForm" autocomplete="off" style="display: none;">
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+        Informe seu e-mail cadastrado para receber um link de redefinição de chave de acesso.
+      </p>
+
+      <div class="login-input-wrap">
+        <label for="inputRecoverEmail">E-mail ou Usuário Cadastrado</label>
+        <input type="text" id="inputRecoverEmail" placeholder="seuemail@exemplo.com" required>
+      </div>
+
+      <button type="submit" id="btnRecoverSubmit" class="btn-login-submit">
+        <span>Enviar Link de Recuperação</span> <span>📨</span>
+      </button>
+
+      <div style="text-align: center; margin-top: 1rem;">
+        <a href="#login" id="btnBackToLoginFromRecover" style="font-size: 0.82rem; color: var(--text-secondary); text-decoration: none;">
+          ← Voltar para o login
+        </a>
+      </div>
+    </form>
+
+    <!-- ================================================================= -->
+    <!-- 3. FORMULÁRIO DE REDEFINIÇÃO DE SENHA (COM TOKEN) -->
+    <!-- ================================================================= -->
+    <form id="resetForm" autocomplete="off" style="display: none;">
+      <input type="hidden" id="inputResetToken">
+
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+        Defina sua nova chave de acesso para entrar no OASIS.
+      </p>
+
+      <div class="login-input-wrap">
+        <label for="inputNewPassword">Nova Senha</label>
+        <input type="password" id="inputNewPassword" placeholder="••••••••" required minlength="4">
+      </div>
+
+      <div class="login-input-wrap">
+        <label for="inputConfirmPassword">Confirmar Nova Senha</label>
+        <input type="password" id="inputConfirmPassword" placeholder="••••••••" required minlength="4">
+      </div>
+
+      <button type="submit" id="btnResetSubmit" class="btn-login-submit">
+        <span>Salvar Nova Senha</span> <span>✓</span>
+      </button>
+
+      <div style="text-align: center; margin-top: 1rem;">
+        <a href="#login" id="btnBackToLoginFromReset" style="font-size: 0.82rem; color: var(--text-secondary); text-decoration: none;">
+          ← Voltar para o login
+        </a>
+      </div>
+    </form>
+
+    <!-- FOOTER LINKS -->
     <div class="login-footer">
-      <p><a href="index.html">← Voltar à Apresentação Pública</a></p>
+      <p><a href="index.html">← Voltar para o início</a></p>
       <p style="margin-top: 0.5rem; opacity: 0.6;">Anorak OASIS Project Hub &bull; Homologação &amp; Gestão</p>
     </div>
   </div>
 
   <script>
-    // Se já estiver logado, redireciona diretamente para o app.html
-    (async function checkExistingAuth() {
-      try {
-        const res = await fetch('api/auth/check_auth.php');
-        if (res.ok) {
-          const data = await res.json();
-          if (data.authenticated) {
-            window.location.replace('app.html');
-          }
-        }
-      } catch (e) {}
-    })();
-
     const loginForm = document.getElementById('loginForm');
+    const recoverForm = document.getElementById('recoverForm');
+    const resetForm = document.getElementById('resetForm');
     const alertBox = document.getElementById('loginAlert');
-    const submitBtn = document.getElementById('btnLoginSubmit');
+    const cardTitle = document.getElementById('cardTitle');
+    const cardSubtitle = document.getElementById('cardSubtitle');
 
     function showAlert(message, type = 'error') {
       alertBox.textContent = message;
@@ -83,12 +136,73 @@
       alertBox.style.display = 'flex';
     }
 
+    function switchView(view) {
+      alertBox.style.display = 'none';
+      loginForm.style.display = 'none';
+      recoverForm.style.display = 'none';
+      resetForm.style.display = 'none';
+
+      if (view === 'recover') {
+        recoverForm.style.display = 'block';
+        cardTitle.textContent = 'RECUPERAR SENHA';
+        cardSubtitle.textContent = 'Redefinição de Acesso ao OASIS';
+      } else if (view === 'reset') {
+        resetForm.style.display = 'block';
+        cardTitle.textContent = 'NOVA SENHA';
+        cardSubtitle.textContent = 'Defina sua nova chave de acesso';
+      } else {
+        loginForm.style.display = 'block';
+        cardTitle.textContent = 'ANORAK OASIS';
+        cardSubtitle.textContent = 'Identificação de Acesso ao Painel Privado';
+      }
+    }
+
+    // Checa token na URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+
+    if (token) {
+      document.getElementById('inputResetToken').value = token;
+      switchView('reset');
+    } else {
+      // Se não tem token e já estiver logado, redireciona para o app.html
+      (async function checkExistingAuth() {
+        try {
+          const res = await fetch('api/auth/check_auth.php');
+          if (res.ok) {
+            const data = await res.json();
+            if (data.authenticated) {
+              window.location.replace('app.html');
+            }
+          }
+        } catch (e) {}
+      })();
+    }
+
+    // Toggle de visualizações
+    document.getElementById('btnShowRecover').addEventListener('click', (e) => {
+      e.preventDefault();
+      switchView('recover');
+    });
+
+    document.getElementById('btnBackToLoginFromRecover').addEventListener('click', (e) => {
+      e.preventDefault();
+      switchView('login');
+    });
+
+    document.getElementById('btnBackToLoginFromReset').addEventListener('click', (e) => {
+      e.preventDefault();
+      switchView('login');
+    });
+
+    // 1. Submit Login
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       alertBox.style.display = 'none';
 
       const username = document.getElementById('inputUsername').value.trim();
       const password = document.getElementById('inputPassword').value.trim();
+      const submitBtn = document.getElementById('btnLoginSubmit');
 
       if (!username || !password) {
         showAlert('Preencha o usuário e a senha.');
@@ -111,7 +225,7 @@
           showAlert('Acesso autorizado! Redirecionando para o OASIS...', 'success');
           setTimeout(() => {
             window.location.href = 'app.html';
-          }, 600);
+          }, 500);
         } else {
           showAlert(data.message || 'Credenciais inválidas. Verifique usuário e senha.');
           submitBtn.disabled = false;
@@ -121,6 +235,91 @@
         showAlert('Erro de conexão com o servidor. Tente novamente.');
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<span>Conectar ao OASIS</span> <span>➔</span>';
+      }
+    });
+
+    // 2. Submit Recuperar Senha
+    recoverForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      alertBox.style.display = 'none';
+
+      const email = document.getElementById('inputRecoverEmail').value.trim();
+      const submitBtn = document.getElementById('btnRecoverSubmit');
+
+      if (!email) return;
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>Gerando link...</span> ⏳';
+
+      try {
+        const res = await fetch('api/auth/recover_password.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+          showAlert('Link de recuperação gerado com sucesso! Verifique seu e-mail ou use o link de acesso.', 'success');
+          if (data.debug_token) {
+            setTimeout(() => {
+              window.location.href = `login.html?token=${data.debug_token}`;
+            }, 1200);
+          }
+        } else {
+          showAlert(data.message || 'Erro ao processar recuperação.');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>Enviar Link de Recuperação</span> <span>📨</span>';
+        }
+      } catch (err) {
+        showAlert('Erro de comunicação com o servidor.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Enviar Link de Recuperação</span> <span>📨</span>';
+      }
+    });
+
+    // 3. Submit Redefinir Senha
+    resetForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      alertBox.style.display = 'none';
+
+      const token = document.getElementById('inputResetToken').value;
+      const password = document.getElementById('inputNewPassword').value;
+      const confirmPassword = document.getElementById('inputConfirmPassword').value;
+      const submitBtn = document.getElementById('btnResetSubmit');
+
+      if (password !== confirmPassword) {
+        showAlert('As senhas não coincidem. Digite a mesma senha em ambos os campos.');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>Salvando nova senha...</span> ⏳';
+
+      try {
+        const res = await fetch('api/auth/reset_password.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+          showAlert('Senha alterada com sucesso! Redirecionando para o login...', 'success');
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1200);
+        } else {
+          showAlert(data.message || 'Token inválido ou expirado.');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>Salvar Nova Senha</span> <span>✓</span>';
+        }
+      } catch (err) {
+        showAlert('Erro ao redefinir a senha.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Salvar Nova Senha</span> <span>✓</span>';
       }
     });
   </script>

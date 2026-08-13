@@ -85,6 +85,8 @@ try {
     Upload-File "$localDir\api\auth\login.php" "api/auth/login.php"
     Upload-File "$localDir\api\auth\check_auth.php" "api/auth/check_auth.php"
     Upload-File "$localDir\api\auth\logout.php" "api/auth/logout.php"
+    Upload-File "$localDir\api\auth\recover_password.php" "api/auth/recover_password.php"
+    Upload-File "$localDir\api\auth\reset_password.php" "api/auth/reset_password.php"
 
     Write-Host "`n=================================================" -ForegroundColor Green
     Write-Host " Deploy de PRODUÇÃO finalizado com sucesso!" -ForegroundColor Green

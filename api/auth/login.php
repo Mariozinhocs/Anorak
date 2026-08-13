@@ -10,6 +10,10 @@ if ($method !== 'POST') {
 }
 
 $input = json_decode(file_get_contents('php://input'), true);
+if (!is_array($input)) {
+    $input = $_POST;
+}
+
 $usernameOrEmail = trim($input['username'] ?? '');
 $password = trim($input['password'] ?? '');
 
@@ -21,15 +25,19 @@ if (empty($usernameOrEmail) || empty($password)) {
 
 try {
     $pdo = getDatabaseConnection();
+    $db_prefix = getenv('DB_TABLE_PREFIX') ?: '';
     $users_table = $db_prefix . 'users';
 
     $stmt = $pdo->prepare("
         SELECT id, username, email, password_hash, role, timezone, deleted_at 
         FROM `{$users_table}` 
-        WHERE (username = :val OR email = :val) 
+        WHERE (username = :val1 OR email = :val2) 
         LIMIT 1
     ");
-    $stmt->execute([':val' => $usernameOrEmail]);
+    $stmt->execute([
+        ':val1' => $usernameOrEmail,
+        ':val2' => $usernameOrEmail
+    ]);
     $user = $stmt->fetch();
 
     if (!$user) {

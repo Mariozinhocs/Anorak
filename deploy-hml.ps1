@@ -86,6 +86,8 @@ try {
     Upload-File "$localDir\api\auth\login.php" "hml/api/auth/login.php"
     Upload-File "$localDir\api\auth\check_auth.php" "hml/api/auth/check_auth.php"
     Upload-File "$localDir\api\auth\logout.php" "hml/api/auth/logout.php"
+    Upload-File "$localDir\api\auth\recover_password.php" "hml/api/auth/recover_password.php"
+    Upload-File "$localDir\api\auth\reset_password.php" "hml/api/auth/reset_password.php"
 
     Write-Host "`n=================================================" -ForegroundColor Green
     Write-Host " Deploy HML finalizado com sucesso!" -ForegroundColor Green

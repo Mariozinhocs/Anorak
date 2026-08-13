@@ -14,6 +14,7 @@ if (!isset($_SESSION['anorak_user_id'])) {
 
 try {
     $pdo = getDatabaseConnection();
+    $db_prefix = getenv('DB_TABLE_PREFIX') ?: '';
     $users_table = $db_prefix . 'users';
 
     $stmt = $pdo->prepare("SELECT id, username, email, role, timezone, deleted_at FROM `{$users_table}` WHERE id = :id LIMIT 1");

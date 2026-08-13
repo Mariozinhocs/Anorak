@@ -29,6 +29,8 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}users` (
     `plan` ENUM('explorer', 'creator', 'master') NOT NULL DEFAULT 'creator',
     `plan_status` VARCHAR(50) NOT NULL DEFAULT 'active',
     `plan_expires_at` DATETIME NULL DEFAULT NULL,
+    `password_reset_token` VARCHAR(255) DEFAULT NULL,
+    `password_reset_expires` DATETIME DEFAULT NULL,
     `timezone` VARCHAR(100) NOT NULL DEFAULT 'America/Sao_Paulo',
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

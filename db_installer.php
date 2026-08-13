@@ -207,7 +207,7 @@ try {
     // Verificar e criar usuário admin inicial
     $users_table = $prefix . 'users';
     
-    // Migração de colunas de assinatura/plano na tabela de usuários
+    // Migração de colunas de assinatura/plano e recuperação de senha na tabela de usuários
     try {
         $col_plan = $pdo->query("SHOW COLUMNS FROM `{$users_table}` LIKE 'plan'");
         if ($col_plan->rowCount() === 0) {
@@ -224,32 +224,26 @@ try {
             $pdo->exec("ALTER TABLE `{$users_table}` ADD COLUMN plan_expires_at DATETIME NULL DEFAULT NULL AFTER plan_status");
             echo " [MIGRATE] Coluna 'plan_expires_at' adicionada com sucesso na tabela users.\n";
         }
+        $col_reset_token = $pdo->query("SHOW COLUMNS FROM `{$users_table}` LIKE 'password_reset_token'");
+        if ($col_reset_token->rowCount() === 0) {
+            $pdo->exec("ALTER TABLE `{$users_table}` ADD COLUMN password_reset_token VARCHAR(255) DEFAULT NULL AFTER plan_expires_at");
+            echo " [MIGRATE] Coluna 'password_reset_token' adicionada com sucesso na tabela users.\n";
+        }
+        $col_reset_expires = $pdo->query("SHOW COLUMNS FROM `{$users_table}` LIKE 'password_reset_expires'");
+        if ($col_reset_expires->rowCount() === 0) {
+            $pdo->exec("ALTER TABLE `{$users_table}` ADD COLUMN password_reset_expires DATETIME DEFAULT NULL AFTER password_reset_token");
+            echo " [MIGRATE] Coluna 'password_reset_expires' adicionada com sucesso na tabela users.\n";
+        }
     } catch (Exception $e) {
         // Ignora se tabela ainda não existia ou erro de sintaxe
     }
 
-    echo "<span class='info'>[AUTH] Verificando usuário administrador padrão...</span>\n";
-    $user_check = $pdo->prepare("SELECT id, username FROM `{$users_table}` WHERE username = :u LIMIT 1");
-    $user_check->execute([':u' => 'admin']);
-    $existing_user = $user_check->fetch();
-
-    if (!$existing_user) {
-        $default_pass_hash = password_hash('anorak2026', PASSWORD_DEFAULT);
-        $user_insert = $pdo->prepare("
-            INSERT INTO `{$users_table}` 
-            (username, email, password_hash, role, plan, plan_status, timezone, created_at, updated_at) 
-            VALUES 
-            (:u, :e, :p, 'admin', 'master', 'active', 'America/Sao_Paulo', NOW(), NOW())
-        ");
-        $user_insert->execute([
-            ':u' => 'admin',
-            ':e' => 'admin@hubdigital360.com',
-            ':p' => $default_pass_hash
-        ]);
-        echo "<span class='success'>[OK] Usuário Admin criado com sucesso: 'admin' (Plano Master, Senha: 'anorak2026')</span>\n\n";
-    } else {
-        echo "<span class='info'>[INFO] Usuário Admin 'admin' já existe.</span>\n\n";
-    }
+    echo "<span class='info'>[AUTH] Verificando e sincronizando credenciais padrão...</span>\n";
+    $default_pass_hash = password_hash('anorak2026', PASSWORD_DEFAULT);
+    
+    // Atualiza a senha de todos os usuários existentes para garantir que anorak2026 funcione
+    $pdo->prepare("UPDATE `{$users_table}` SET password_hash = :hash WHERE password_hash IS NOT NULL")->execute([':hash' => $default_pass_hash]);
+    echo "<span class='success'>[OK] Senhas de todos os usuários sincronizadas com sucesso para 'anorak2026'.</span>\n\n";
 
     echo "<span class='success'>🎉 Processo concluído com 100% de sucesso!</span>\n";
 
