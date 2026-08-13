@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acesso Restrito — Anorak OASIS</title>
+  <meta name="description" content="Autenticação e controle de acesso ao painel de gestão modular Anorak OASIS.">
+  
+  <!-- Favicon / Theme -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%20%220%22%20%22100%22%20%22100%22><text y=%22.9em%22 font-size=%2290%22>🗝️</text></svg>">
+  <meta name="theme-color" content="#070b14">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/login.css">
+</head>
+<body class="login-page">
+  <!-- Ambient Grid -->
+  <div class="oasis-grid-bg"></div>
+
+  <div class="login-card">
+    <div class="login-header">
+      <div class="login-avatar" title="Identificação de Avatar">
+        🧙‍♂️
+      </div>
+      <h1 class="login-title">ANORAK OASIS</h1>
+      <p class="login-subtitle">Identificação de Acesso ao Painel Privado</p>
+    </div>
+
+    <!-- Alert Box -->
+    <div id="loginAlert" class="login-alert" role="alert"></div>
+
+    <form id="loginForm" autocomplete="off">
+      <div class="login-input-wrap">
+        <label for="inputUsername">Usuário ou E-mail</label>
+        <input type="text" id="inputUsername" name="username" placeholder="mariozinhocs" required autofocus>
+      </div>
+
+      <div class="login-input-wrap">
+        <label for="inputPassword">Chave de Acesso / Senha</label>
+        <input type="password" id="inputPassword" name="password" placeholder="••••••••" required>
+      </div>
+
+      <button type="submit" id="btnLoginSubmit" class="btn-login-submit">
+        <span>Conectar ao OASIS</span> <span>➔</span>
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <p><a href="index.html">← Voltar à Apresentação Pública</a></p>
+      <p style="margin-top: 0.5rem; opacity: 0.6;">Anorak OASIS Project Hub &bull; Homologação &amp; Gestão</p>
+    </div>
+  </div>
+
+  <script>
+    // Se já estiver logado, redireciona diretamente para o app.html
+    (async function checkExistingAuth() {
+      try {
+        const res = await fetch('api/auth/check_auth.php');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.authenticated) {
+            window.location.replace('app.html');
+          }
+        }
+      } catch (e) {}
+    })();
+
+    const loginForm = document.getElementById('loginForm');
+    const alertBox = document.getElementById('loginAlert');
+    const submitBtn = document.getElementById('btnLoginSubmit');
+
+    function showAlert(message, type = 'error') {
+      alertBox.textContent = message;
+      alertBox.className = `login-alert ${type}`;
+      alertBox.style.display = 'flex';
+    }
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      alertBox.style.display = 'none';
+
+      const username = document.getElementById('inputUsername').value.trim();
+      const password = document.getElementById('inputPassword').value.trim();
+
+      if (!username || !password) {
+        showAlert('Preencha o usuário e a senha.');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>Verificando credenciais...</span> ⏳';
+
+      try {
+        const res = await fetch('api/auth/login.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+          showAlert('Acesso autorizado! Redirecionando para o OASIS...', 'success');
+          setTimeout(() => {
+            window.location.href = 'app.html';
+          }, 600);
+        } else {
+          showAlert(data.message || 'Credenciais inválidas. Verifique usuário e senha.');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>Conectar ao OASIS</span> <span>➔</span>';
+        }
+      } catch (err) {
+        showAlert('Erro de conexão com o servidor. Tente novamente.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Conectar ao OASIS</span> <span>➔</span>';
+      }
+    });
+  </script>
+</body>
+</html>

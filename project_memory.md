@@ -2,48 +2,54 @@
 
 ## 📌 Status Atual do Desenvolvimento
 
-1. **Arquitetura e M.O. de Deploy:**
-   - **Ambiente de Homologação (`/hml`):** Todo o ciclo de desenvolvimento, novos módulos e testes é isolado no subdiretório `/hml` (`http://anorak.hubdigital360.com/hml/`).
-   - **Ambiente de Produção (`root`):** Apenas releases validadas são publicadas na raiz via `deploy-prod.ps1`.
-   - **Controle de Versão:** Repositório Git configurado em [Mariozinhocs/Anorak](https://github.com/Mariozinhocs/Anorak.git) com `.gitignore` protegendo credenciais (`.env*`, `ftp_config*.json`, etc.).
+1. **Separação de Camadas (Home Pública vs. Área Privada):**
+   - **Landing Page Pública ([index.html](file:///g:/Meu%20Drive/Dev's/Anorak/index.html)):** Apresentação imersiva do ecossistema Anorak (Pilares, Chaves de Halliday, Matriz de Priorização e CTAs de acesso).
+   - **Área Privada Protegida ([app.html](file:///g:/Meu%20Drive/Dev's/Anorak/app.html)):** Painel completo de gestão (Mapa Operacional, Incubadora de Ideias, Matriz de Tempo e Checklists de Homologação) com guarda de rota obrigatória (redireciona para `login.html` se não autenticado) e botão de Logout.
+   - **Tela de Login / Autenticação ([login.html](file:///g:/Meu%20Drive/Dev's/Anorak/login.html)):** Interface de identificação com feedback visual, bloqueio de submissão dupla e redirecionamento dinâmico.
 
-2. **Camada de Banco de Dados e Backend (MySQL + PHP REST API):**
-   - **Schema DDL (`api/schema.sql`):** Suporta prefixos dinâmicos (`{PREFIX}`) para isolamento de tabelas (`items`, `users`, `activity_logs`).
-   - **Instalador Automático (`db_installer.php`):** Interface visual que verifica conectividade PDO MySQL, executa o schema, aplica migrações e realiza o seeding inicial dos projetos e ideias.
-   - **API RESTful (`api/items.php`):** Endpoints com suporte completo a GET, POST, PUT e DELETE com campos JSON estruturados.
-   - **Configurações Globais (`api/config.php`):** Gerenciador de `.env`, conexão PDO segura (`utf8mb4`), timezone UTC forçado e headers CORS/JSON.
+2. **Backend de Autenticação e Segurança (PHP + MySQL):**
+   - **`api/auth/login.php`:** Validação de credenciais via `password_verify`, suporte a e-mail ou username, e persistência de sessão PHP com cookies seguros (HTTPOnly, SameSite).
+   - **`api/auth/check_auth.php`:** Endpoint leve para verificação em tempo real da sessão do usuário ativo.
+   - **`api/auth/logout.php`:** Encerramento seguro de sessão e destruição de cookies.
+   - **Instalador ([db_installer.php](file:///g:/Meu%20Drive/Dev's/Anorak/db_installer.php)):** Criação e migração das tabelas (`items`, `users`, `activity_logs`) com seeding automático do usuário administrador padrão (`mariozinhocs` / senha padrão `anorak2026`).
 
-3. **Frontend Reativo e Offline-First (Vanilla JS + CSS Custom):**
-   - **Armazenamento Híbrido (`js/db.js`):** Funciona 100% offline via LocalStorage / IndexedDB com sincronização automática e transparente em segundo plano via `api/items.php` quando online.
-   - **Modelo de Dados Flexível (`js/models.js`):** Suporte a Projetos, Tarefas, Ideias, Níveis de Prioridade, Matriz de Decisão (Impacto x Urgência) e Chaves de Halliday (Cobre, Jade, Cristal).
-   - **Módulos Adicionais:** Captura de ideias por voz (`voice.js`), Matriz de Eisenhower/Impacto (`matrix.js`) e Monitoramento passivo de repositórios GitHub (`sync.js`).
+3. **Arquitetura e M.O. de Deploy:**
+   - **Ambiente de Homologação (`/hml`):** Todo o desenvolvimento e validações sobem para a subpasta `hml/` (`http://anorak.hubdigital360.com/hml/`).
+   - **Ambiente de Produção (`root`):** Publicação direta na raiz do domínio via `deploy-prod.ps1`.
+   - **Repositório Git:** Sincronizado em [Mariozinhocs/Anorak](https://github.com/Mariozinhocs/Anorak.git) com `.gitignore` protegendo credenciais.
 
 ---
 
 ## 📂 Estrutura de Arquivos Criados/Modificados
 
-* **Infraestrutura e Deploys:**
-  * [.gitignore](file:///g:/Meu%20Drive/Dev's/Anorak/.gitignore) (Proteção de arquivos `.env`, `.bak` e senhas)
-  * [.env.example](file:///g:/Meu%20Drive/Dev's/Anorak/.env.example) (Modelo de configuração)
-  * [.env.hml](file:///g:/Meu%20Drive/Dev's/Anorak/.env.hml) (Configuração de homologação)
-  * [deploy-hml.ps1](file:///g:/Meu%20Drive/Dev's/Anorak/deploy-hml.ps1) (Deploy automatizado para `/hml` via FTP)
-  * [deploy-prod.ps1](file:///g:/Meu%20Drive/Dev's/Anorak/deploy-prod.ps1) (Deploy automatizado para a raiz `prod` via FTP)
-  * [project_memory.md](file:///g:/Meu%20Drive/Dev's/Anorak/project_memory.md) (Documento vivo de memória do projeto)
-
-* **Backend e Banco de Dados:**
-  * [db_installer.php](file:///g:/Meu%20Drive/Dev's/Anorak/db_installer.php) (Script instalador e migrador de banco)
-  * [api/schema.sql](file:///g:/Meu%20Drive/Dev's/Anorak/api/schema.sql) (Definição DDL das tabelas MySQL)
-  * [api/config.php](file:///g:/Meu%20Drive/Dev's/Anorak/api/config.php) (Configurações PDO e UTC)
-  * [api/items.php](file:///g:/Meu%20Drive/Dev's/Anorak/api/items.php) (API RESTful de sincronização de itens)
-
 * **Frontend:**
-  * [index.html](file:///g:/Meu%20Drive/Dev's/Anorak/index.html) (Estrutura da aplicação)
-  * [css/](file:///g:/Meu%20Drive/Dev's/Anorak/css/) (`variables.css`, `base.css`, `components.css`, `animations.css`)
-  * [js/](file:///g:/Meu%20Drive/Dev's/Anorak/js/) (`db.js`, `models.js`, `app.js`, `voice.js`, `matrix.js`, `sync.js`)
+  * [index.html](file:///g:/Meu%20Drive/Dev's/Anorak/index.html) (Landing page pública de apresentação)
+  * [login.html](file:///g:/Meu%20Drive/Dev's/Anorak/login.html) (Tela de autenticação)
+  * [app.html](file:///g:/Meu%20Drive/Dev's/Anorak/app.html) (Painel restrito de homologação e gestão)
+  * [css/home.css](file:///g:/Meu%20Drive/Dev's/Anorak/css/home.css) (Estilos da Home de apresentação)
+  * [css/login.css](file:///g:/Meu%20Drive/Dev's/Anorak/css/login.css) (Estilos da tela de login)
+  * [css/variables.css](file:///g:/Meu%20Drive/Dev's/Anorak/css/variables.css), [css/base.css](file:///g:/Meu%20Drive/Dev's/Anorak/css/base.css), [css/components.css](file:///g:/Meu%20Drive/Dev's/Anorak/css/components.css), [css/animations.css](file:///g:/Meu%20Drive/Dev's/Anorak/css/animations.css)
+  * [js/app.js](file:///g:/Meu%20Drive/Dev's/Anorak/js/app.js) (Controlador principal com verificação de auth e logout)
+  * [js/db.js](file:///g:/Meu%20Drive/Dev's/Anorak/js/db.js) (Camada de persistência híbrida Offline-First + MySQL)
+  * [js/models.js](file:///g:/Meu%20Drive/Dev's/Anorak/js/models.js), [js/voice.js](file:///g:/Meu%20Drive/Dev's/Anorak/js/voice.js), [js/matrix.js](file:///g:/Meu%20Drive/Dev's/Anorak/js/matrix.js), [js/sync.js](file:///g:/Meu%20Drive/Dev's/Anorak/js/sync.js)
+
+* **Backend e APIs:**
+  * [api/config.php](file:///g:/Meu%20Drive/Dev's/Anorak/api/config.php) (Configurações PDO, UTC e sessões)
+  * [api/schema.sql](file:///g:/Meu%20Drive/Dev's/Anorak/api/schema.sql) (DDL das tabelas MySQL com `{PREFIX}`)
+  * [api/items.php](file:///g:/Meu%20Drive/Dev's/Anorak/api/items.php) (CRUD de projetos e ideias)
+  * [api/auth/login.php](file:///g:/Meu%20Drive/Dev's/Anorak/api/auth/login.php) (Endpoint de login)
+  * [api/auth/check_auth.php](file:///g:/Meu%20Drive/Dev's/Anorak/api/auth/check_auth.php) (Endpoint de verificação de sessão)
+  * [api/auth/logout.php](file:///g:/Meu%20Drive/Dev's/Anorak/api/auth/logout.php) (Endpoint de logout)
+  * [db_installer.php](file:///g:/Meu%20Drive/Dev's/Anorak/db_installer.php) (Instalador/migrador web com admin seeding)
+
+* **Infraestrutura e Deploys:**
+  * [deploy-hml.ps1](file:///g:/Meu%20Drive/Dev's/Anorak/deploy-hml.ps1) (Deploy para `/hml`)
+  * [deploy-prod.ps1](file:///g:/Meu%20Drive/Dev's/Anorak/deploy-prod.ps1) (Deploy para raiz)
+  * [.gitignore](file:///g:/Meu%20Drive/Dev's/Anorak/.gitignore) (Proteção de arquivos sensíveis)
 
 ---
 
-## 🎯 Próximos Passos
-1. Executar o instalador do banco em Homologação (`http://anorak.hubdigital360.com/hml/db_installer.php`).
-2. Validar a persistência remota dos projetos e ideias no MySQL.
-3. Testar a matriz de decisão e a captura por voz em dispositivos móveis no ambiente HML.
+## 🎯 Credenciais Padrão do Ambiente
+
+- **Usuário:** `mariozinhocs` (ou `mario@hubdigital360.com`)
+- **Senha Padrão Inicial:** `anorak2026`

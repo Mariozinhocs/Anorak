@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Anorak — OASIS Project Hub & Creative Incubator</title>
-  <meta name="description" content="Sistema inteligente de gestão modular de projetos em homologação, repositório de ideias e matriz de decisão inspirado em James Halliday / Jogador Nº 1.">
+  <meta name="description" content="Plataforma de gestão inteligente de projetos em homologação, repositório ágil de ideias e matriz de decisão inspirada no universo de Jogador Nº 1.">
   
   <!-- Favicon / Theme -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%20%220%22%20%22100%22%20%22100%22><text y=%22.9em%22 font-size=%2290%22>🗝️</text></svg>">
@@ -18,343 +18,153 @@
   <!-- Stylesheets -->
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/home.css">
 </head>
-<body>
+<body class="home-body">
   <!-- Ambient Grid -->
   <div class="oasis-grid-bg"></div>
 
-  <div class="app-container">
-    <!-- TOP NAVIGATION HUD -->
-    <header class="glass-panel anorak-header">
-      <div class="brand-section">
-        <div class="avatar-halo floating" title="Anorak, Mago do OASIS">
-          <div class="avatar-placeholder">🧙‍♂️</div>
-        </div>
-        <div class="brand-info">
-          <h1 class="brand-title">ANORAK <span style="font-size: 1rem; color: var(--primary-cyan);">🗝️</span></h1>
-          <span class="brand-subtitle">Project Hub &amp; Creative Incubator</span>
-        </div>
+  <!-- HEADER NAVIGATION -->
+  <header class="home-header">
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <div class="avatar-halo" style="width: 40px; height: 40px;">
+        <div class="avatar-placeholder" style="font-size: 1.25rem;">🧙‍♂️</div>
       </div>
-
-      <!-- DUAL MODE SWITCHER -->
-      <nav class="dual-mode-nav" aria-label="Modo de Visualização">
-        <button type="button" class="mode-btn active" data-mode="operational" id="tabOperational">
-          <span>⚡</span> Mapa de Status (3 Projetos)
-        </button>
-        <button type="button" class="mode-btn" data-mode="incubator" id="tabIncubator">
-          <span>💡</span> Incubadora de Ideias
-        </button>
-        <button type="button" class="mode-btn" data-mode="matrix" id="tabMatrix">
-          <span>🧭</span> Matriz de Tempo
-        </button>
-      </nav>
-
-      <!-- HEADER ACTIONS -->
-      <div class="header-actions">
-        <button type="button" class="btn-magic" id="btnQuickCapture" title="Captura Rápida (Ctrl + Espaço)">
-          <span>🎙️</span> Capturar Ideia
-        </button>
-        <button type="button" class="btn-icon" id="btnExportBackup" title="Exportar Backup JSON">
-          💾
-        </button>
-        <label class="btn-icon" title="Importar Backup JSON" style="cursor: pointer;">
-          📂
-          <input type="file" id="inputImportBackup" accept=".json" style="display: none;">
-        </label>
+      <div>
+        <span style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; letter-spacing: 0.05em; color: #fff;">ANORAK</span>
+        <span style="font-size: 0.75rem; color: var(--primary-cyan); display: block; line-height: 1;">OASIS Project Hub</span>
       </div>
-    </header>
-
-    <!-- STATS / INTELLIGENCE BAR -->
-    <section class="intelligence-bar" aria-label="Indicadores Globais">
-      <div class="glass-panel intel-card">
-        <div class="intel-icon-box">📂</div>
-        <div class="intel-content">
-          <h4>Projetos em Homologação</h4>
-          <div class="intel-value" id="statActiveProjects">3</div>
-          <span class="intel-hint">Frentes ativas mapeadas</span>
-        </div>
-      </div>
-
-      <div class="glass-panel intel-card">
-        <div class="intel-icon-box purple">✓</div>
-        <div class="intel-content">
-          <h4>Validação de Etapas</h4>
-          <div class="intel-value" id="statHomologationRate">0/0 (0%)</div>
-          <span class="intel-hint">Gatilhos de evolução</span>
-        </div>
-      </div>
-
-      <div class="glass-panel intel-card">
-        <div class="intel-icon-box amber">💡</div>
-        <div class="intel-content">
-          <h4>Ideias na Incubadora</h4>
-          <div class="intel-value" id="statIncubatorIdeas">0</div>
-          <span class="intel-hint">Prontas para promoção</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================================================================== -->
-    <!-- VIEW 1: MODO OPERACIONAL (MAPA DE STATUS & HOMOLOGAÇÃO) -->
-    <!-- ===================================================================== -->
-    <main class="view-section" id="viewOperational">
-      <div class="view-header">
-        <div>
-          <h2><span>⚡</span> Frentes de Homologação &amp; Status</h2>
-          <p>Acompanhe e valide interativamente o avanço dos seus projetos ativos rumo à produção.</p>
-        </div>
-        <button type="button" class="btn-secondary" id="btnNewProject">+ Novo Projeto</button>
-      </div>
-
-      <!-- GRID DE PROJETOS -->
-      <div class="projects-grid" id="projectsContainer">
-        <!-- Renderizado dinamicamente via app.js -->
-      </div>
-    </main>
-
-    <!-- ===================================================================== -->
-    <!-- VIEW 2: MODO INCUBADORA (REPOSITÓRIO DE IDEIAS) -->
-    <!-- ===================================================================== -->
-    <section class="view-section" id="viewIncubator" style="display: none;">
-      <div class="view-header">
-        <div>
-          <h2><span>💡</span> Incubadora Criativa de Ideias</h2>
-          <p>Espaço livre de anotações. Promova qualquer ideia para um projeto ativo com 1 clique.</p>
-        </div>
-        <button type="button" class="btn-magic" id="btnNewIdea">+ Criar Ideia</button>
-      </div>
-
-      <!-- Filtro por Tags -->
-      <div class="incubator-controls">
-        <div class="filter-tags" id="ideaTagsFilter">
-          <!-- Renderizado dinamicamente -->
-        </div>
-      </div>
-
-      <!-- MASONRY / GRID DE IDEIAS -->
-      <div class="ideas-masonry" id="ideasContainer">
-        <!-- Renderizado dinamicamente via app.js -->
-      </div>
-    </section>
-
-    <!-- ===================================================================== -->
-    <!-- VIEW 3: MATRIZ DE DECISÃO ("ONDE INVESTIR MEU TEMPO HOJE?") -->
-    <!-- ===================================================================== -->
-    <section class="view-section" id="viewMatrix" style="display: none;">
-      <div class="view-header" style="grid-column: 1/-1;">
-        <div>
-          <h2><span>🧭</span> Matriz de Priorização &amp; Inteligência Halliday</h2>
-          <p>Onde investir seu tempo hoje com base no gargalo da homologação vs. valor estratégico.</p>
-        </div>
-      </div>
-
-      <div class="matrix-section">
-        <!-- 4 Quadrantes -->
-        <div class="glass-panel matrix-quadrant-container">
-          <div class="matrix-quadrant q1">
-            <div class="quadrant-title">
-              <span>🔥 Q1: Homologação Crítica</span>
-              <span style="color: #ef4444;">Urgente &amp; Alto Impacto</span>
-            </div>
-            <div class="quadrant-items" id="quadrantQ1"></div>
-          </div>
-
-          <div class="matrix-quadrant q2">
-            <div class="quadrant-title">
-              <span>💎 Q2: Inovação / Chave de Cristal</span>
-              <span style="color: var(--primary-cyan);">Estratégico</span>
-            </div>
-            <div class="quadrant-items" id="quadrantQ2"></div>
-          </div>
-
-          <div class="matrix-quadrant q3">
-            <div class="quadrant-title">
-              <span>⚡ Q3: Refinamento Rápido</span>
-              <span style="color: #f59e0b;">Operacional</span>
-            </div>
-            <div class="quadrant-items" id="quadrantQ3"></div>
-          </div>
-
-          <div class="matrix-quadrant q4">
-            <div class="quadrant-title">
-              <span>📦 Q4: Incubadora / Backlog</span>
-              <span style="color: #64748b;">Futuro</span>
-            </div>
-            <div class="quadrant-items" id="quadrantQ4"></div>
-          </div>
-        </div>
-
-        <!-- Halliday Advisor Box -->
-        <div class="glass-panel matrix-advisor">
-          <div class="advisor-header">
-            <div class="avatar-halo" style="width: 36px; height: 36px;">
-              <div class="avatar-placeholder" style="font-size: 1rem;">🧙‍♂️</div>
-            </div>
-            <div>
-              <h3 style="font-size: 1.1rem;">Conselho do Mago Anorak</h3>
-              <span style="font-size: 0.75rem; color: var(--primary-cyan);">Algoritmo de Priorização OASIS</span>
-            </div>
-          </div>
-
-          <blockquote class="advisor-quote" id="advisorQuote">
-            "Carregando sabedoria..."
-          </blockquote>
-
-          <div style="font-size: 0.8rem; color: var(--text-secondary);">
-            💡 <em>Dica: Concluir as tarefas de homologação ativas desbloqueia as 3 Chaves (Cobre ➔ Jade ➔ Cristal) para cada projeto.</em>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <!-- ===================================================================== -->
-  <!-- MODAL: QUICK CAPTURE / SNAPSHOT DE IDEIA (COM VOZ) -->
-  <!-- ===================================================================== -->
-  <div class="modal-backdrop" id="modalQuickCapture" role="dialog" aria-modal="true">
-    <div class="modal-container">
-      <div class="modal-header">
-        <h3><span>🎙️</span> Snapshot Rápido de Ideia</h3>
-        <button type="button" class="modal-close" aria-label="Fechar">&times;</button>
-      </div>
-
-      <form id="formQuickCapture">
-        <!-- Voice Bar -->
-        <div class="voice-status-box" style="margin-bottom: 1rem;">
-          <div class="voice-status-indicator">
-            <div class="voice-pulse"></div>
-            <span id="voiceStatusText">Reconhecimento por voz pronto</span>
-          </div>
-          <button type="button" class="btn-icon" id="btnVoiceRecord" title="Gravar / Transcrever Voz">
-            🎤
-          </button>
-        </div>
-
-        <div class="form-group">
-          <label for="quickIdeaTitle">Título / Conceito da Ideia *</label>
-          <input type="text" id="quickIdeaTitle" class="form-input" placeholder="Ex: Módulo de IA para relatórios semanais" required>
-        </div>
-
-        <div class="form-group" style="margin-top: 0.75rem;">
-          <label for="quickIdeaDesc">Descrição / Anotações Rápidas</label>
-          <textarea id="quickIdeaDesc" class="form-textarea" placeholder="Descreva livremente ou fale pelo microfone..."></textarea>
-        </div>
-
-        <div class="form-row" style="margin-top: 0.75rem;">
-          <div class="form-group">
-            <label for="quickIdeaTags">Tags (separadas por vírgula)</label>
-            <input type="text" id="quickIdeaTags" class="form-input" placeholder="IA, Automação, 360">
-          </div>
-          <div class="form-group">
-            <label for="quickIdeaPriority">Prioridade</label>
-            <select id="quickIdeaPriority" class="form-select">
-              <option value="media">Média</option>
-              <option value="alta">Alta (Priorizado)</option>
-              <option value="baixa">Baixa (Backlog)</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="modal-actions" style="margin-top: 1.5rem;">
-          <button type="button" class="btn-secondary btn-modal-cancel">Cancelar</button>
-          <button type="submit" class="btn-magic">Salvar Ideia</button>
-        </div>
-      </form>
     </div>
-  </div>
 
-  <!-- ===================================================================== -->
-  <!-- MODAL: PROMOVER IDEIA A PROJETO (WIZARD GUIADO) -->
-  <!-- ===================================================================== -->
-  <div class="modal-backdrop" id="modalPromote" role="dialog" aria-modal="true">
-    <div class="modal-container">
-      <div class="modal-header">
-        <h3><span>🚀</span> Promover Ideia a Projeto Ativo</h3>
-        <button type="button" class="modal-close" aria-label="Fechar">&times;</button>
+    <ul class="home-nav-links">
+      <li><a href="#pilares">Pilares</a></li>
+      <li><a href="#chaves">Chaves de Halliday</a></li>
+      <li><a href="#matriz">Matriz de Decisão</a></li>
+      <li><a href="login.html" class="btn-nav-login">Entrar no OASIS ➔</a></li>
+    </ul>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="hero-section">
+    <div class="hero-badge">
+      <span>🗝️</span> Gestão Modular &bull; Homologação Contínua &bull; OASIS
+    </div>
+
+    <h1 class="hero-title">
+      Do Conceito à Produção.<br>
+      <span class="gradient-text">Conquiste o OASIS do seu Projeto.</span>
+    </h1>
+
+    <p class="hero-subtitle">
+      O <strong>Anorak Project Hub</strong> unifica o acompanhamento em tempo real das suas frentes ativas de homologação, incubadora criativa de ideias com captura por voz e matriz inteligente de priorização.
+    </p>
+
+    <div class="hero-cta-group">
+      <a href="login.html" class="btn-hero-primary">
+        <span>Acessar Painel Privado</span> <span>➔</span>
+      </a>
+      <a href="#pilares" class="btn-hero-secondary">
+        <span>Conhecer a Arquitetura</span> <span>↓</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- PILARES / FEATURES SECTION -->
+  <section class="features-section" id="pilares">
+    <div class="section-header">
+      <span class="section-tag">Engenharia de Alto Desempenho</span>
+      <h2 class="section-title">Pilares do Ecossistema Anorak</h2>
+      <p style="color: var(--text-secondary);">
+        Construído para desenvolvedores e criadores que precisam de controle cirúrgico de homologação e fluxo contínuo de inovação.
+      </p>
+    </div>
+
+    <div class="grid-3-col">
+      <!-- Card 1 -->
+      <div class="feature-card">
+        <div class="feature-icon-box">⚡</div>
+        <h3>Frentes de Homologação</h3>
+        <p>
+          Checklists reativos com validação granular de etapas, gatilhos de auditoria de data/hora e acompanhamento visual do estágio de cada projeto.
+        </p>
       </div>
 
-      <form id="formPromote">
-        <input type="hidden" id="promoteIdeaId">
-
-        <div class="form-group">
-          <label for="promoteTitle">Nome do Projeto *</label>
-          <input type="text" id="promoteTitle" class="form-input" required>
-        </div>
-
-        <div class="form-group" style="margin-top: 0.75rem;">
-          <label for="promoteDescription">Descrição / Escopo</label>
-          <textarea id="promoteDescription" class="form-textarea"></textarea>
-        </div>
-
-        <div class="form-row" style="margin-top: 0.75rem;">
-          <div class="form-group">
-            <label for="promoteGithubLink">Repositório GitHub (opcional)</label>
-            <input type="url" id="promoteGithubLink" class="form-input" placeholder="https://github.com/...">
-          </div>
-          <div class="form-group">
-            <label for="promoteDriveLink">Pasta no Drive (opcional)</label>
-            <input type="url" id="promoteDriveLink" class="form-input" placeholder="https://drive.google.com/...">
-          </div>
-        </div>
-
-        <div class="form-group" style="margin-top: 1rem; display: flex; align-items: center; gap: 0.5rem; flex-direction: row;">
-          <input type="checkbox" id="promoteChecklistTemplate" checked style="accent-color: var(--primary-cyan); width: 18px; height: 18px;">
-          <label for="promoteChecklistTemplate" style="text-transform: none; font-size: 0.85rem; cursor: pointer;">
-            Gerar checklist padrão estruturado de homologação (Ambiente, MVP, QA, Deploy)
-          </label>
-        </div>
-
-        <div class="modal-actions" style="margin-top: 1.5rem;">
-          <button type="button" class="btn-secondary btn-modal-cancel">Cancelar</button>
-          <button type="submit" class="btn-magic">✨ Converter e Abrir Homologação</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ===================================================================== -->
-  <!-- MODAL: NOVO PROJETO MANUAL -->
-  <!-- ===================================================================== -->
-  <div class="modal-backdrop" id="modalNewProject" role="dialog" aria-modal="true">
-    <div class="modal-container">
-      <div class="modal-header">
-        <h3><span>⚡</span> Criar Nova Frente de Projeto</h3>
-        <button type="button" class="modal-close" aria-label="Fechar">&times;</button>
+      <!-- Card 2 -->
+      <div class="feature-card">
+        <div class="feature-icon-box" style="background: rgba(168, 85, 247, 0.1); border-color: rgba(168, 85, 247, 0.3);">🎙️</div>
+        <h3>Incubadora &amp; Voz</h3>
+        <p>
+          Capture insights e ideias técnicas instantaneamente via microfone ou atalhos. Promova qualquer rascunho a projeto ativo com 1 clique.
+        </p>
       </div>
 
-      <form id="formNewProject">
-        <div class="form-group">
-          <label for="newProjTitle">Nome do Projeto *</label>
-          <input type="text" id="newProjTitle" class="form-input" placeholder="Ex: Novo SaaS 360" required>
-        </div>
-
-        <div class="form-group" style="margin-top: 0.75rem;">
-          <label for="newProjDesc">Descrição / Objetivos</label>
-          <textarea id="newProjDesc" class="form-textarea" placeholder="Descreva os principais entregáveis..."></textarea>
-        </div>
-
-        <div class="form-row" style="margin-top: 0.75rem;">
-          <div class="form-group">
-            <label for="newProjGithub">Repositório GitHub</label>
-            <input type="url" id="newProjGithub" class="form-input" placeholder="https://github.com/...">
-          </div>
-          <div class="form-group">
-            <label for="newProjDrive">Pasta do Drive</label>
-            <input type="url" id="newProjDrive" class="form-input" placeholder="https://drive.google.com/...">
-          </div>
-        </div>
-
-        <div class="modal-actions" style="margin-top: 1.5rem;">
-          <button type="button" class="btn-secondary btn-modal-cancel">Cancelar</button>
-          <button type="submit" class="btn-magic">Criar Projeto</button>
-        </div>
-      </form>
+      <!-- Card 3 -->
+      <div class="feature-card" id="matriz">
+        <div class="feature-icon-box" style="background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3);">🧭</div>
+        <h3>Matriz Halliday</h3>
+        <p>
+          Algoritmo inteligente de priorização (Impacto vs. Urgência) que responde diariamente à pergunta: <em>"Onde investir meu tempo hoje?"</em>
+        </p>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Main JavaScript App Entrypoint -->
-  <script type="module" src="js/app.js"></script>
+  <!-- HALLIDAY KEYS SECTION -->
+  <section class="keys-showcase-section" id="chaves">
+    <div class="section-header">
+      <span class="section-tag">Gamificação &amp; Estágios</span>
+      <h2 class="section-title">As Três Chaves de Halliday</h2>
+      <p style="color: var(--text-secondary);">
+        Cada projeto evolui através de estágios claros de maturidade técnica até a conquista da produção.
+      </p>
+    </div>
+
+    <div class="keys-grid">
+      <!-- Chave 1 -->
+      <div class="key-card copper">
+        <div class="key-icon">🗝️</div>
+        <h4>Chave de Cobre</h4>
+        <p><strong>Arquitetura &amp; Planejamento:</strong> Definição de escopo, estrutura de banco, requisitos de API e setup inicial de ambiente.</p>
+      </div>
+
+      <!-- Chave 2 -->
+      <div class="key-card jade">
+        <div class="key-icon">🗝️</div>
+        <h4>Chave de Jade</h4>
+        <p><strong>Homologação Ativa:</strong> Validação em ambiente /hml, testes funcionais, segurança, controle de sessão e correções finas.</p>
+      </div>
+
+      <!-- Chave 3 -->
+      <div class="key-card crystal">
+        <div class="key-icon">💎</div>
+        <h4>Chave de Cristal</h4>
+        <p><strong>Produção &amp; Escala:</strong> Deploy concluído em produção, métricas de carga validadas e transição para modo SaaS.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER CTA -->
+  <section class="footer-cta-section">
+    <div class="cta-box">
+      <div class="avatar-halo floating" style="width: 56px; height: 56px; margin: 0 auto 1.5rem;">
+        <div class="avatar-placeholder" style="font-size: 1.75rem;">🧙‍♂️</div>
+      </div>
+      <h2 style="font-family: var(--font-display); font-size: 2.2rem; margin-bottom: 1rem; color: #fff;">
+        Pronto para Entrar no OASIS?
+      </h2>
+      <p style="color: var(--text-secondary); max-width: 550px; margin: 0 auto 2rem;">
+        Acesse o painel restrito com suas credenciais para gerenciar seus projetos e homologações ativas.
+      </p>
+      <a href="login.html" class="btn-hero-primary" style="padding: 1rem 2.5rem;">
+        <span>Conectar ao Painel</span> <span>➔</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="home-footer">
+    <p>&copy; 2026 Anorak OASIS Project Hub &bull; Hub Digital 360 &bull; Todos os direitos reservados.</p>
+  </footer>
 </body>
 </html>

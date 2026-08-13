@@ -19,12 +19,36 @@ class AnorakApp {
   }
 
   async init() {
+    // 1. Verificação de Autenticação
+    const isAuthenticated = await this.verifyAuth();
+    if (!isAuthenticated) {
+      window.location.replace('login.html');
+      return;
+    }
+
     await db.init();
     this.initAudioContext();
     this.setupEventListeners();
     this.render();
     this.renderDecisionMatrix();
     this.checkGitHubSync();
+  }
+
+  async verifyAuth() {
+    try {
+      const res = await fetch('api/auth/check_auth.php');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.authenticated && data.user) {
+          const userEl = document.getElementById('currentUserName');
+          if (userEl) userEl.textContent = `👤 ${data.user.username}`;
+          return true;
+        }
+      }
+    } catch (e) {
+      console.warn('Erro ao checar auth:', e);
+    }
+    return false;
   }
 
   initAudioContext() {
@@ -142,6 +166,19 @@ class AnorakApp {
           } catch (err) {
             this.showToast('Erro ao importar backup: ' + err.message);
           }
+        }
+      });
+    }
+
+    // Botão de Logout
+    const btnLogout = document.getElementById('btnLogout');
+    if (btnLogout) {
+      btnLogout.addEventListener('click', async () => {
+        if (confirm('Deseja realmente sair do OASIS Hub?')) {
+          try {
+            await fetch('api/auth/logout.php');
+          } catch (e) {}
+          window.location.replace('login.html');
         }
       });
     }

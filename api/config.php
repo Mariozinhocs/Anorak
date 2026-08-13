@@ -14,6 +14,23 @@ header('Content-Type: application/json; charset=utf-8');
 header('X-Content-Type-Options: nosniff');
 header('X-Frame-Options: SAMEORIGIN');
 
+// Inicialização segura de sessão
+function startAnorakSession() {
+    if (session_status() === PHP_SESSION_NONE) {
+        $cookieParams = [
+            'lifetime' => 86400 * 30, // 30 dias
+            'path' => '/',
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ];
+        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+            $cookieParams['secure'] = true;
+        }
+        session_set_cookie_params($cookieParams);
+        session_start();
+    }
+}
+
 // Função auxiliar para carregar o arquivo .env
 function loadEnv($path) {
     if (!file_exists($path)) {

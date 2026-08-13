@@ -204,6 +204,31 @@ try {
         echo "<span class='warning'>[AVISO] A tabela `{$items_table}` já contém $total_items registros. Nenhum seed inserido para preservar dados existentes.</span>\n\n";
     }
 
+    // Verificar e criar usuário admin inicial (mariozinhocs)
+    $users_table = $prefix . 'users';
+    echo "<span class='info'>[AUTH] Verificando usuário administrador padrão...</span>\n";
+    $user_check = $pdo->prepare("SELECT id, username FROM `{$users_table}` WHERE username = :u LIMIT 1");
+    $user_check->execute([':u' => 'mariozinhocs']);
+    $existing_user = $user_check->fetch();
+
+    if (!$existing_user) {
+        $default_pass_hash = password_hash('anorak2026', PASSWORD_DEFAULT);
+        $user_insert = $pdo->prepare("
+            INSERT INTO `{$users_table}` 
+            (username, email, password_hash, role, timezone, created_at, updated_at) 
+            VALUES 
+            (:u, :e, :p, 'admin', 'America/Sao_Paulo', NOW(), NOW())
+        ");
+        $user_insert->execute([
+            ':u' => 'mariozinhocs',
+            ':e' => 'mario@hubdigital360.com',
+            ':p' => $default_pass_hash
+        ]);
+        echo "<span class='success'>[OK] Usuário Admin criado com sucesso: 'mariozinhocs' (Senha inicial: 'anorak2026')</span>\n\n";
+    } else {
+        echo "<span class='info'>[INFO] Usuário Admin 'mariozinhocs' já existe.</span>\n\n";
+    }
+
     echo "<span class='success'>🎉 Processo concluído com 100% de sucesso!</span>\n";
 
 } catch (Exception $e) {
