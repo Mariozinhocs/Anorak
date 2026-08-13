@@ -1,0 +1,12 @@
+# Ambientes e Credenciais
+.env
+.env.*
+!.env.example
+ftp_config*.json
+*.bak
+
+# Logs e arquivos temporários
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
