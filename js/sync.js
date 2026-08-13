@@ -10,7 +10,7 @@ export class AnorakSyncEngine {
 
   /**
    * Extrai o owner e repo de uma URL do GitHub
-   * Ex: https://github.com/Mariozinhocs/360-studio.git -> { owner: 'Mariozinhocs', repo: '360-studio' }
+   * Ex: https://github.com/usuario/projeto.git -> { owner: 'usuario', repo: 'projeto' }
    */
   parseGitHubUrl(url) {
     if (!url) return null;

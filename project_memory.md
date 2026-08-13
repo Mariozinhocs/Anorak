@@ -16,12 +16,12 @@
    - **`api/auth/login.php`:** Validação de credenciais via `password_verify`, suporte a e-mail ou username, e persistência de sessão PHP com cookies seguros (HTTPOnly, SameSite).
    - **`api/auth/check_auth.php`:** Endpoint leve para verificação em tempo real da sessão do usuário ativo.
    - **`api/auth/logout.php`:** Encerramento seguro de sessão e destruição de cookies.
-   - **Instalador ([db_installer.php](file:///g:/Meu%20Drive/Dev's/Anorak/db_installer.php)):** Criação e migração das tabelas (`items`, `users`, `activity_logs`) com seeding automático do usuário administrador padrão (`mariozinhocs` / Plano Master / senha padrão `anorak2026`).
+   - **Instalador ([db_installer.php](file:///g:/Meu%20Drive/Dev's/Anorak/db_installer.php)):** Criação e migração das tabelas (`items`, `users`, `activity_logs`) com seeding automático do usuário administrador padrão (`admin` / Plano Master / senha padrão `anorak2026`).
 
 3. **Arquitetura e M.O. de Deploy:**
    - **Ambiente de Homologação (`/hml`):** Todo o desenvolvimento e validações sobem para a subpasta `hml/` (`http://anorak.hubdigital360.com/hml/`).
    - **Ambiente de Produção (`root`):** Publicação direta na raiz do domínio via `deploy-prod.ps1`.
-   - **Repositório Git:** Sincronizado em [Mariozinhocs/Anorak](https://github.com/Mariozinhocs/Anorak.git) com `.gitignore` protegendo credenciais.
+   - **Repositório Git:** Sincronizado no GitHub com `.gitignore` protegendo credenciais.
 
 ---
 
@@ -29,7 +29,7 @@
 
 * **Frontend:**
   * [index.html](file:///g:/Meu%20Drive/Dev's/Anorak/index.html) (Landing page pública de apresentação)
-  * [login.html](file:///g:/Meu%20Drive/Dev's/Anorak/login.html) (Tela de autenticação)
+  * [login.html](file:///g:/Meu%20Drive/Dev's/Anorak/login.html) (Tela de autenticação com placeholders genéricos)
   * [app.html](file:///g:/Meu%20Drive/Dev's/Anorak/app.html) (Painel restrito de homologação e gestão)
   * [css/home.css](file:///g:/Meu%20Drive/Dev's/Anorak/css/home.css) (Estilos da Home de apresentação)
   * [css/login.css](file:///g:/Meu%20Drive/Dev's/Anorak/css/login.css) (Estilos da tela de login)
@@ -56,5 +56,5 @@
 
 ## 🎯 Credenciais Padrão do Ambiente
 
-- **Usuário:** `mariozinhocs` (ou `mario@hubdigital360.com`)
+- **Usuário:** `admin` (ou `admin@hubdigital360.com`)
 - **Senha Padrão Inicial:** `anorak2026`
