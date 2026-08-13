@@ -206,6 +206,28 @@ try {
 
     // Verificar e criar usuário admin inicial (mariozinhocs)
     $users_table = $prefix . 'users';
+    
+    // Migração de colunas de assinatura/plano na tabela de usuários
+    try {
+        $col_plan = $pdo->query("SHOW COLUMNS FROM `{$users_table}` LIKE 'plan'");
+        if ($col_plan->rowCount() === 0) {
+            $pdo->exec("ALTER TABLE `{$users_table}` ADD COLUMN plan ENUM('explorer', 'creator', 'master') NOT NULL DEFAULT 'creator' AFTER role");
+            echo " [MIGRATE] Coluna 'plan' adicionada com sucesso na tabela users.\n";
+        }
+        $col_plan_status = $pdo->query("SHOW COLUMNS FROM `{$users_table}` LIKE 'plan_status'");
+        if ($col_plan_status->rowCount() === 0) {
+            $pdo->exec("ALTER TABLE `{$users_table}` ADD COLUMN plan_status VARCHAR(50) NOT NULL DEFAULT 'active' AFTER plan");
+            echo " [MIGRATE] Coluna 'plan_status' adicionada com sucesso na tabela users.\n";
+        }
+        $col_plan_expires = $pdo->query("SHOW COLUMNS FROM `{$users_table}` LIKE 'plan_expires_at'");
+        if ($col_plan_expires->rowCount() === 0) {
+            $pdo->exec("ALTER TABLE `{$users_table}` ADD COLUMN plan_expires_at DATETIME NULL DEFAULT NULL AFTER plan_status");
+            echo " [MIGRATE] Coluna 'plan_expires_at' adicionada com sucesso na tabela users.\n";
+        }
+    } catch (Exception $e) {
+        // Ignora se tabela ainda não existia ou erro de sintaxe
+    }
+
     echo "<span class='info'>[AUTH] Verificando usuário administrador padrão...</span>\n";
     $user_check = $pdo->prepare("SELECT id, username FROM `{$users_table}` WHERE username = :u LIMIT 1");
     $user_check->execute([':u' => 'mariozinhocs']);
@@ -215,16 +237,16 @@ try {
         $default_pass_hash = password_hash('anorak2026', PASSWORD_DEFAULT);
         $user_insert = $pdo->prepare("
             INSERT INTO `{$users_table}` 
-            (username, email, password_hash, role, timezone, created_at, updated_at) 
+            (username, email, password_hash, role, plan, plan_status, timezone, created_at, updated_at) 
             VALUES 
-            (:u, :e, :p, 'admin', 'America/Sao_Paulo', NOW(), NOW())
+            (:u, :e, :p, 'admin', 'master', 'active', 'America/Sao_Paulo', NOW(), NOW())
         ");
         $user_insert->execute([
             ':u' => 'mariozinhocs',
             ':e' => 'mario@hubdigital360.com',
             ':p' => $default_pass_hash
         ]);
-        echo "<span class='success'>[OK] Usuário Admin criado com sucesso: 'mariozinhocs' (Senha inicial: 'anorak2026')</span>\n\n";
+        echo "<span class='success'>[OK] Usuário Admin criado com sucesso: 'mariozinhocs' (Plano Master, Senha: 'anorak2026')</span>\n\n";
     } else {
         echo "<span class='info'>[INFO] Usuário Admin 'mariozinhocs' já existe.</span>\n\n";
     }

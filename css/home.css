@@ -261,6 +261,269 @@
   line-height: 1.6;
 }
 
+/* Halliday Matrix Showcase Detailed Section */
+.matrix-showcase-section {
+  padding: 6rem 5%;
+  max-width: 1280px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.matrix-demo-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 2.5rem;
+  align-items: center;
+  margin-top: 3rem;
+}
+
+.matrix-grid-visual {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.matrix-quad-card {
+  background: rgba(13, 19, 33, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.matrix-quad-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.matrix-quad-card.q1-border {
+  border-top: 3px solid #ef4444;
+}
+
+.matrix-quad-card.q2-border {
+  border-top: 3px solid var(--primary-cyan);
+}
+
+.matrix-quad-card.q3-border {
+  border-top: 3px solid #f59e0b;
+}
+
+.matrix-quad-card.q4-border {
+  border-top: 3px solid #64748b;
+}
+
+.quad-badge-tag {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+}
+
+.q1-tag { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+.q2-tag { background: rgba(56, 189, 248, 0.15); color: var(--primary-cyan); border: 1px solid rgba(56, 189, 248, 0.3); }
+.q3-tag { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+.q4-tag { background: rgba(100, 116, 139, 0.15); color: #94a3b8; border: 1px solid rgba(100, 116, 139, 0.3); }
+
+.quad-item-pill {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.82rem;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-primary);
+}
+
+.matrix-advisor-highlight {
+  background: linear-gradient(135deg, rgba(13, 19, 33, 0.9), rgba(22, 33, 62, 0.9));
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(56, 189, 248, 0.15);
+  position: relative;
+}
+
+.advisor-quote-box {
+  background: rgba(5, 8, 16, 0.7);
+  border-left: 3px solid var(--primary-cyan);
+  padding: 1.25rem;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  margin: 1.5rem 0;
+  font-style: italic;
+  font-size: 1rem;
+  color: #e0f2fe;
+}
+
+/* Pricing & Monetization Section */
+.pricing-section {
+  padding: 6rem 5%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 3.5rem;
+  align-items: stretch;
+}
+
+.pricing-card {
+  background: rgba(13, 19, 33, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  transition: all var(--transition-normal);
+}
+
+.pricing-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(56, 189, 248, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+.pricing-card.featured {
+  background: linear-gradient(180deg, rgba(13, 19, 33, 0.95), rgba(20, 31, 56, 0.95));
+  border: 2px solid var(--primary-cyan);
+  box-shadow: 0 0 35px rgba(56, 189, 248, 0.25);
+  transform: scale(1.03);
+}
+
+.pricing-card.featured:hover {
+  transform: scale(1.03) translateY(-6px);
+}
+
+.featured-ribbon {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--primary-cyan), var(--accent-purple));
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.35rem 1.25rem;
+  border-radius: 999px;
+  box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+}
+
+.pricing-header h3 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.pricing-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  min-height: 42px;
+}
+
+.pricing-amount {
+  margin: 1.5rem 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.pricing-amount .currency {
+  font-size: 1.2rem;
+  color: var(--primary-cyan);
+  font-weight: 600;
+}
+
+.pricing-amount .val {
+  font-family: var(--font-display);
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+
+.pricing-amount .period {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.pricing-features {
+  list-style: none;
+  margin: 1.5rem 0 2rem 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.pricing-features li {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.pricing-features li span.check {
+  color: var(--primary-cyan);
+  font-weight: bold;
+}
+
+.btn-pricing {
+  width: 100%;
+  padding: 0.9rem;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+  transition: all var(--transition-normal);
+}
+
+.btn-pricing-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn-pricing-secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--primary-cyan);
+}
+
+.btn-pricing-primary {
+  background: linear-gradient(135deg, var(--primary-cyan), var(--accent-purple));
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 15px rgba(56, 189, 248, 0.35);
+}
+
+.btn-pricing-primary:hover {
+  box-shadow: 0 6px 25px rgba(56, 189, 248, 0.55);
+  filter: brightness(1.1);
+}
+
 /* Halliday Keys Showcase */
 .keys-showcase-section {
   padding: 6rem 5%;
@@ -347,11 +610,26 @@
   color: var(--text-muted);
 }
 
+@media (max-width: 900px) {
+  .matrix-demo-layout {
+    grid-template-columns: 1fr;
+  }
+  .pricing-card.featured {
+    transform: none;
+  }
+  .pricing-card.featured:hover {
+    transform: translateY(-6px);
+  }
+}
+
 @media (max-width: 768px) {
   .home-header {
     padding: 1rem 5%;
   }
   .home-nav-links {
     display: none;
+  }
+  .matrix-grid-visual {
+    grid-template-columns: 1fr;
   }
 }
