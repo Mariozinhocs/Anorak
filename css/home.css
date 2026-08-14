@@ -4,7 +4,8 @@
    ========================================================================== */
 
 .home-body {
-  background-color: var(--bg-dark);
+  background-color: transparent !important;
+  background-image: none !important;
   color: var(--text-primary);
   font-family: var(--font-main);
   overflow-x: hidden;
@@ -713,7 +714,8 @@
 .bg-video-container {
   position: fixed;
   inset: 0;
-  z-index: -2;
+  z-index: -1;
+  background-color: #070b14;
   overflow: hidden;
   pointer-events: none;
 }
