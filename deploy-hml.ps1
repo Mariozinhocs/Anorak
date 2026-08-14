@@ -81,6 +81,7 @@ try {
     Upload-File "$localDir\assets\anorak_construction_case.png" "hml/assets/anorak_construction_case.png"
     Upload-File "$localDir\assets\anorak_creative_case.png" "hml/assets/anorak_creative_case.png"
     Upload-File "$localDir\assets\anorak_business_case.png" "hml/assets/anorak_business_case.png"
+    Upload-File "$localDir\assets\bg-video.mp4" "hml/assets/bg-video.mp4"
 
     # 4. Envio dos arquivos CSS
     Upload-File "$localDir\css\variables.css" "hml/css/variables.css"
