@@ -633,3 +633,78 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================================
+   8. SIMULATOR & GOVERNANCE LANDING PAGE STYLES
+   ========================================================================== */
+.simulator-layout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+  .simulator-layout {
+    flex-direction: column;
+  }
+}
+
+.sim-custom-checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1.5px solid var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: bold;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.sim-check-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.65rem;
+  background: rgba(13, 20, 36, 0.5);
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sim-check-item:hover {
+  background: rgba(18, 28, 51, 0.8);
+  border-color: rgba(0, 242, 254, 0.2);
+}
+
+.sim-check-item.done {
+  opacity: 0.75;
+}
+
+.sim-check-item.done .sim-check-title {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.sim-governance-preview {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  text-align: left;
+}
+
+.governance-section .feature-card {
+  transition: all var(--transition-normal);
+}
+
+.governance-section .feature-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--primary-cyan);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 242, 254, 0.15);
+}

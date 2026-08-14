@@ -116,75 +116,75 @@ export class AnorakDB {
 
   seedInitialData() {
     this.items = [
-      // PROJETO 1: 360 Studio (Em Homologação)
+      // PROJETO 1: RetroVerse VR (Em Homologação)
       new Item({
-        id: 'proj_360_studio',
+        id: 'proj_retroverse_vr',
         type: ItemType.PROJECT,
-        title: '360 Studio',
-        description: 'Plataforma imersiva de passeios virtuais 360°, gerenciamento de hotspots, plantas baixas e painel administrativo.',
+        title: 'RetroVerse VR',
+        description: 'Plataforma imersiva de emuladores retrô 3D, salas virtuais multiplayer e painel de controle do OASIS.',
         status: ProjectStatus.HOMOLOGATION,
         priority: 'alta',
         impact: 'alto',
         urgency: 'alta',
-        tags: ['Passeio Virtual', '360', 'Hostinger', 'PHP/JS'],
+        tags: ['Retro', 'VR', 'OASIS', 'Three.js'],
         contextLinks: {
-          driveFolder: 'https://drive.google.com/drive/folders/360-studio',
-          githubRepo: 'https://github.com/Mariozinhocs/360-studio.git',
-          liveUrl: 'https://hubdigital360.com'
+          driveFolder: 'https://drive.google.com/drive/folders/retroverse-vr',
+          githubRepo: 'https://github.com/Mariozinhocs/retroverse-vr.git',
+          liveUrl: 'https://retroverse.oasis'
         },
         tasks: [
-          { id: 't_360_1', title: 'Integração e limpeza de arquivos órfãos (clean_orphans.php)', category: 'Backend', completed: true, validatedAt: '2026-08-10T14:30:00Z' },
-          { id: 't_360_2', title: 'Refatoração da autenticação e admin_helper.php', category: 'Segurança', completed: true, validatedAt: '2026-08-11T18:00:00Z' },
-          { id: 't_360_3', title: 'Homologação do visualizador 360 e transição de cenas', category: 'Frontend', completed: true, validatedAt: '2026-08-12T10:15:00Z' },
-          { id: 't_360_4', title: 'Validação final de upload no Hostinger & Teste de Carga', category: 'Deploy', completed: false },
-          { id: 't_360_5', title: 'Aceite de usabilidade em dispositivos móveis', category: 'QA', completed: false }
+          { id: 't_360_1', title: 'Integração e limpeza do emulador NES (clean_emu.php)', category: 'Backend', completed: true, validatedAt: '2026-08-10T14:30:00Z' },
+          { id: 't_360_2', title: 'Refatoração dos shaders WebGL e helper_render.php', category: 'Segurança', completed: true, validatedAt: '2026-08-11T18:00:00Z' },
+          { id: 't_360_3', title: 'Homologação do lobby multiplayer e transição de salas', category: 'Frontend', completed: true, validatedAt: '2026-08-12T10:15:00Z' },
+          { id: 't_360_4', title: 'Validação final de carregamento de ROMs & Assets', category: 'Deploy', completed: false },
+          { id: 't_360_5', title: 'Aceite de usabilidade com óculos de realidade virtual', category: 'QA', completed: false }
         ]
       }),
 
-      // PROJETO 2: Anorak (Mago do OASIS)
+      // PROJETO 2: OASIS Engine (Mago do OASIS)
       new Item({
-        id: 'proj_anorak_core',
+        id: 'proj_oasis_engine',
         type: ItemType.PROJECT,
-        title: 'Anorak - OASIS Project Hub',
-        description: 'Sistema inteligente de gestão modular de projetos em homologação, repositório de ideias e matriz de decisão.',
+        title: 'OASIS Engine',
+        description: 'Motor inteligente de processamento de voz com IA, alocação dinâmica de recursos e lógica da matriz de priorização.',
         status: ProjectStatus.HOMOLOGATION,
         priority: 'alta',
         impact: 'alto',
         urgency: 'alta',
-        tags: ['Gestão', 'Incubadora', 'OASIS', 'Ready Player One'],
+        tags: ['Gestão', 'Incubadora', 'OASIS', 'IA'],
         contextLinks: {
-          driveFolder: 'https://drive.google.com/drive/folders/anorak',
-          githubRepo: 'https://github.com/Mariozinhocs/Anorak.git',
-          liveUrl: 'https://anorak.hubdigital360.com'
+          driveFolder: 'https://drive.google.com/drive/folders/oasis-engine',
+          githubRepo: 'https://github.com/Mariozinhocs/oasis-engine.git',
+          liveUrl: 'https://engine.oasis'
         },
         tasks: [
           { id: 't_ano_1', title: 'Arquitetura de dados orientada a Entidades e Atributos', category: 'Arquitetura', completed: true, validatedAt: '2026-08-12T23:00:00Z' },
           { id: 't_ano_2', title: 'Dashboard Dual Mode: Operacional & Incubadora', category: 'Frontend', completed: true, validatedAt: '2026-08-12T23:45:00Z' },
           { id: 't_ano_3', title: 'Checklists interativos com gatilhos e Chaves de Halliday', category: 'Lógica', completed: true, validatedAt: '2026-08-12T23:50:00Z' },
-          { id: 't_ano_4', title: 'Captura de ideias por voz (Web Speech) e Matriz de Decisão', category: 'Inteligência', completed: false },
-          { id: 't_ano_5', title: 'Deploy no Hostinger (anorak.hubdigital360.com)', category: 'Deploy', completed: false }
+          { id: 't_ano_4', title: 'Integração da IA de processamento de áudio e Matriz de Decisão', category: 'Inteligência', completed: false },
+          { id: 't_ano_5', title: 'Deploy no Hostinger (engine.hubdigital360.com)', category: 'Deploy', completed: false }
         ]
       }),
 
-      // PROJETO 3: Hub Digital Connect / SaaS
+      // PROJETO 3: SyncLink API / SaaS
       new Item({
-        id: 'proj_hub_connect',
+        id: 'proj_synclink_api',
         type: ItemType.PROJECT,
-        title: 'Hub Digital Connect',
-        description: 'Módulo de automação de propostas, integrações com WhatsApp API e portal do cliente para serviços digitais.',
+        title: 'SyncLink API',
+        description: 'Módulo de automação de propostas, integrações seguras com APIs externas e canais de sincronização offline-first.',
         status: ProjectStatus.HOMOLOGATION,
         priority: 'media',
         impact: 'alto',
         urgency: 'media',
-        tags: ['Automação', 'CRM', 'API'],
+        tags: ['Automação', 'Offline-First', 'API'],
         contextLinks: {
-          driveFolder: 'https://drive.google.com/drive/folders/hub-connect',
-          githubRepo: 'https://github.com/Mariozinhocs/hub-connect.git',
+          driveFolder: 'https://drive.google.com/drive/folders/synclink-api',
+          githubRepo: 'https://github.com/Mariozinhocs/synclink-api.git',
           liveUrl: ''
         },
         tasks: [
           { id: 't_hub_1', title: 'Estruturação do fluxo de propostas automáticas', category: 'Planejamento', completed: true, validatedAt: '2026-08-05T11:00:00Z' },
-          { id: 't_hub_2', title: 'Validação de webhooks de pagamento', category: 'Integração', completed: false },
+          { id: 't_hub_2', title: 'Validação de assinaturas de Webhooks & Segurança', category: 'Integração', completed: false },
           { id: 't_hub_3', title: 'Testes de homologação com clientes beta', category: 'Validação', completed: false },
           { id: 't_hub_4', title: 'Geração de relatórios em tempo real', category: 'Backend', completed: false }
         ]
@@ -206,13 +206,13 @@ export class AnorakDB {
       new Item({
         id: 'idea_client_portal_white_label',
         type: ItemType.IDEA,
-        title: 'Portal do Cliente White-Label para Tours 360',
-        description: 'Permitir que imobiliárias e clientes finais acessem os relatórios de visualizações dos seus passeios com a própria marca.',
+        title: 'Ready Player Hub: Customização de Clãs',
+        description: 'Permitir que clãs de jogadores acessem relatórios de conquistas e inventário personalizado com marca própria.',
         status: IdeaStatus.DRAFT,
         priority: 'media',
         impact: 'alto',
         urgency: 'media',
-        tags: ['SaaS', 'WhiteLabel', '360'],
+        tags: ['SaaS', 'WhiteLabel', 'OASIS'],
         contextLinks: {}
       }),
       new Item({

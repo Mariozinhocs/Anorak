@@ -41,6 +41,7 @@ export class Item {
     priority = 'media', // 'baixa', 'media', 'alta', 'critica'
     impact = 'medio',   // 'baixo', 'medio', 'alto'
     urgency = 'media',  // 'baixa', 'media', 'alta'
+    assignedTo = '',    // Responsável atribuído
     tags = [],
     contextLinks = { driveFolder: '', githubRepo: '', liveUrl: '' },
     tasks = [],
@@ -52,6 +53,7 @@ export class Item {
     this.type = type;
     this.title = title;
     this.description = description;
+    this.assignedTo = assignedTo;
     this.tags = Array.isArray(tags) ? tags : [];
     this.contextLinks = {
       driveFolder: contextLinks.driveFolder || '',
@@ -81,7 +83,8 @@ export class Item {
       status: t.status || TaskStatus.PENDING,
       completed: !!t.completed,
       validatedAt: t.validatedAt || null,
-      notes: t.notes || ''
+      notes: t.notes || '',
+      evidence: t.evidence || null
     }));
 
     this.validationHistory = validationHistory || [];
@@ -111,7 +114,7 @@ export class Item {
   /**
    * Atualiza status de uma tarefa e registra no histórico de homologação
    */
-  toggleTask(taskId) {
+  toggleTask(taskId, username = 'sistema') {
     const task = this.tasks.find(t => t.id === taskId);
     if (!task) return null;
 
@@ -125,7 +128,8 @@ export class Item {
       timestamp: new Date().toISOString(),
       action: task.completed ? 'Etapa Homologada' : 'Etapa Reaberta',
       taskTitle: task.title,
-      taskId: task.id
+      taskId: task.id,
+      by: username
     });
 
     // Auto-ajuste de status do projeto com base no progresso
@@ -137,5 +141,56 @@ export class Item {
     }
 
     return task;
+  }
+
+  setAssignedTo(username, updatedBy = 'sistema') {
+    const oldAssignee = this.assignedTo || 'Nenhum';
+    this.assignedTo = username;
+    this.updatedAt = new Date().toISOString();
+    this.validationHistory.unshift({
+      timestamp: new Date().toISOString(),
+      action: 'Responsável Alterado',
+      taskTitle: 'Mudança de Atribuição',
+      taskId: 'assigned_to_change',
+      details: `De: ${oldAssignee} ➔ Para: ${username}`,
+      by: updatedBy
+    });
+  }
+
+  addEvidence(taskId, evidence, username = 'sistema') {
+    const task = this.tasks.find(t => t.id === taskId);
+    if (!task) return false;
+
+    task.evidence = evidence; // { type: 'file'|'link', path: '...', name: '...' }
+    this.updatedAt = new Date().toISOString();
+
+    this.validationHistory.unshift({
+      timestamp: new Date().toISOString(),
+      action: 'Evidência Anexada',
+      taskTitle: task.title,
+      taskId: task.id,
+      details: `Arquivo: ${evidence.name} (${evidence.type === 'file' ? 'Upload' : 'Link'})`,
+      by: username
+    });
+    return true;
+  }
+
+  removeEvidence(taskId, username = 'sistema') {
+    const task = this.tasks.find(t => t.id === taskId);
+    if (!task) return false;
+
+    const oldEvidence = task.evidence;
+    task.evidence = null;
+    this.updatedAt = new Date().toISOString();
+
+    this.validationHistory.unshift({
+      timestamp: new Date().toISOString(),
+      action: 'Evidência Removida',
+      taskTitle: task.title,
+      taskId: task.id,
+      details: oldEvidence ? `Arquivo: ${oldEvidence.name}` : '',
+      by: username
+    });
+    return true;
   }
 }

@@ -364,8 +364,29 @@
 /* Project Progress & Phase Indicator */
 .phase-progress-wrap {
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.2rem;
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+}
+
+.gauge-holder {
+  flex-shrink: 0;
+  width: 68px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-details {
+  flex-grow: 1;
+  display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.45rem;
 }
 
 .progress-labels {
@@ -949,4 +970,220 @@
   align-items: center;
   gap: 0.75rem;
   animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ==========================================================================
+   7. GOVERNANCE & AUDIT TRAIL COMPONENTS
+   ========================================================================== */
+.project-responsible-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  background: rgba(0, 0, 0, 0.2);
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.project-responsible-row span {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.responsible-select {
+  background: transparent;
+  border: none;
+  color: var(--primary-cyan);
+  font-family: var(--font-main);
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.responsible-select:hover, .responsible-select:focus {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.responsible-select option {
+  background: var(--bg-surface);
+  color: #fff;
+}
+
+.check-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: rgba(13, 20, 36, 0.4);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  transition: all var(--transition-fast);
+}
+
+.check-item-click-target {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  cursor: pointer;
+}
+
+.check-evidence-box {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-left: 0.75rem;
+}
+
+.btn-evidence-attach {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.btn-evidence-attach:hover {
+  color: var(--primary-cyan);
+  background: rgba(0, 242, 254, 0.08);
+}
+
+.evidence-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(0, 242, 254, 0.1);
+  border: 1px solid rgba(0, 242, 254, 0.25);
+  color: var(--primary-cyan);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.evidence-badge a {
+  color: inherit;
+  text-decoration: none;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.evidence-badge a:hover {
+  text-decoration: underline;
+}
+
+.btn-evidence-delete {
+  background: transparent;
+  border: none;
+  color: var(--accent-magenta);
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.btn-evidence-delete:hover {
+  transform: scale(1.2);
+}
+
+/* Collapsible Audit Timeline Section */
+.audit-collapse-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+}
+
+.audit-collapse-trigger {
+  width: 100%;
+  background: transparent;
+  border: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-muted);
+  font-size: 0.775rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 0;
+  transition: color 0.2s;
+}
+
+.audit-collapse-trigger:hover {
+  color: var(--text-secondary);
+}
+
+.audit-timeline-content {
+  margin-top: 0.75rem;
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 6px;
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  padding-left: 10px;
+}
+
+.audit-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.audit-timeline-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  position: relative;
+  padding-bottom: 0.25rem;
+}
+
+.audit-timeline-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.audit-user {
+  color: var(--primary-blue);
+  font-weight: 600;
+}
+
+.audit-timeline-action {
+  font-size: 0.775rem;
+  color: var(--text-secondary);
+  line-height: 1.3;
+}
+
+.audit-timeline-action strong {
+  color: #fff;
+}
+
+.audit-timeline-details {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  background: rgba(0, 0, 0, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
 }

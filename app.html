@@ -73,6 +73,9 @@
         <!-- User Badge & Logout -->
         <div class="user-hud-badge" id="userHudBadge" style="display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--glass-border);">
           <span style="font-size: 0.85rem; color: var(--primary-cyan); font-weight: 600;" id="currentUserName">Carregando...</span>
+          <a href="admin.html" id="btnAdminLink" class="btn-icon" title="Painel Admin (Assinaturas)" style="display: none; width: 28px; height: 28px; font-size: 0.8rem; text-decoration: none; border-color: rgba(0, 242, 254, 0.3); background: rgba(0, 242, 254, 0.1);">
+            🛡️
+          </a>
           <button type="button" class="btn-icon" id="btnLogout" title="Encerrar Sessão (Logout)" style="width: 28px; height: 28px; font-size: 0.8rem; background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #fca5a5;">
             🚪
           </button>
@@ -363,6 +366,111 @@
         <div class="modal-actions" style="margin-top: 1.5rem;">
           <button type="button" class="btn-secondary btn-modal-cancel">Cancelar</button>
           <button type="submit" class="btn-magic">Criar Projeto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: EDITAR PROJETO -->
+  <!-- ===================================================================== -->
+  <div class="modal-backdrop" id="modalEditProject" role="dialog" aria-modal="true">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3><span>📝</span> Editar Informações do Projeto</h3>
+        <button type="button" class="modal-close" aria-label="Fechar">&times;</button>
+      </div>
+
+      <form id="formEditProject">
+        <input type="hidden" id="editProjId">
+
+        <div class="form-group">
+          <label for="editProjTitle">Nome do Projeto *</label>
+          <input type="text" id="editProjTitle" class="form-input" required>
+        </div>
+
+        <div class="form-group" style="margin-top: 0.75rem;">
+          <label for="editProjDesc">Descrição / Objetivos</label>
+          <textarea id="editProjDesc" class="form-textarea" placeholder="Descreva os principais entregáveis..."></textarea>
+        </div>
+
+        <div class="form-row" style="margin-top: 0.75rem;">
+          <div class="form-group">
+            <label for="editProjGithub">Repositório GitHub</label>
+            <input type="url" id="editProjGithub" class="form-input" placeholder="https://github.com/...">
+          </div>
+          <div class="form-group">
+            <label for="editProjDrive">Pasta do Drive</label>
+            <input type="url" id="editProjDrive" class="form-input" placeholder="https://drive.google.com/...">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 0.75rem;">
+          <label for="editProjLive">URL de Homologação / Ambiente Live</label>
+          <input type="url" id="editProjLive" class="form-input" placeholder="https://...">
+        </div>
+
+        <div class="modal-actions" style="margin-top: 1.5rem;">
+          <button type="button" class="btn-secondary btn-modal-cancel">Cancelar</button>
+          <button type="submit" class="btn-magic">Salvar Alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: ANEXAR EVIDÊNCIA -->
+  <!-- ===================================================================== -->
+  <div class="modal-backdrop" id="modalEvidence" role="dialog" aria-modal="true">
+    <div class="modal-container" style="max-width: 450px;">
+      <div class="modal-header">
+        <h3><span>📎</span> Anexar Evidência de Homologação</h3>
+        <button type="button" class="modal-close" aria-label="Fechar">&times;</button>
+      </div>
+
+      <form id="formEvidence">
+        <input type="hidden" id="evidenceProjId">
+        <input type="hidden" id="evidenceTaskId">
+
+        <!-- Selector de Tipo -->
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label>Tipo de Evidência</label>
+          <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+            <label style="text-transform: none; font-size: 0.85rem; display: flex; align-items: center; gap: 0.25rem; cursor: pointer;">
+              <input type="radio" name="evidenceType" value="file" checked style="accent-color: var(--primary-cyan); width: 16px; height: 16px;">
+              📁 Upload de Arquivo
+            </label>
+            <label style="text-transform: none; font-size: 0.85rem; display: flex; align-items: center; gap: 0.25rem; cursor: pointer;">
+              <input type="radio" name="evidenceType" value="link" style="accent-color: var(--primary-cyan); width: 16px; height: 16px;">
+              🔗 Link URL Corporativo
+            </label>
+          </div>
+        </div>
+
+        <!-- Seção de Arquivo -->
+        <div id="evidenceFileGroup" class="form-group">
+          <label for="inputEvidenceFile">Escolher Arquivo *</label>
+          <input type="file" id="inputEvidenceFile" class="form-input" style="padding: 6px;">
+          <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">
+            Máximo: 10MB. Extensões permitidas: PDF, Imagens, ZIP, Word, Excel, TXT.
+          </span>
+        </div>
+
+        <!-- Seção de Link -->
+        <div id="evidenceLinkGroup" class="form-group" style="display: none;">
+          <div class="form-group">
+            <label for="inputEvidenceUrl">URL do Link *</label>
+            <input type="url" id="inputEvidenceUrl" class="form-input" placeholder="https://drive.google.com/folder-ou-arquivo">
+          </div>
+          <div class="form-group" style="margin-top: 0.75rem;">
+            <label for="inputEvidenceUrlName">Nome do Link / Título *</label>
+            <input type="text" id="inputEvidenceUrlName" class="form-input" placeholder="Ex: Pasta no Google Drive">
+          </div>
+        </div>
+
+        <div class="modal-actions" style="margin-top: 1.5rem;">
+          <button type="button" class="btn-secondary btn-modal-cancel">Cancelar</button>
+          <button type="submit" class="btn-magic">Salvar Evidência</button>
         </div>
       </form>
     </div>

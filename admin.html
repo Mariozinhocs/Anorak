@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Admin — Anorak OASIS</title>
+  <meta name="description" content="Painel de controle administrativo para gestão de assinaturas, contas de usuários e transações financeiras.">
+  
+  <!-- Favicon / Theme -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%20%220%22%20%22100%22%20%22100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+  <meta name="theme-color" content="#070b14">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <!-- Ambient Grid -->
+  <div class="oasis-grid-bg"></div>
+
+  <div class="app-container">
+    <!-- TOP NAVIGATION HUD -->
+    <header class="glass-panel anorak-header">
+      <div class="brand-section">
+        <div class="avatar-halo">
+          <div class="avatar-placeholder">🛡️</div>
+        </div>
+        <div class="brand-info">
+          <h1 class="brand-title">ANORAK ADMIN <span style="font-size: 1rem; color: var(--accent-magenta);">🗝️</span></h1>
+          <span class="brand-subtitle">Gestão de Assinaturas &amp; Contas</span>
+        </div>
+      </div>
+
+      <!-- DUAL MODE SWITCHER (ABAS) -->
+      <nav class="dual-mode-nav" aria-label="Modo Administrativo">
+        <button type="button" class="mode-btn active" data-tab="accounts" id="btnTabAccounts">
+          <span>👥</span> Contas e Planos
+        </button>
+        <button type="button" class="mode-btn" data-tab="payments" id="btnTabPayments">
+          <span>💳</span> Histórico de Pagamentos
+        </button>
+        <button type="button" class="mode-btn" data-tab="deploy" id="btnTabDeploy">
+          <span>⚙️</span> Deploy &amp; Banco
+        </button>
+      </nav>
+
+      <!-- HEADER ACTIONS -->
+      <div class="header-actions">
+        <a href="app.html" class="btn-magic" style="text-decoration: none; padding: 0.5rem 1.25rem;">
+          <span>⚡</span> Voltar ao Hub
+        </a>
+        <button type="button" class="btn-icon" id="btnLogout" title="Encerrar Sessão (Logout)" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #fca5a5;">
+          🚪
+        </button>
+      </div>
+    </header>
+
+    <!-- STATS / METRICAS HUD -->
+    <section class="intelligence-bar" aria-label="Estatísticas Financeiras">
+      <div class="glass-panel intel-card">
+        <div class="intel-icon-box">📊</div>
+        <div class="intel-content">
+          <h4>MRR Estimado (Mensal)</h4>
+          <div class="intel-value" id="statMRR">R$ 0,00</div>
+          <span class="intel-hint" id="statMRRDetail">Explorer / Creator / Master / Legend</span>
+        </div>
+      </div>
+
+      <div class="glass-panel intel-card">
+        <div class="intel-icon-box purple">👑</div>
+        <div class="intel-content">
+          <h4>Assinantes Ativos</h4>
+          <div class="intel-value" id="statActiveSubscribers">0 / 0</div>
+          <span class="intel-hint">Contas pagas / Contas totais</span>
+        </div>
+      </div>
+
+      <div class="glass-panel intel-card">
+        <div class="intel-icon-box amber">💰</div>
+        <div class="intel-content">
+          <h4>Vendas Completadas</h4>
+          <div class="intel-value" id="statSalesVolume">R$ 0,00</div>
+          <span class="intel-hint">Volume financeiro total</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- ABA 1: CONTAS E ASSINATURAS -->
+    <!-- ===================================================================== -->
+    <main class="view-section" id="viewAccounts">
+      <div class="view-header">
+        <div>
+          <h2><span>👥</span> Gestão de Clientes e Planos</h2>
+          <p>Gerencie dados de login, alterne níveis de assinatura e ative/suspenda acessos corporativos.</p>
+        </div>
+        <div class="filters-container">
+          <!-- Busca -->
+          <div class="search-wrap">
+            <input type="text" id="inputSearchUsers" class="form-input" placeholder="Pesquisar por usuário ou e-mail...">
+          </div>
+          <!-- Filtro Plano -->
+          <select id="selectFilterPlan" class="form-select">
+            <option value="">Todos os Planos</option>
+            <option value="explorer">Explorer (Grátis)</option>
+            <option value="creator">Creator (R$ 49/mês)</option>
+            <option value="master">Master (R$ 119/mês)</option>
+            <option value="legend">Legend (R$ 199/mês)</option>
+          </select>
+          <!-- Filtro Status -->
+          <select id="selectFilterStatus" class="form-select">
+            <option value="">Todos os Status</option>
+            <option value="active">Ativos</option>
+            <option value="suspended">Suspensos</option>
+            <option value="expired">Expirados</option>
+            <option value="deleted">Excluídos (Lixeira)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tabela de Contas -->
+      <div class="glass-panel table-container">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th style="width: 40px; text-align: center;"><input type="checkbox" id="chkSelectAllUsers"></th>
+              <th>Usuário / E-mail</th>
+              <th>Permissão</th>
+              <th>Plano de Assinatura</th>
+              <th>Status Plano</th>
+              <th>Expiração do Acesso</th>
+              <th style="text-align: center;">Projetos/Ideias</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tableUsersBody">
+            <tr>
+              <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 3rem;">
+                <div class="spinner"></div> Carregando dados das contas...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <!-- ===================================================================== -->
+    <!-- ABA 2: LOG DE TRANSAÇÕES / PAGAMENTOS -->
+    <!-- ===================================================================== -->
+    <section class="view-section" id="viewPayments" style="display: none;">
+      <div class="view-header">
+        <div>
+          <h2><span>💳</span> Histórico de Transações Financeiras</h2>
+          <p>Acompanhe todos os pagamentos e registros de faturamento manual no ecossistema.</p>
+        </div>
+        <button type="button" class="btn-magic" id="btnOpenAddPayment">
+          <span>+</span> Registrar Pagamento Manual
+        </button>
+      </div>
+
+      <!-- Tabela de Pagamentos -->
+      <div class="glass-panel table-container">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID Transação</th>
+              <th>Cliente (E-mail)</th>
+              <th>Plano Adquirido</th>
+              <th>Valor (BRL)</th>
+              <th>Método de Pago</th>
+              <th>Status</th>
+              <th>Data Registro</th>
+            </tr>
+          </thead>
+          <tbody id="tablePaymentsBody">
+            <tr>
+              <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 3rem;">
+                Carregando histórico de pagamentos...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- ABA 3: DEPLOY & BANCO -->
+    <!-- ===================================================================== -->
+    <section class="view-section" id="viewDeploy" style="display: none;">
+      <div class="view-header">
+        <div>
+          <h2><span>⚙️</span> Deploy e Sincronização do Servidor</h2>
+          <p>Execute migrações estruturais do banco ou envie atualizações de código para homologação.</p>
+        </div>
+      </div>
+
+      <div class="deploy-controls-grid">
+        <div class="glass-panel deploy-action-card">
+          <h3>🔮 Migrações de Banco de Dados</h3>
+          <p>Roda a verificação de integridade estrutural das tabelas e migrações (incluindo seedings).</p>
+          <button type="button" class="btn-magic" id="btnRunMigrations" style="margin-top: 1rem;">
+            <span>🚀</span> Rodar db_installer.php
+          </button>
+        </div>
+
+        <div class="glass-panel deploy-action-card">
+          <h3>⚡ Deploy para Homologação</h3>
+          <p>Dispara o script local PowerShell para atualizar os arquivos do site no FTP de homologação.</p>
+          <button type="button" class="btn-magic" id="btnRunDeploy" style="margin-top: 1rem; background: linear-gradient(135deg, var(--key-copper), var(--accent-purple)); color: #fff; box-shadow: 0 0 15px var(--key-copper-glow);">
+            <span>📤</span> Iniciar Deploy HML
+          </button>
+        </div>
+      </div>
+
+      <!-- Terminal Output Box -->
+      <div class="glass-panel console-card" style="margin-top: 1.5rem; width: 100%;">
+        <div class="console-header">
+          <span>💻 Console de Saída do Sistema</span>
+          <button type="button" class="btn-icon" id="btnClearConsole" title="Limpar Console" style="width: 24px; height: 24px; font-size: 0.75rem;">🧹</button>
+        </div>
+        <pre class="console-body" id="consoleOutput">Console pronto para execução de tarefas...</pre>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: EDITAR CONTA E PLANO -->
+  <!-- ===================================================================== -->
+  <div class="modal-backdrop" id="modalEditUser" role="dialog" aria-modal="true">
+    <div class="modal-container" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3><span>📝</span> Editar Conta e Assinatura</h3>
+        <button type="button" class="modal-close" aria-label="Fechar">&times;</button>
+      </div>
+
+      <form id="formEditUser">
+        <input type="hidden" id="editUserId">
+
+        <div class="form-group">
+          <label for="editUsername">Nome de Usuário (Login)</label>
+          <input type="text" id="editUsername" class="form-input" required>
+        </div>
+
+        <div class="form-group" style="margin-top: 0.75rem;">
+          <label for="editEmail">E-mail de Contato</label>
+          <input type="email" id="editEmail" class="form-input" required>
+        </div>
+
+        <div class="form-row" style="margin-top: 0.75rem;">
+          <div class="form-group">
+            <label for="editRole">Permissão de Acesso</label>
+            <select id="editRole" class="form-select" required>
+              <option value="user">Cliente (Usuário Comum)</option>
+              <option value="admin">Administrador (Controle Total)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="editPlan">Plano Associado</label>
+            <select id="editPlan" class="form-select" required>
+              <option value="explorer">Explorer (Grátis)</option>
+              <option value="creator">Creator (R$ 49/mês)</option>
+              <option value="master">Master (R$ 119/mês)</option>
+              <option value="legend">Legend (R$ 199/mês)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-top: 0.75rem;">
+          <div class="form-group">
+            <label for="editPlanStatus">Status do Plano</label>
+            <select id="editPlanStatus" class="form-select" required>
+              <option value="active">Ativo</option>
+              <option value="suspended">Suspenso</option>
+              <option value="expired">Expirado</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="editPlanExpires">Data de Expiração</label>
+            <input type="datetime-local" id="editPlanExpires" class="form-input">
+            <span style="font-size: 0.7rem; color: var(--text-muted);">Deixe em branco para acesso permanente.</span>
+          </div>
+        </div>
+
+        <div class="modal-actions" style="margin-top: 1.5rem; justify-content: space-between;">
+          <button type="button" class="btn-secondary" id="btnDeleteUserPhysical" style="background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: #fca5a5;">
+            🗑️ Excluir Conta
+          </button>
+          <div style="display: flex; gap: 0.5rem;">
+            <button type="button" class="btn-secondary btn-modal-cancel">Cancelar</button>
+            <button type="submit" class="btn-magic">Salvar Alterações</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: REDEFINIR SENHA -->
+  <!-- ===================================================================== -->
+  <div class="modal-backdrop" id="modalResetPassword" role="dialog" aria-modal="true">
+    <div class="modal-container" style="max-width: 450px;">
+      <div class="modal-header">
+        <h3><span>🔑</span> Redefinir Senha do Cliente</h3>
+        <button type="button" class="modal-close" aria-label="Fechar">&times;</button>
+      </div>
+
+      <form id="formResetPassword">
+        <input type="hidden" id="resetPwdUserId">
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;" id="resetPwdUsernameText">
+          Defina uma nova senha para o usuário.
+        </p>
+
+        <div class="form-group">
+          <label for="newPasswordInput">Nova Senha</label>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="newPasswordInput" class="form-input" style="flex: 1;" required minlength="4">
+            <button type="button" class="btn-secondary" id="btnGeneratePwd" style="padding: 10px 14px;">Gerar</button>
+          </div>
+        </div>
+
+        <div class="modal-actions" style="margin-top: 1.5rem;">
+          <button type="button" class="btn-secondary btn-modal-cancel">Cancelar</button>
+          <button type="submit" class="btn-magic">Atualizar Senha</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: REGISTRAR PAGAMENTO MANUAL -->
+  <!-- ===================================================================== -->
+  <div class="modal-backdrop" id="modalAddPayment" role="dialog" aria-modal="true">
+    <div class="modal-container" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3><span>💳</span> Registrar Transação Financeira</h3>
+        <button type="button" class="modal-close" aria-label="Fechar">&times;</button>
+      </div>
+
+      <form id="formAddPayment">
+        <div class="form-group">
+          <label for="payUserId">Selecione o Cliente *</label>
+          <select id="payUserId" class="form-select" required>
+            <option value="">Carregando clientes...</option>
+          </select>
+        </div>
+
+        <div class="form-row" style="margin-top: 0.75rem;">
+          <div class="form-group">
+            <label for="payPlan">Plano Correspondente *</label>
+            <select id="payPlan" class="form-select" required>
+              <option value="creator">Creator (R$ 49/mês)</option>
+              <option value="master">Master (R$ 119/mês)</option>
+              <option value="legend">Legend (R$ 199/mês)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="payAmount">Valor da Transação (R$) *</label>
+            <input type="number" id="payAmount" class="form-input" value="49.00" step="0.01" required>
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-top: 0.75rem;">
+          <div class="form-group">
+            <label for="payMethod">Método de Pagamento</label>
+            <select id="payMethod" class="form-select" required>
+              <option value="pix">Pix (Transferência)</option>
+              <option value="credit_card">Cartão de Crédito</option>
+              <option value="boleto">Boleto Bancário</option>
+              <option value="manual">Manual / Cortesia</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="payDuration">Duração do Acesso (Dias)</label>
+            <input type="number" id="payDuration" class="form-input" value="30" required>
+            <span style="font-size: 0.7rem; color: var(--text-muted);">Use 0 para vitalício.</span>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 0.75rem;">
+          <label for="payTransId">Código de Autenticação / Transaction ID</label>
+          <input type="text" id="payTransId" class="form-input" placeholder="Gerado automaticamente se deixado em branco">
+        </div>
+
+        <div class="modal-actions" style="margin-top: 1.5rem;">
+          <button type="button" class="btn-secondary btn-modal-cancel">Cancelar</button>
+          <button type="submit" class="btn-magic">Registrar e Ativar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- BARRA DE AÇÕES EM LOTE (BATCH ACTIONS) -->
+  <!-- ===================================================================== -->
+  <div class="batch-actions-bar glass-panel" id="batchActionsBar">
+    <span class="batch-selected-count"><span id="batchCountText">0</span> selecionados</span>
+    <div class="batch-buttons">
+      <button type="button" class="btn-secondary btn-sm" id="btnBatchRestore" style="background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.3); color: #a7f3d0; display: none;">
+        <span>🔄</span> Restaurar em Lote
+      </button>
+      <button type="button" class="btn-magic btn-sm" id="btnBatchEdit" style="box-shadow: none;">
+        <span>📝</span> Editar em Lote
+      </button>
+      <button type="button" class="btn-secondary btn-sm" id="btnBatchDelete" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #fca5a5;">
+        <span>🗑️</span> Excluir em Lote
+      </button>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: EDITAR EM LOTE -->
+  <!-- ===================================================================== -->
+  <div class="modal-backdrop" id="modalBatchEdit" role="dialog" aria-modal="true">
+    <div class="modal-container" style="max-width: 450px;">
+      <div class="modal-header">
+        <h3><span>📝</span> Editar Contas em Lote</h3>
+        <button type="button" class="modal-close" aria-label="Fechar">&times;</button>
+      </div>
+
+      <form id="formBatchEdit">
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+          Altere as configurações de acesso de <strong id="batchUsersCountText">0</strong> usuários selecionados:
+        </p>
+
+        <div class="form-group">
+          <label for="batchPlan">Alterar Plano</label>
+          <select id="batchPlan" class="form-select">
+            <option value="">-- Não alterar --</option>
+            <option value="explorer">Explorer (Grátis)</option>
+            <option value="creator">Creator (R$ 49/mês)</option>
+            <option value="master">Master (R$ 119/mês)</option>
+            <option value="legend">Legend (R$ 199/mês)</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-top: 0.75rem;">
+          <label for="batchStatus">Alterar Status</label>
+          <select id="batchStatus" class="form-select">
+            <option value="">-- Não alterar --</option>
+            <option value="active">Ativo</option>
+            <option value="suspended">Suspenso</option>
+            <option value="expired">Expirado</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-top: 0.75rem;">
+          <label for="batchRole">Alterar Nível de Acesso</label>
+          <select id="batchRole" class="form-select">
+            <option value="">-- Não alterar --</option>
+            <option value="user">Cliente (Usuário Comum)</option>
+            <option value="admin">Administrador (Controle Total)</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-top: 0.75rem;">
+          <label for="batchExpiresOption">Alterar Expiração de Acesso</label>
+          <select id="batchExpiresOption" class="form-select">
+            <option value="keep">-- Manter expiração original --</option>
+            <option value="permanent">Remover expiração (Acesso Permanente)</option>
+            <option value="set">Definir nova data de expiração</option>
+          </select>
+          <input type="datetime-local" id="batchExpiresAt" class="form-input" style="display: none; margin-top: 0.5rem;">
+        </div>
+
+        <div class="modal-actions" style="margin-top: 1.5rem;">
+          <button type="button" class="btn-secondary btn-modal-cancel">Cancelar</button>
+          <button type="submit" class="btn-magic">Salvar em Lote</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Alerts Container -->
+  <div class="toast-container"></div>
+
+  <!-- JS Scripts -->
+  <script src="js/admin.js"></script>
+</body>
+</html>

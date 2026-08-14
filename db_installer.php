@@ -100,73 +100,73 @@ try {
 
         $seed_projects = [
             [
-                'id' => 'proj_360_studio',
+                'id' => 'proj_retroverse_vr',
                 'type' => 'project',
-                'title' => '360 Studio',
-                'description' => 'Plataforma imersiva de passeios virtuais 360°, gerenciamento de hotspots, plantas baixas e painel administrativo.',
+                'title' => 'RetroVerse VR',
+                'description' => 'Plataforma imersiva de emuladores retrô 3D, salas virtuais multiplayer e painel de controle do OASIS.',
                 'status' => 'homologacao',
                 'priority' => 'alta',
                 'impact' => 'alto',
                 'urgency' => 'alta',
-                'tags_json' => json_encode(['Passeio Virtual', '360', 'Hostinger', 'PHP/JS']),
+                'tags_json' => json_encode(['Retro', 'VR', 'OASIS', 'Three.js']),
                 'context_links_json' => json_encode([
-                    'driveFolder' => 'https://drive.google.com/drive/folders/360-studio',
-                    'githubRepo' => 'https://github.com/Mariozinhocs/360-studio.git',
-                    'liveUrl' => 'https://hubdigital360.com'
+                    'driveFolder' => 'https://drive.google.com/drive/folders/retroverse-vr',
+                    'githubRepo' => 'https://github.com/Mariozinhocs/retroverse-vr.git',
+                    'liveUrl' => 'https://retroverse.oasis'
                 ]),
                 'tasks_json' => json_encode([
-                    ['id' => 't_360_1', 'title' => 'Integração e limpeza de arquivos órfãos (clean_orphans.php)', 'category' => 'Backend', 'completed' => true, 'validatedAt' => '2026-08-10T14:30:00Z'],
-                    ['id' => 't_360_2', 'title' => 'Refatoração da autenticação e admin_helper.php', 'category' => 'Segurança', 'completed' => true, 'validatedAt' => '2026-08-11T18:00:00Z'],
-                    ['id' => 't_360_3', 'title' => 'Homologação do visualizador 360 e transição de cenas', 'category' => 'Frontend', 'completed' => true, 'validatedAt' => '2026-08-12T10:15:00Z'],
-                    ['id' => 't_360_4', 'title' => 'Validação final de upload no Hostinger & Teste de Carga', 'category' => 'Deploy', 'completed' => false],
-                    ['id' => 't_360_5', 'title' => 'Aceite de usabilidade em dispositivos móveis', 'category' => 'QA', 'completed' => false]
+                    ['id' => 't_360_1', 'title' => 'Integração e limpeza do emulador NES (clean_emu.php)', 'category' => 'Backend', 'completed' => true, 'validatedAt' => '2026-08-10T14:30:00Z'],
+                    ['id' => 't_360_2', 'title' => 'Refatoração dos shaders WebGL e helper_render.php', 'category' => 'Segurança', 'completed' => true, 'validatedAt' => '2026-08-11T18:00:00Z'],
+                    ['id' => 't_360_3', 'title' => 'Homologação do lobby multiplayer e transição de salas', 'category' => 'Frontend', 'completed' => true, 'validatedAt' => '2026-08-12T10:15:00Z'],
+                    ['id' => 't_360_4', 'title' => 'Validação final de carregamento de ROMs & Assets', 'category' => 'Deploy', 'completed' => false],
+                    ['id' => 't_360_5', 'title' => 'Aceite de usabilidade com óculos de realidade virtual', 'category' => 'QA', 'completed' => false]
                 ]),
                 'validation_history_json' => json_encode([
                     ['timestamp' => '2026-08-12T23:00:00Z', 'action' => 'Ambiente HML Configurado', 'taskTitle' => 'Homologação', 'taskId' => 'init']
                 ])
             ],
             [
-                'id' => 'proj_anorak_core',
+                'id' => 'proj_oasis_engine',
                 'type' => 'project',
-                'title' => 'Anorak - OASIS Project Hub',
-                'description' => 'Sistema inteligente de gestão modular de projetos em homologação, repositório de ideias e matriz de decisão.',
+                'title' => 'OASIS Engine',
+                'description' => 'Motor inteligente de processamento de voz com IA, alocação dinâmica de recursos e lógica da matriz de priorização.',
                 'status' => 'homologacao',
                 'priority' => 'alta',
                 'impact' => 'alto',
                 'urgency' => 'alta',
-                'tags_json' => json_encode(['Gestão', 'Incubadora', 'OASIS', 'Ready Player One']),
+                'tags_json' => json_encode(['Gestão', 'Incubadora', 'OASIS', 'IA']),
                 'context_links_json' => json_encode([
-                    'driveFolder' => 'https://drive.google.com/drive/folders/anorak',
-                    'githubRepo' => 'https://github.com/Mariozinhocs/Anorak.git',
-                    'liveUrl' => 'https://anorak.hubdigital360.com'
+                    'driveFolder' => 'https://drive.google.com/drive/folders/oasis-engine',
+                    'githubRepo' => 'https://github.com/Mariozinhocs/oasis-engine.git',
+                    'liveUrl' => 'https://engine.oasis'
                 ]),
                 'tasks_json' => json_encode([
                     ['id' => 't_ano_1', 'title' => 'Arquitetura de dados orientada a Entidades e Atributos', 'category' => 'Arquitetura', 'completed' => true, 'validatedAt' => '2026-08-12T23:00:00Z'],
                     ['id' => 't_ano_2', 'title' => 'Dashboard Dual Mode: Operacional & Incubadora', 'category' => 'Frontend', 'completed' => true, 'validatedAt' => '2026-08-12T23:45:00Z'],
                     ['id' => 't_ano_3', 'title' => 'Checklists interativos com gatilhos e Chaves de Halliday', 'category' => 'Lógica', 'completed' => true, 'validatedAt' => '2026-08-12T23:50:00Z'],
-                    ['id' => 't_ano_4', 'title' => 'Captura de ideias por voz (Web Speech) e Matriz de Decisão', 'category' => 'Inteligência', 'completed' => false],
-                    ['id' => 't_ano_5', 'title' => 'Deploy no Hostinger (anorak.hubdigital360.com)', 'category' => 'Deploy', 'completed' => false]
+                    ['id' => 't_ano_4', 'title' => 'Integração da IA de processamento de áudio e Matriz de Decisão', 'category' => 'Inteligência', 'completed' => false],
+                    ['id' => 't_ano_5', 'title' => 'Deploy no Hostinger (engine.hubdigital360.com)', 'category' => 'Deploy', 'completed' => false]
                 ]),
                 'validation_history_json' => json_encode([])
             ],
             [
-                'id' => 'proj_hub_connect',
+                'id' => 'proj_synclink_api',
                 'type' => 'project',
-                'title' => 'Hub Digital Connect',
-                'description' => 'Módulo de automação de propostas, integrações com WhatsApp API e portal do cliente para serviços digitais.',
+                'title' => 'SyncLink API',
+                'description' => 'Módulo de automação de propostas, integrações seguras com APIs externas e canais de sincronização offline-first.',
                 'status' => 'homologacao',
                 'priority' => 'media',
                 'impact' => 'alto',
                 'urgency' => 'media',
-                'tags_json' => json_encode(['Automação', 'CRM', 'API']),
+                'tags_json' => json_encode(['Automação', 'Offline-First', 'API']),
                 'context_links_json' => json_encode([
-                    'driveFolder' => 'https://drive.google.com/drive/folders/hub-connect',
-                    'githubRepo' => 'https://github.com/Mariozinhocs/hub-connect.git',
+                    'driveFolder' => 'https://drive.google.com/drive/folders/synclink-api',
+                    'githubRepo' => 'https://github.com/Mariozinhocs/synclink-api.git',
                     'liveUrl' => ''
                 ]),
                 'tasks_json' => json_encode([
                     ['id' => 't_hub_1', 'title' => 'Estruturação do fluxo de propostas automáticas', 'category' => 'Planejamento', 'completed' => true, 'validatedAt' => '2026-08-05T11:00:00Z'],
-                    ['id' => 't_hub_2', 'title' => 'Validação de webhooks de pagamento', 'category' => 'Integração', 'completed' => false],
+                    ['id' => 't_hub_2', 'title' => 'Validação de assinaturas de Webhooks & Segurança', 'category' => 'Integração', 'completed' => false],
                     ['id' => 't_hub_3', 'title' => 'Testes de homologação com clientes beta', 'category' => 'Validação', 'completed' => false],
                     ['id' => 't_hub_4', 'title' => 'Geração de relatórios em tempo real', 'category' => 'Backend', 'completed' => false]
                 ]),
@@ -206,6 +206,20 @@ try {
 
     // Verificar e criar usuário admin inicial
     $users_table = $prefix . 'users';
+    try {
+        $count_users = (int) $pdo->query("SELECT COUNT(*) FROM `{$users_table}` WHERE username = 'admin'")->fetchColumn();
+        if ($count_users === 0) {
+            $admin_pass_hash = password_hash('anorak2026', PASSWORD_DEFAULT);
+            $stmt_admin = $pdo->prepare("
+                INSERT INTO `{$users_table}` (username, email, password_hash, role, plan, plan_status)
+                VALUES ('admin', 'admin@hubdigital360.com', :hash, 'admin', 'master', 'active')
+            ");
+            $stmt_admin->execute([':hash' => $admin_pass_hash]);
+            echo " [SEED] Usuário administrador padrão 'admin' criado com sucesso.\n";
+        }
+    } catch (Exception $e) {
+        echo " [ERROR] Falha ao verificar/criar usuário admin: " . $e->getMessage() . "\n";
+    }
     
     // Migração de colunas de assinatura/plano e recuperação de senha na tabela de usuários
     try {
@@ -234,8 +248,23 @@ try {
             $pdo->exec("ALTER TABLE `{$users_table}` ADD COLUMN password_reset_expires DATETIME DEFAULT NULL AFTER password_reset_token");
             echo " [MIGRATE] Coluna 'password_reset_expires' adicionada com sucesso na tabela users.\n";
         }
+
+        // Migração para novos recursos de governança: items e activity_logs
+        $items_table_mig = $prefix . 'items';
+        $col_assigned = $pdo->query("SHOW COLUMNS FROM `{$items_table_mig}` LIKE 'assigned_to'");
+        if ($col_assigned->rowCount() === 0) {
+            $pdo->exec("ALTER TABLE `{$items_table_mig}` ADD COLUMN assigned_to VARCHAR(100) NULL AFTER urgency");
+            echo " [MIGRATE] Coluna 'assigned_to' adicionada com sucesso na tabela items.\n";
+        }
+
+        $activity_logs_table_mig = $prefix . 'activity_logs';
+        $col_username = $pdo->query("SHOW COLUMNS FROM `{$activity_logs_table_mig}` LIKE 'username'");
+        if ($col_username->rowCount() === 0) {
+            $pdo->exec("ALTER TABLE `{$activity_logs_table_mig}` ADD COLUMN username VARCHAR(100) NULL AFTER item_id");
+            echo " [MIGRATE] Coluna 'username' adicionada com sucesso na tabela activity_logs.\n";
+        }
     } catch (Exception $e) {
-        // Ignora se tabela ainda não existia ou erro de sintaxe
+        echo " [MIGRATE ERROR] Erro ao aplicar migrações de colunas: " . $e->getMessage() . "\n";
     }
 
     echo "<span class='info'>[AUTH] Verificando e sincronizando credenciais padrão...</span>\n";

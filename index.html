@@ -117,6 +117,113 @@
     </div>
   </section>
 
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- SEÇÃO INTERATIVA: SIMULADOR DE INTERFACE -->
+  <!-- ========================================================================= -->
+  <section class="simulator-section" id="simulador" style="padding: 5rem 2rem; background: rgba(5, 8, 17, 0.4); border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle);">
+    <div class="section-header" style="text-align: center; margin-bottom: 3rem;">
+      <span class="section-tag" style="color: var(--primary-cyan); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: bold;">Veja o Anorak em Ação</span>
+      <h2 class="section-title" style="font-size: 2rem; color: #fff; margin-top: 0.5rem; margin-bottom: 1rem;">Experimente o Painel de Homologação</h2>
+      <p style="color: var(--text-secondary); max-width: 700px; margin: 0 auto; line-height: 1.6; font-size: 0.95rem;">
+        Interaja com o simulador abaixo para entender o fluxo de trabalho e ver como as chaves de maturidade e os conselhos do mago reagem ao seu progresso.
+      </p>
+    </div>
+
+    <div class="simulator-layout" style="display: flex; flex-wrap: wrap; gap: 2rem; max-width: 1200px; margin: 0 auto;">
+      <!-- Painel do Simulador (Card Mockup) -->
+      <div class="simulator-card glass-panel" style="flex: 1.5; padding: 1.5rem; text-align: left; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-glass);">
+        <div class="simulator-card-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem;">
+          <div>
+            <h3 class="simulator-project-title" style="margin: 0; font-size: 1.25rem; color: #fff;">RetroVerse VR (Demonstração)</h3>
+            <p class="simulator-project-desc" style="margin: 0; font-size: 0.85rem; color: var(--text-secondary);">Renderizador de Ambientes 3D e Emulação Multi-Core</p>
+          </div>
+          <!-- Chaves do Simulador -->
+          <div class="simulator-keys-box" style="display: flex; gap: 0.4rem; background: rgba(0,0,0,0.4); padding: 0.35rem 0.6rem; border-radius: var(--radius-full); border: 1px solid var(--border-subtle);">
+            <span class="sim-key-badge copper active" id="sim-key-copper" style="width:26px; height:26px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; background:rgba(245,158,11,0.2); border:1px solid var(--key-copper); box-shadow:0 0 12px var(--key-copper-glow); color:var(--key-copper);" title="Chave de Cobre: Planejamento (Conquistada)">🗝️</span>
+            <span class="sim-key-badge jade" id="sim-key-jade" style="width:26px; height:26px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; opacity:0.25; filter:grayscale(1); transition:all 0.3s;" title="Chave de Jade: Homologação Ativa">🗝️</span>
+            <span class="sim-key-badge crystal" id="sim-key-crystal" style="width:26px; height:26px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; opacity:0.25; filter:grayscale(1); transition:all 0.3s;" title="Chave de Cristal: Produção">💎</span>
+          </div>
+        </div>
+
+        <!-- Barra de Progresso do Simulador -->
+        <div class="sim-progress-wrap" style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem;">
+          <div class="sim-progress-labels" style="display: flex; justify-content: space-between; font-size: 0.775rem; color: var(--text-muted);">
+            <span>Progresso da Homologação</span>
+            <span id="sim-progress-pct" class="mono">25%</span>
+          </div>
+          <div class="sim-progress-bar-bg" style="height: 7px; background: rgba(255,255,255,0.07); border-radius: var(--radius-full); overflow: hidden; position: relative;">
+            <div class="sim-progress-bar-fill" id="sim-progress-fill" style="width: 25%; height: 100%; background: linear-gradient(90deg, var(--primary-cyan), var(--primary-blue)); border-radius: var(--radius-full); box-shadow: 0 0 10px var(--primary-glow); transition: width 0.4s ease;"></div>
+          </div>
+        </div>
+
+        <!-- Checklist do Simulador -->
+        <div class="sim-checklist" style="display: flex; flex-direction: column; gap: 0.6rem; background: rgba(5,8,17,0.45); padding: 1rem; border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.04);">
+          <div class="sim-checklist-title" style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); font-weight: bold; margin-bottom: 0.25rem;">Etapas de Validação</div>
+          
+          <div class="sim-check-item done" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.65rem; background: rgba(13,20,36,0.5); border-radius: var(--radius-sm); opacity: 0.75;">
+            <div class="sim-custom-checkbox" style="width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid var(--key-jade); background: var(--key-jade); color: #050811; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; flex-shrink: 0;">✓</div>
+            <div class="sim-check-info" style="display: flex; flex-direction: column; flex: 1;">
+              <span class="sim-check-title" style="font-size: 0.85rem; font-weight: 500; color: var(--text-primary); text-decoration: line-through; color: var(--text-muted);">Configuração inicial de banco HML</span>
+              <span class="sim-check-desc" style="font-size: 0.7rem; color: var(--text-muted);">Validado por @mario.henrique</span>
+            </div>
+          </div>
+
+          <div class="sim-check-item" onclick="window.anorakSimulator.toggleStep(1, this)" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.65rem; background: rgba(13,20,36,0.5); border-radius: var(--radius-sm); border: 1px solid transparent; cursor: pointer; transition: all 0.2s;">
+            <div class="sim-custom-checkbox" id="sim-cb-1" style="width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; flex-shrink: 0; color: #050811;"></div>
+            <div class="sim-check-info" style="display: flex; flex-direction: column; flex: 1;">
+              <span class="sim-check-title" style="font-size: 0.85rem; font-weight: 500; color: var(--text-primary);">Validação do Renderizador e Ambientes VR</span>
+              <span class="sim-check-desc" style="font-size: 0.7rem; color: var(--text-muted);">Pendente &bull; Clique para validar</span>
+            </div>
+          </div>
+
+          <div class="sim-check-item" onclick="window.anorakSimulator.toggleStep(2, this)" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.65rem; background: rgba(13,20,36,0.5); border-radius: var(--radius-sm); border: 1px solid transparent; cursor: pointer; transition: all 0.2s;">
+            <div class="sim-custom-checkbox" id="sim-cb-2" style="width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; flex-shrink: 0; color: #050811;"></div>
+            <div class="sim-check-info" style="display: flex; flex-direction: column; flex: 1;">
+              <span class="sim-check-title" style="font-size: 0.85rem; font-weight: 500; color: var(--text-primary);">Testes de Carregamento de ROMs &amp; Assets</span>
+              <span class="sim-check-desc" style="font-size: 0.7rem; color: var(--text-muted);">Pendente &bull; Clique para validar</span>
+            </div>
+          </div>
+
+          <div class="sim-check-item" onclick="window.anorakSimulator.toggleStep(3, this)" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.65rem; background: rgba(13,20,36,0.5); border-radius: var(--radius-sm); border: 1px solid transparent; cursor: pointer; transition: all 0.2s;">
+            <div class="sim-custom-checkbox" id="sim-cb-3" style="width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; flex-shrink: 0; color: #050811;"></div>
+            <div class="sim-check-info" style="display: flex; flex-direction: column; flex: 1;">
+              <span class="sim-check-title" style="font-size: 0.85rem; font-weight: 500; color: var(--text-primary);">Homologação final e Termo de Aceite</span>
+              <span class="sim-check-desc" style="font-size: 0.7rem; color: var(--text-muted);">Pendente &bull; Clique para validar</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conselheiro do Simulador -->
+      <div class="simulator-advisor glass-panel" style="flex: 1; padding: 1.5rem; text-align: left; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-glass); display: flex; flex-direction: column; justify-content: space-between; gap: 1.5rem;">
+        <div class="advisor-header" style="display: flex; align-items: center; gap: 0.75rem;">
+          <div class="avatar-halo" style="width: 44px; height: 44px; border-radius:50%; padding:2px; background: linear-gradient(135deg, var(--primary-cyan), var(--accent-purple)); box-shadow: 0 0 15px var(--primary-glow);">
+            <div class="avatar-placeholder" style="width:100%; height:100%; border-radius:50%; background:var(--bg-surface); display:flex; align-items:center; justify-content:center; font-size: 1.25rem;">🧙‍♂️</div>
+          </div>
+          <div>
+            <h3 style="font-size: 1.1rem; margin: 0; color: #fff;">Conselho do Mago Anorak</h3>
+            <span style="font-size: 0.75rem; color: var(--primary-cyan);">Motor de Decisão OASIS</span>
+          </div>
+        </div>
+        
+        <div class="advisor-quote-box" id="sim-advisor-quote" style="font-size: 1rem; line-height: 1.6; color: var(--text-highlight); font-style: italic; background: rgba(0, 242, 254, 0.05); padding: 1.25rem; border-radius: var(--radius-md); border-left: 3px solid var(--primary-cyan); min-height: 80px;">
+          "Para começar a homologação, valide a etapa 'Validação do Renderizador e Ambientes VR' clicando no item!"
+        </div>
+
+        <div class="sim-governance-preview" style="background: rgba(0,0,0,0.2); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.02);">
+          <h4 style="font-size: 0.75rem; color: var(--primary-cyan); text-transform: uppercase; margin: 0 0 0.25rem 0; letter-spacing: 0.05em;">🔒 Garantias de Governança</h4>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; line-height: 1.4;">
+            No Anorak completo, cada homologação de etapa gera um registro auditável em tempo real, vinculando autoria e guarda de evidências.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ========================================================================= -->
   <!-- SEÇÃO ELABORADA: MATRIZ DE PRIORIZAÇÃO HALLIDAY -->
   <!-- ========================================================================= -->
@@ -136,28 +243,28 @@
           <span class="quad-badge-tag q1-tag">🔥 Q1 &bull; Homologação Crítica</span>
           <h4 style="font-size: 1rem; color: #fff; margin-bottom: 0.25rem;">Alto Impacto &amp; Alta Urgência</h4>
           <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">Gargalos imediatos que travam a ida para Produção.</p>
-          <div class="quad-item-pill"><span>⚡</span> 360 Studio: Validação de Upload &amp; QA</div>
+          <div class="quad-item-pill"><span>⚡</span> RetroVerse VR: Motor de Render &amp; QA</div>
         </div>
 
         <div class="matrix-quad-card q2-border">
           <span class="quad-badge-tag q2-tag">💎 Q2 &bull; Inovação &amp; Chave de Cristal</span>
           <h4 style="font-size: 1rem; color: #fff; margin-bottom: 0.25rem;">Alto Impacto &amp; Estratégico</h4>
           <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">Recursos de alto valor que multiplicam a monetização.</p>
-          <div class="quad-item-pill"><span>🪄</span> Anorak: Captura de Ideias por Voz com IA</div>
+          <div class="quad-item-pill"><span>🪄</span> OASIS Assistant: Processamento de Voz &amp; IA</div>
         </div>
 
         <div class="matrix-quad-card q3-border">
           <span class="quad-badge-tag q3-tag">⚡ Q3 &bull; Refinamento Rápido</span>
           <h4 style="font-size: 1rem; color: #fff; margin-bottom: 0.25rem;">Média Prioridade &amp; Quick Wins</h4>
           <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">Pequenos ajustes de interface e micro-otimizações.</p>
-          <div class="quad-item-pill"><span>🔧</span> Hub Connect: Validação de Webhooks</div>
+          <div class="quad-item-pill"><span>🔧</span> SyncLink API: Validação de Webhooks</div>
         </div>
 
         <div class="matrix-quad-card q4-border">
           <span class="quad-badge-tag q4-tag">📦 Q4 &bull; Incubadora / Backlog</span>
           <h4 style="font-size: 1rem; color: #fff; margin-bottom: 0.25rem;">Baixa Urgência &amp; Ideação</h4>
           <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">Ideias salvas para o futuro sem sobrecarregar o foco atual.</p>
-          <div class="quad-item-pill"><span>💡</span> Portal do Cliente White-Label 360</div>
+          <div class="quad-item-pill"><span>💡</span> Ready Player Hub: Portal White-Label</div>
         </div>
       </div>
 
@@ -224,6 +331,48 @@
   </section>
 
   <!-- ========================================================================= -->
+  <!-- SEÇÃO DE GOVERNANÇA, SEGURANÇA E AUDITORIA -->
+  <!-- ========================================================================= -->
+  <section class="governance-section" id="governanca" style="background: rgba(13, 20, 36, 0.4); border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle); padding: 5rem 2rem;">
+    <div class="section-header" style="text-align: center; margin-bottom: 3rem;">
+      <span class="section-tag" style="color: var(--primary-cyan); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: bold;">Segurança &amp; Conformidade</span>
+      <h2 class="section-title" style="font-size: 2rem; color: #fff; margin-top: 0.5rem; margin-bottom: 1rem;">Conformidade Rígida para Projetos Governamentais</h2>
+      <p style="color: var(--text-secondary); max-width: 700px; margin: 0 auto; line-height: 1.6; font-size: 0.95rem;">
+        Anorak fornece infraestrutura de auditoria completa, garantindo transparência técnica exigida em projetos públicos e institucionais.
+      </p>
+    </div>
+
+    <div class="grid-3-col" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1200px; margin: 0 auto;">
+      <!-- Card 1 -->
+      <div class="feature-card" style="padding: 1.75rem; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); text-align: left;">
+        <div class="feature-icon-box" style="width: 48px; height: 48px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: rgba(0, 242, 254, 0.1); color: var(--primary-cyan); border: 1px solid rgba(0, 242, 254, 0.2); margin-bottom: 1.25rem;">📜</div>
+        <h3 style="font-size: 1.2rem; color: #fff; margin-bottom: 0.75rem;">Trilha de Auditoria Estrita</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">
+          Logs detalhados que registram quem validou cada etapa, quando ocorreu e quais alterações foram efetuadas na trilha de homologação.
+        </p>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="feature-card" style="padding: 1.75rem; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); text-align: left;">
+        <div class="feature-icon-box" style="width: 48px; height: 48px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: rgba(16, 185, 129, 0.1); color: var(--key-jade); border: 1px solid rgba(16, 185, 129, 0.2); margin-bottom: 1.25rem;">📎</div>
+        <h3 style="font-size: 1.2rem; color: #fff; margin-bottom: 0.75rem;">Anexo de Evidências Físicas</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">
+          Suporte a upload de PDFs, imagens de aceites ou links de repositórios diretamente vinculados às tarefas correspondentes.
+        </p>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="feature-card" style="padding: 1.75rem; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); text-align: left;">
+        <div class="feature-icon-box" style="width: 48px; height: 48px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: rgba(56, 189, 248, 0.1); color: var(--key-crystal); border: 1px solid rgba(56, 189, 248, 0.2); margin-bottom: 1.25rem;">🖨️</div>
+        <h3 style="font-size: 1.2rem; color: #fff; margin-bottom: 0.75rem;">Relatórios PDF para Assinatura</h3>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">
+          Exportação limpa e profissional de relatórios em 1 clique, ideal para aprovações em reuniões de comitê ou auditorias externas.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
   <!-- SEÇÃO DE PLANOS COMERCIAIS / MONETIZAÇÃO SAAS -->
   <!-- ========================================================================= -->
   <section class="pricing-section" id="planos">
@@ -253,6 +402,7 @@
           <li><span class="check">✓</span> Incubadora com até 10 ideias</li>
           <li><span class="check">✓</span> Matriz Halliday básica</li>
           <li><span class="check">✓</span> Armazenamento Offline-First</li>
+          <li style="opacity: 0.5; text-decoration: line-through;"><span class="check">✗</span> Sem auditoria ou anexos</li>
         </ul>
 
         <a href="login.html" class="btn-pricing btn-pricing-secondary">Começar Grátis ➔</a>
@@ -275,8 +425,8 @@
           <li><span class="check">✓</span> <strong>Frentes Ilimitadas</strong> de Projetos</li>
           <li><span class="check">✓</span> <strong>Captura por Voz com IA</strong> Ilimitada</li>
           <li><span class="check">✓</span> Sincronização em Nuvem (MySQL + GitHub)</li>
-          <li><span class="check">✓</span> Matriz Halliday com Heurística Avançada</li>
-          <li><span class="check">✓</span> Exportação e Backup JSON em 1 clique</li>
+          <li><span class="check">✓</span> Atribuição de Responsável Técnico</li>
+          <li><span class="check">✓</span> Anexos de Evidências (Links Úteis)</li>
         </ul>
 
         <a href="login.html" class="btn-pricing btn-pricing-primary">Acessar Plano Creator ➔</a>
@@ -296,10 +446,10 @@
 
         <ul class="pricing-features">
           <li><span class="check">✓</span> Tudo do plano Creator</li>
-          <li><span class="check">✓</span> Múltiplos Ambientes (DEV, HML, STG, PROD)</li>
-          <li><span class="check">✓</span> Pipelines Automatizadas de Deploy FTP/SSH</li>
-          <li><span class="check">✓</span> Acesso completo à API RESTful</li>
-          <li><span class="check">✓</span> Suporte Prioritário Direto</li>
+          <li><span class="check">✓</span> <strong>Trilha de Auditoria Completa</strong></li>
+          <li><span class="check">✓</span> Upload de Evidências no Servidor (10MB)</li>
+          <li><span class="check">✓</span> Relatórios em PDF para Assinatura</li>
+          <li><span class="check">✓</span> Múltiplos Ambientes (DEV, HML, PROD)</li>
         </ul>
 
         <a href="login.html" class="btn-pricing btn-pricing-secondary">Contratar Master ➔</a>
@@ -329,5 +479,81 @@
   <footer class="home-footer">
     <p>&copy; 2026 Anorak OASIS Project Hub &bull; Hub Digital 360 &bull; Todos os direitos reservados.</p>
   </footer>
+
+  <!-- Simulator Interactivity Script -->
+  <script>
+    class AnorakSimulator {
+      constructor() {
+        this.steps = [true, false, false, false];
+        this.quotes = [
+          "Para começar a homologação, valide a etapa 'Validação do Renderizador e Ambientes VR' clicando no item!",
+          "Fantástico! Você conquistou a Chave de Jade 🗝️. Agora, realize os testes de carregamento de ROMs e assets.",
+          "Quase pronto! Faça a homologação final e o Termo de Aceite.",
+          "Incrível! Chave de Cristal conquistada 💎. O projeto está pronto para ir ao ar com governança completa!"
+        ];
+      }
+
+      toggleStep(index, element) {
+        this.steps[index] = !this.steps[index];
+        
+        const cb = document.getElementById('sim-cb-' + index);
+        if (cb) {
+          cb.textContent = this.steps[index] ? '✓' : '';
+          cb.style.background = this.steps[index] ? 'var(--key-jade)' : 'transparent';
+          cb.style.borderColor = this.steps[index] ? 'var(--key-jade)' : 'var(--text-muted)';
+          element.classList.toggle('done', this.steps[index]);
+        }
+
+        // Calcula porcentagem e chaves
+        const completed = this.steps.filter(Boolean).length;
+        const pct = Math.round((completed / 4) * 100);
+        
+        document.getElementById('sim-progress-pct').textContent = pct + '%';
+        document.getElementById('sim-progress-fill').style.width = pct + '%';
+
+        // Atualiza chaves
+        const keyJade = document.getElementById('sim-key-jade');
+        const keyCrystal = document.getElementById('sim-key-crystal');
+
+        if (pct >= 50) {
+          keyJade.style.opacity = '1';
+          keyJade.style.filter = 'grayscale(0)';
+          keyJade.style.background = 'rgba(16, 185, 129, 0.2)';
+          keyJade.style.border = '1px solid var(--key-jade)';
+          keyJade.style.boxShadow = '0 0 12px var(--key-jade-glow)';
+        } else {
+          keyJade.style.opacity = '0.25';
+          keyJade.style.filter = 'grayscale(1)';
+          keyJade.style.background = 'transparent';
+          keyJade.style.border = 'none';
+          keyJade.style.boxShadow = 'none';
+        }
+
+        if (pct === 100) {
+          keyCrystal.style.opacity = '1';
+          keyCrystal.style.filter = 'grayscale(0)';
+          keyCrystal.style.background = 'rgba(56, 189, 248, 0.25)';
+          keyCrystal.style.border = '1px solid var(--key-crystal)';
+          keyCrystal.style.boxShadow = '0 0 15px var(--key-crystal-glow)';
+        } else {
+          keyCrystal.style.opacity = '0.25';
+          keyCrystal.style.filter = 'grayscale(1)';
+          keyCrystal.style.background = 'transparent';
+          keyCrystal.style.border = 'none';
+          keyCrystal.style.boxShadow = 'none';
+        }
+
+        // Atualiza conselho do mago
+        let quoteIndex = 0;
+        if (this.steps[1] && !this.steps[2]) quoteIndex = 1;
+        else if (this.steps[1] && this.steps[2] && !this.steps[3]) quoteIndex = 2;
+        else if (this.steps[1] && this.steps[2] && this.steps[3]) quoteIndex = 3;
+        else quoteIndex = 0;
+
+        document.getElementById('sim-advisor-quote').textContent = '"' + this.quotes[quoteIndex] + '"';
+      }
+    }
+    window.anorakSimulator = new AnorakSimulator();
+  </script>
 </body>
 </html>

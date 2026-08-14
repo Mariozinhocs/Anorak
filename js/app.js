@@ -26,6 +26,7 @@ class AnorakApp {
       return;
     }
 
+    await this.loadUsersList();
     await db.init();
     this.initAudioContext();
     this.setupEventListeners();
@@ -40,8 +41,14 @@ class AnorakApp {
       if (res.ok) {
         const data = await res.json();
         if (data.authenticated && data.user) {
+          this.currentUser = data.user;
           const userEl = document.getElementById('currentUserName');
           if (userEl) userEl.textContent = `👤 ${data.user.username}`;
+          
+          const adminLink = document.getElementById('btnAdminLink');
+          if (adminLink && data.user.role === 'admin') {
+            adminLink.style.display = 'inline-flex';
+          }
           return true;
         }
       }
@@ -49,6 +56,22 @@ class AnorakApp {
       console.warn('Erro ao checar auth:', e);
     }
     return false;
+  }
+
+  async loadUsersList() {
+    try {
+      const res = await fetch('api/users/list.php');
+      if (res.ok) {
+        const result = await res.json();
+        if (result.status === 'success' && Array.isArray(result.data)) {
+          this.usersList = result.data.map(u => u.username);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('Erro ao listar usuários:', e);
+    }
+    this.usersList = ['admin', 'mario.henrique', 'convidado'];
   }
 
   initAudioContext() {
@@ -151,6 +174,15 @@ class AnorakApp {
       });
     }
 
+    // Form Edit Project Submit
+    const formEditProj = document.getElementById('formEditProject');
+    if (formEditProj) {
+      formEditProj.addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.saveEditProject();
+      });
+    }
+
     // Backup Export & Import
     const btnExport = document.getElementById('btnExportBackup');
     if (btnExport) btnExport.addEventListener('click', () => db.exportDataJSON());
@@ -180,6 +212,35 @@ class AnorakApp {
           } catch (e) {}
           window.location.replace('login.html');
         }
+      });
+    }
+
+    // Alternar campos no modal de evidências
+    const radioFile = document.querySelector('input[name="evidenceType"][value="file"]');
+    const radioLink = document.querySelector('input[name="evidenceType"][value="link"]');
+    const fileGroup = document.getElementById('evidenceFileGroup');
+    const linkGroup = document.getElementById('evidenceLinkGroup');
+
+    if (radioFile && radioLink && fileGroup && linkGroup) {
+      document.querySelectorAll('input[name="evidenceType"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+          if (e.target.value === 'file') {
+            fileGroup.style.display = 'block';
+            linkGroup.style.display = 'none';
+          } else {
+            fileGroup.style.display = 'none';
+            linkGroup.style.display = 'block';
+          }
+        });
+      });
+    }
+
+    // Submit do formulário de evidência
+    const formEv = document.getElementById('formEvidence');
+    if (formEv) {
+      formEv.addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.saveEvidence();
       });
     }
 
@@ -269,14 +330,30 @@ class AnorakApp {
             </div>
           </div>
 
-          <!-- Barra de Progresso de Homologação -->
+          <!-- Linha de Responsável (Governança) -->
+          <div class="project-responsible-row">
+            <span>Responsável:</span>
+            <select class="responsible-select" onchange="window.anorakApp.handleSetAssignee('${proj.id}', this.value)">
+              <option value="" ${!proj.assignedTo ? 'selected' : ''}>Sem responsável</option>
+              ${(this.usersList || []).map(u => `
+                <option value="${u}" ${proj.assignedTo === u ? 'selected' : ''}>@${u}</option>
+              `).join('')}
+            </select>
+          </div>
+
+          <!-- Barra de Progresso de Homologação com Mini Gauge -->
           <div class="phase-progress-wrap">
-            <div class="progress-labels">
-              <span>Status: <strong style="color: var(--primary-cyan); text-transform: uppercase;">${proj.status}</strong></span>
-              <span class="mono">${evo.completed}/${evo.total} etapas (${evo.percentage}%)</span>
+            <div class="gauge-holder" title="Progresso da Fase: ${evo.percentage}%">
+              ${this.renderMiniGauge(evo.percentage)}
             </div>
-            <div class="progress-bar-bg">
-              <div class="progress-bar-fill" style="width: ${evo.percentage}%;"></div>
+            <div class="progress-details">
+              <div class="progress-labels">
+                <span>Status: <strong style="color: var(--primary-cyan); text-transform: uppercase;">${proj.status}</strong></span>
+                <span class="mono">${evo.completed}/${evo.total} etapas</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: ${evo.percentage}%;"></div>
+              </div>
             </div>
           </div>
 
@@ -289,11 +366,26 @@ class AnorakApp {
             <div class="checklist-items">
               ${proj.tasks.length === 0 ? '<div style="font-size: 0.8rem; color: var(--text-muted); padding: 0.5rem;">Nenhuma etapa de validação cadastrada.</div>' : ''}
               ${proj.tasks.map(task => `
-                <div class="check-item ${task.completed ? 'done' : ''}" onclick="window.anorakApp.handleToggleTask('${proj.id}', '${task.id}')">
-                  <div class="custom-checkbox">${task.completed ? '✓' : ''}</div>
-                  <div class="check-info">
-                    <span class="check-title">${this.escapeHTML(task.title)}</span>
-                    ${task.validatedAt ? `<span class="check-timestamp">Validado em: ${new Date(task.validatedAt).toLocaleDateString('pt-BR')} às ${new Date(task.validatedAt).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}</span>` : ''}
+                <div class="check-item ${task.completed ? 'done' : ''}">
+                  <div class="check-item-click-target" onclick="window.anorakApp.handleToggleTask('${proj.id}', '${task.id}')">
+                    <div class="custom-checkbox">${task.completed ? '✓' : ''}</div>
+                    <div class="check-info">
+                      <span class="check-title">${this.escapeHTML(task.title)}</span>
+                      ${task.validatedAt ? `<span class="check-timestamp">Validado em: ${new Date(task.validatedAt).toLocaleDateString('pt-BR')} às ${new Date(task.validatedAt).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}</span>` : ''}
+                    </div>
+                  </div>
+                  
+                  <div class="check-evidence-box">
+                    ${task.evidence ? `
+                      <span class="evidence-badge" title="Visualizar evidência">
+                        📎 <a href="${task.evidence.path}" target="_blank" rel="noopener">${this.escapeHTML(task.evidence.name)}</a>
+                        <button class="btn-evidence-delete" title="Excluir evidência" onclick="window.anorakApp.handleRemoveEvidence('${proj.id}', '${task.id}')">&times;</button>
+                      </span>
+                    ` : `
+                      <button class="btn-evidence-attach" title="Anexar Evidência" onclick="window.anorakApp.openEvidenceModal('${proj.id}', '${task.id}')">
+                        📎 Anexar
+                      </button>
+                    `}
                   </div>
                 </div>
               `).join('')}
@@ -321,7 +413,38 @@ class AnorakApp {
               ` : ''}
             </div>
             
-            <button class="btn-icon" style="width: 28px; height: 28px; font-size: 0.8rem;" title="Opções do Projeto" onclick="window.anorakApp.handleDeleteProject('${proj.id}')">🗑️</button>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn-icon" style="width: 28px; height: 28px; font-size: 0.8rem;" title="Editar Projeto" onclick="window.anorakApp.openEditProjectModal('${proj.id}')">✏️</button>
+              <button class="btn-icon" style="width: 28px; height: 28px; font-size: 0.8rem;" title="Exportar Relatório PDF" onclick="window.anorakApp.exportProjectReport('${proj.id}')">🖨️</button>
+              <button class="btn-icon" style="width: 28px; height: 28px; font-size: 0.8rem;" title="Excluir Projeto" onclick="window.anorakApp.handleDeleteProject('${proj.id}')">🗑️</button>
+            </div>
+          </div>
+
+          <!-- Painel Expansível de Auditoria (Governança) -->
+          <div class="audit-collapse-section">
+            <button class="audit-collapse-trigger" onclick="window.anorakApp.toggleAuditTimeline(this)">
+              <span>📜 Trilha de Auditoria &amp; Histórico</span> <span>▼</span>
+            </button>
+            <div class="audit-timeline-content" style="display: none;">
+              ${proj.validationHistory.length === 0 ? `
+                <div style="font-size: 0.75rem; color: var(--text-muted); padding: 0.5rem 0;">Nenhum registro de auditoria disponível.</div>
+              ` : `
+                <div class="audit-timeline">
+                  ${proj.validationHistory.map(log => `
+                    <div class="audit-timeline-item">
+                      <div class="audit-timeline-meta">
+                        <span class="audit-time">${new Date(log.timestamp).toLocaleDateString('pt-BR')} ${new Date(log.timestamp).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}</span>
+                        <span class="audit-user">@${this.escapeHTML(log.by || 'sistema')}</span>
+                      </div>
+                      <div class="audit-timeline-action">
+                        <strong>${this.escapeHTML(log.action)}</strong>: ${this.escapeHTML(log.taskTitle || '')}
+                        ${log.details ? `<div class="audit-timeline-details">${this.escapeHTML(log.details)}</div>` : ''}
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              `}
+            </div>
           </div>
         </article>
       `;
@@ -332,7 +455,8 @@ class AnorakApp {
     const project = db.getById(projectId);
     if (!project) return;
 
-    const task = project.toggleTask(taskId);
+    const username = this.currentUser ? this.currentUser.username : 'sistema';
+    const task = project.toggleTask(taskId, username);
     db.save(project);
     this.playCyberChime(task && task.completed ? 880 : 380, 'sine', 0.15);
 
@@ -342,6 +466,273 @@ class AnorakApp {
 
     this.render();
     this.renderDecisionMatrix();
+  }
+
+  handleSetAssignee(projectId, username) {
+    const project = db.getById(projectId);
+    if (!project) return;
+
+    const currentBy = this.currentUser ? this.currentUser.username : 'sistema';
+    project.setAssignedTo(username, currentBy);
+    db.save(project);
+    this.showToast(`Responsável atualizado: @${username}`);
+    this.render();
+  }
+
+  openEvidenceModal(projectId, taskId) {
+    const modal = document.getElementById('modalEvidence');
+    const inputProjId = document.getElementById('evidenceProjId');
+    const inputTaskId = document.getElementById('evidenceTaskId');
+
+    if (inputProjId) inputProjId.value = projectId;
+    if (inputTaskId) inputTaskId.value = taskId;
+
+    // Reset fields
+    const fileInput = document.getElementById('inputEvidenceFile');
+    const urlInput = document.getElementById('inputEvidenceUrl');
+    const urlNameInput = document.getElementById('inputEvidenceUrlName');
+    if (fileInput) fileInput.value = '';
+    if (urlInput) urlInput.value = '';
+    if (urlNameInput) urlNameInput.value = '';
+
+    // Reset radio selection
+    const radioFile = document.querySelector('input[name="evidenceType"][value="file"]');
+    const radioLink = document.querySelector('input[name="evidenceType"][value="link"]');
+    
+    if (this.currentUser && this.currentUser.plan === 'explorer') {
+      if (radioFile) radioFile.disabled = true;
+      if (radioLink) {
+        radioLink.checked = true;
+        radioLink.dispatchEvent(new Event('change'));
+      }
+      this.showToast('Upload de arquivo desativado no plano Grátis. Por favor, use link externo.');
+    } else {
+      if (radioFile) {
+        radioFile.disabled = false;
+        radioFile.checked = true;
+        radioFile.dispatchEvent(new Event('change'));
+      }
+    }
+
+    if (modal) modal.classList.add('active');
+  }
+
+  async saveEvidence() {
+    const projectId = document.getElementById('evidenceProjId').value;
+    const taskId = document.getElementById('evidenceTaskId').value;
+    const type = document.querySelector('input[name="evidenceType"]:checked').value;
+    const username = this.currentUser ? this.currentUser.username : 'sistema';
+
+    const project = db.getById(projectId);
+    if (!project) return;
+
+    if (type === 'file') {
+      const fileInput = document.getElementById('inputEvidenceFile');
+      if (!fileInput.files || fileInput.files.length === 0) {
+        alert('Por favor, selecione um arquivo.');
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const formData = new FormData();
+      formData.append('evidence_file', file);
+
+      this.showToast('Enviando arquivo ao servidor...');
+
+      try {
+        const res = await fetch('api/upload_evidence.php', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (res.ok) {
+          const result = await res.json();
+          if (result.status === 'success') {
+            project.addEvidence(taskId, { type: 'file', path: result.path, name: result.name }, username);
+            db.save(project);
+            this.showToast('Evidência anexada com sucesso!');
+            document.getElementById('modalEvidence').classList.remove('active');
+            this.render();
+          } else {
+            alert('Erro no servidor: ' + result.message);
+          }
+        } else {
+          const errData = await res.json().catch(() => ({ message: 'Erro desconhecido' }));
+          alert('Falha no upload: ' + errData.message);
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Erro de conexão ao enviar evidência. Certifique-se de estar online.');
+      }
+    } else {
+      const urlInput = document.getElementById('inputEvidenceUrl');
+      const urlNameInput = document.getElementById('inputEvidenceUrlName');
+      const url = urlInput.value.trim();
+      const name = urlNameInput.value.trim();
+
+      if (!url || !name) {
+        alert('Por favor, preencha a URL e o título do link.');
+        return;
+      }
+
+      project.addEvidence(taskId, { type: 'link', path: url, name: name }, username);
+      db.save(project);
+      this.showToast('Link de evidência anexado!');
+      document.getElementById('modalEvidence').classList.remove('active');
+      this.render();
+    }
+  }
+
+  handleRemoveEvidence(projectId, taskId) {
+    const project = db.getById(projectId);
+    if (!project) return;
+
+    if (confirm('Tem certeza que deseja excluir esta evidência?')) {
+      const username = this.currentUser ? this.currentUser.username : 'sistema';
+      project.removeEvidence(taskId, username);
+      db.save(project);
+      this.showToast('Evidência removida.');
+      this.render();
+    }
+  }
+
+  toggleAuditTimeline(button) {
+    const content = button.nextElementSibling;
+    const arrow = button.querySelector('span:last-child');
+    if (content) {
+      const isHidden = content.style.display === 'none';
+      content.style.display = isHidden ? 'block' : 'none';
+      if (arrow) arrow.textContent = isHidden ? '▲' : '▼';
+    }
+  }
+
+  exportProjectReport(projectId) {
+    const proj = db.getById(projectId);
+    if (!proj) return;
+
+    const evo = proj.getEvolution();
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      alert('Por favor, permita popups para este site para exportar o relatório.');
+      return;
+    }
+
+    const tasksHtml = proj.tasks.map(t => `
+      <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;">${this.escapeHTML(t.category)}</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${this.escapeHTML(t.title)}</td>
+        <td class="status ${t.completed ? 'completed' : 'pending'}" style="padding: 8px; border: 1px solid #ddd; font-weight: bold; color: ${t.completed ? 'green' : 'orange'};">${t.completed ? 'HOMOLOGADO' : 'PENDENTE'}</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${t.validatedAt ? new Date(t.validatedAt).toLocaleDateString('pt-BR') + ' ' + new Date(t.validatedAt).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'}) : '-'}</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${t.evidence ? this.escapeHTML(t.evidence.name) + ' (' + (t.evidence.type === 'file' ? 'Arquivo' : 'Link') + ')' : '-'}</td>
+      </tr>
+    `).join('');
+
+    const historyHtml = proj.validationHistory.map(log => `
+      <div class="history-row" style="padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 13px;">
+        <span class="time" style="color: #666; margin-right: 15px; font-family: monospace;">${new Date(log.timestamp).toLocaleDateString('pt-BR')} ${new Date(log.timestamp).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}</span>
+        <span class="user" style="font-weight: bold; color: #0284c7; margin-right: 15px;">@${this.escapeHTML(log.by || 'sistema')}</span>
+        <span class="action"><strong>${this.escapeHTML(log.action)}</strong>: ${this.escapeHTML(log.taskTitle || '')} ${log.details ? ' (' + this.escapeHTML(log.details) + ')' : ''}</span>
+      </div>
+    `).join('');
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html lang="pt-BR">
+      <head>
+        <meta charset="UTF-8">
+        <title>Relatório de Homologação - Anorak OASIS</title>
+        <style>
+          body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; margin: 40px; line-height: 1.5; font-size: 14px; }
+          .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+          .header h1 { margin: 0; font-size: 24px; color: #111; letter-spacing: 0.05em; }
+          .header .brand { font-size: 12px; text-transform: uppercase; color: #666; }
+          .meta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px; background: #f9f9f9; padding: 20px; border-radius: 6px; border: 1px solid #eee; }
+          .meta-item { display: flex; flex-direction: column; }
+          .meta-item label { font-size: 11px; text-transform: uppercase; color: #666; font-weight: bold; margin-bottom: 4px; }
+          .meta-item span { font-size: 14px; color: #111; }
+          .section-title { font-size: 18px; margin-top: 30px; margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 5px; color: #222; }
+          table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+          th { background: #f5f5f5; font-weight: bold; font-size: 12px; text-transform: uppercase; }
+          .signature-section { margin-top: 60px; display: flex; justify-content: space-between; }
+          .signature-box { border-top: 1px solid #333; width: 45%; text-align: center; padding-top: 10px; margin-top: 40px; }
+          .signature-box label { font-size: 11px; color: #666; text-transform: uppercase; display: block; margin-top: 4px; }
+          @media print {
+            body { margin: 20px; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div>
+            <h1>ANORAK — RELATÓRIO DE HOMOLOGAÇÃO</h1>
+            <span class="brand">OASIS Project Hub &amp; Governance Center</span>
+          </div>
+          <div class="no-print">
+            <button onclick="window.print()" style="padding: 8px 16px; background: #0284c7; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Imprimir Relatório (PDF)</button>
+          </div>
+        </div>
+
+        <div class="meta-grid">
+          <div class="meta-item">
+            <label>Projeto</label>
+            <span>${this.escapeHTML(proj.title)}</span>
+          </div>
+          <div class="meta-item">
+            <label>Responsável Atribuído</label>
+            <span>@${this.escapeHTML(proj.assignedTo || 'Não atribuído')}</span>
+          </div>
+          <div class="meta-item" style="grid-column: 1 / -1;">
+            <label>Descrição e Escopo</label>
+            <span>${this.escapeHTML(proj.description || 'Sem descrição')}</span>
+          </div>
+          <div class="meta-item">
+            <label>Estágio Atual / Status</label>
+            <span style="text-transform: uppercase; font-weight: bold;">${this.escapeHTML(proj.status)}</span>
+          </div>
+          <div class="meta-item">
+            <label>Progresso de Validação</label>
+            <span>${evo.completed} de ${evo.total} etapas concluídas (${evo.percentage}%)</span>
+          </div>
+        </div>
+
+        <div class="section-title">Checklist de Homologação e Evidências</div>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+          <thead>
+            <tr>
+              <th style="width: 15%; padding: 8px; border: 1px solid #ddd; text-align: left;">Categoria</th>
+              <th style="width: 45%; padding: 8px; border: 1px solid #ddd; text-align: left;">Etapa / Descrição</th>
+              <th style="width: 15%; padding: 8px; border: 1px solid #ddd; text-align: left;">Status</th>
+              <th style="width: 15%; padding: 8px; border: 1px solid #ddd; text-align: left;">Data de Validação</th>
+              <th style="width: 10%; padding: 8px; border: 1px solid #ddd; text-align: left;">Evidência</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tasksHtml}
+          </tbody>
+        </table>
+
+        <div class="section-title">Histórico de Alterações e Trilha de Auditoria</div>
+        <div class="history-container" style="margin-bottom: 40px;">
+          ${historyHtml}
+        </div>
+
+        <div class="signature-section" style="margin-top: 60px; display: flex; justify-content: space-between;">
+          <div class="signature-box" style="border-top: 1px solid #333; width: 45%; text-align: center; padding-top: 10px; margin-top: 40px;">
+            <span>_______________________________________</span><br>
+            <strong>@${this.escapeHTML(proj.assignedTo || 'Responsável')}</strong>
+            <label style="font-size: 11px; color: #666; text-transform: uppercase; display: block; margin-top: 4px;">Responsável Técnico</label>
+          </div>
+          <div class="signature-box" style="border-top: 1px solid #333; width: 45%; text-align: center; padding-top: 10px; margin-top: 40px;">
+            <span>_______________________________________</span><br>
+            <strong>@${this.escapeHTML(this.currentUser ? this.currentUser.username : 'admin')}</strong>
+            <label style="font-size: 11px; color: #666; text-transform: uppercase; display: block; margin-top: 4px;">Auditor do Projeto / Líder</label>
+          </div>
+        </div>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
   }
 
   promptAddTask(projectId) {
@@ -356,7 +747,8 @@ class AnorakApp {
       title: title.trim(),
       category: 'Geral',
       completed: false,
-      status: 'pendente'
+      status: 'pendente',
+      evidence: null
     });
 
     db.save(project);
@@ -367,7 +759,7 @@ class AnorakApp {
   handleDeleteProject(projectId) {
     const proj = db.getById(projectId);
     if (!proj) return;
-    if (confirm(`Tem certeza que deseja excluir o projeto "${proj.title}"?`)) {
+    if (confirm(`Tem certeza que deseja excluir o projeto "\${proj.title}"?`)) {
       db.delete(projectId);
       this.showToast('Projeto removido.');
       this.render();
@@ -563,6 +955,36 @@ class AnorakApp {
   }
 
   toggleVoiceRecording() {
+    // 1. Bloqueio para plano Explorer (Grátis)
+    if (this.currentUser && this.currentUser.plan === 'explorer') {
+      this.showToast('A captura por voz exige upgrade para plano Creator, Master ou Legend!');
+      return;
+    }
+
+    // 2. Verificação de limites diários
+    const limit = this.getVoiceLimit(this.currentUser ? this.currentUser.plan : 'creator');
+    const today = new Date().toDateString();
+    let currentCount = parseInt(localStorage.getItem('anorak_speech_count') || '0');
+    const lastDate = localStorage.getItem('anorak_speech_date') || '';
+
+    if (lastDate !== today) {
+      currentCount = 0;
+      localStorage.setItem('anorak_speech_date', today);
+      localStorage.setItem('anorak_speech_count', '0');
+    }
+
+    // Se estiver prestes a iniciar gravação, checa limite
+    if (!voiceRecorder.isRecording) {
+      if (currentCount >= limit) {
+        if (limit === 100) {
+          this.showToast('Você atingiu o limite de 100 áudios hoje. Compre pacotes extras no perfil!');
+        } else {
+          this.showToast(`Você atingiu o limite diário de ${limit} transcrições. Faça o upgrade de plano!`);
+        }
+        return;
+      }
+    }
+
     const btn = document.getElementById('btnVoiceRecord');
     const pulse = document.querySelector('.voice-pulse');
     const statusText = document.getElementById('voiceStatusText');
@@ -579,8 +1001,24 @@ class AnorakApp {
         if (pulse) pulse.classList.toggle('recording', isRecording);
         if (btn) btn.style.color = isRecording ? '#ef4444' : 'var(--text-secondary)';
         if (statusText) statusText.textContent = isRecording ? 'Ouvindo... Fale sua ideia livremente' : 'Reconhecimento por voz pronto';
+        
+        // Ao finalizar gravação com sucesso
+        if (!isRecording) {
+          const newCount = currentCount + 1;
+          localStorage.setItem('anorak_speech_count', newCount.toString());
+          console.log(`[Voz Anorak] Transcrições usadas hoje: ${newCount}/${limit}`);
+        }
       }
     );
+  }
+
+  getVoiceLimit(plan) {
+    switch (plan) {
+      case 'creator': return 15;
+      case 'master': return 50;
+      case 'legend': return 100;
+      default: return 0;
+    }
   }
 
   saveQuickIdea() {
@@ -656,6 +1094,48 @@ class AnorakApp {
     this.render();
   }
 
+  openEditProjectModal(projectId) {
+    const project = db.getById(projectId);
+    if (!project) return;
+
+    const modal = document.getElementById('modalEditProject');
+    if (modal) {
+      document.getElementById('editProjId').value = project.id;
+      document.getElementById('editProjTitle').value = project.title;
+      document.getElementById('editProjDesc').value = project.description || '';
+      document.getElementById('editProjGithub').value = project.contextLinks.githubRepo || '';
+      document.getElementById('editProjDrive').value = project.contextLinks.driveFolder || '';
+      document.getElementById('editProjLive').value = project.contextLinks.liveUrl || '';
+      
+      modal.classList.add('active');
+    }
+  }
+
+  saveEditProject() {
+    const id = document.getElementById('editProjId').value;
+    const title = document.getElementById('editProjTitle').value.trim();
+    const description = document.getElementById('editProjDesc').value.trim();
+    const githubRepo = document.getElementById('editProjGithub').value.trim();
+    const driveFolder = document.getElementById('editProjDrive').value.trim();
+    const liveUrl = document.getElementById('editProjLive').value.trim();
+
+    if (!title) return;
+
+    const project = db.getById(id);
+    if (!project) return;
+
+    project.title = title;
+    project.description = description;
+    project.contextLinks.githubRepo = githubRepo;
+    project.contextLinks.driveFolder = driveFolder;
+    project.contextLinks.liveUrl = liveUrl;
+
+    db.save(project);
+    document.getElementById('modalEditProject').classList.remove('active');
+    this.showToast(`Projeto "${title}" atualizado!`);
+    this.render();
+  }
+
   // =========================================================================
   // SINCRONIZADOR PASSIVO GITHUB
   // =========================================================================
@@ -693,6 +1173,79 @@ class AnorakApp {
       toast.style.transition = 'all 0.3s ease';
       setTimeout(() => toast.remove(), 300);
     }, 3500);
+  }
+
+  renderMiniGauge(percentage) {
+    const radius = 30;
+    const circumference = 2 * Math.PI * radius; // ~188.5
+    const maxSweep = 270; // 270 degrees sweep
+    const arcLength = (maxSweep / 360) * circumference; // ~141.37
+    const activeLength = (percentage / 100) * arcLength;
+    const angle = 135 + (percentage / 100) * maxSweep; // Needle rotation from bottom-left (135deg) to bottom-right (405deg)
+
+    return `
+      <svg class="mini-gauge-svg" width="64" height="64" viewBox="0 0 100 100" style="overflow: visible;">
+        <defs>
+          <filter id="gauge-neon-cyan" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+          <filter id="gauge-neon-pink" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+          <radialGradient id="gauge-metal" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#15203b" />
+            <stop offset="70%" stop-color="#0a0f1d" />
+            <stop offset="100%" stop-color="#050811" />
+          </radialGradient>
+        </defs>
+
+        <!-- Housing / Outer Metal Bezel -->
+        <circle cx="50" cy="50" r="47" fill="none" stroke="#1b2438" stroke-width="3" />
+        
+        <!-- Screws on Bezel -->
+        <circle cx="50" cy="6" r="1.5" fill="#4b5563" />
+        <circle cx="94" cy="50" r="1.5" fill="#4b5563" />
+        <circle cx="50" cy="94" r="1.5" fill="#4b5563" />
+        <circle cx="6" cy="50" r="1.5" fill="#4b5563" />
+
+        <!-- Gauge Metallic Face -->
+        <circle cx="50" cy="50" r="44" fill="url(#gauge-metal)" stroke="#0e1726" stroke-width="1" />
+
+        <!-- Neon Pink Outer Glow Ring -->
+        <circle cx="50" cy="50" r="41" fill="none" stroke="#f43f5e" stroke-width="2" filter="url(#gauge-neon-pink)" opacity="0.85" />
+        <circle cx="50" cy="50" r="41" fill="none" stroke="#ff85a2" stroke-width="0.75" opacity="0.9" />
+
+        <!-- Inner ticks (cyan) -->
+        <circle cx="50" cy="50" r="35" fill="none" stroke="rgba(0, 242, 254, 0.25)" stroke-width="1.5" stroke-dasharray="1, 4" transform="rotate(135, 50, 50)" />
+
+        <!-- Progress track (faint cyan) -->
+        <circle cx="50" cy="50" r="30" fill="none" stroke="rgba(0, 242, 254, 0.08)" stroke-width="3.5" stroke-dasharray="${arcLength}, ${circumference}" transform="rotate(135, 50, 50)" stroke-linecap="round" />
+        
+        <!-- Active Progress track (glowing cyan) -->
+        <circle cx="50" cy="50" r="30" fill="none" stroke="#00f2fe" stroke-width="3.5" stroke-dasharray="${activeLength}, ${circumference}" transform="rotate(135, 50, 50)" stroke-linecap="round" filter="url(#gauge-neon-cyan)" />
+
+        <!-- Needle / Pointer (glowing cyan) -->
+        <g transform="rotate(${angle}, 50, 50)">
+          <line x1="50" y1="50" x2="50" y2="16" stroke="#00f2fe" stroke-width="2.5" stroke-linecap="round" filter="url(#gauge-neon-cyan)" />
+          <polygon points="48,22 52,22 50,15" fill="#00f2fe" filter="url(#gauge-neon-cyan)" />
+        </g>
+
+        <!-- Center Knob -->
+        <circle cx="50" cy="50" r="8" fill="#0a0f1d" stroke="#1e293b" stroke-width="1.5" />
+        <circle cx="50" cy="50" r="3" fill="#00f2fe" filter="url(#gauge-neon-cyan)" />
+
+        <!-- Digital Value at bottom -->
+        <text x="50" y="77" text-anchor="middle" fill="#00f2fe" font-family="monospace" font-size="10" font-weight="bold" filter="url(#gauge-neon-cyan)" style="letter-spacing: -0.5px;">${percentage}%</text>
+      </svg>
+    `;
   }
 
   escapeHTML(str) {

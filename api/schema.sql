@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}items` (
     `priority` ENUM('baixa', 'media', 'alta', 'critica') NOT NULL DEFAULT 'media',
     `impact` ENUM('baixo', 'medio', 'alto') NOT NULL DEFAULT 'medio',
     `urgency` ENUM('baixa', 'media', 'alta') NOT NULL DEFAULT 'media',
+    `assigned_to` VARCHAR(100) NULL,
     `tags_json` JSON NULL,
     `context_links_json` JSON NULL,
     `tasks_json` JSON NULL,
@@ -40,10 +41,25 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}users` (
 CREATE TABLE IF NOT EXISTS `{PREFIX}activity_logs` (
     `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
     `item_id` VARCHAR(64) NULL,
+    `username` VARCHAR(100) NULL,
     `action` VARCHAR(100) NOT NULL,
     `details` TEXT NULL,
     `ip_address` VARCHAR(45) NULL,
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     INDEX `idx_item_id` (`item_id`),
     INDEX `idx_created_at` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `{PREFIX}payments` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `user_id` INT NOT NULL,
+    `amount` DECIMAL(10, 2) NOT NULL,
+    `currency` VARCHAR(10) NOT NULL DEFAULT 'BRL',
+    `plan` VARCHAR(50) NOT NULL,
+    `status` VARCHAR(50) NOT NULL DEFAULT 'completed',
+    `payment_method` VARCHAR(50) NOT NULL DEFAULT 'pix',
+    `transaction_id` VARCHAR(100) NOT NULL UNIQUE,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES `{PREFIX}users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
