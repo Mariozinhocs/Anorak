@@ -77,7 +77,6 @@ try {
     Upload-File "$localDir\login.html" "hml/login.html"
     Upload-File "$localDir\app.html" "hml/app.html"
     Upload-File "$localDir\admin.html" "hml/admin.html"
-    Upload-File "$localDir\aplicacoes.html" "hml/aplicacoes.html"
     Upload-File "$localDir\assets\anorak_construction_case.png" "hml/assets/anorak_construction_case.png"
     Upload-File "$localDir\assets\anorak_creative_case.png" "hml/assets/anorak_creative_case.png"
     Upload-File "$localDir\assets\anorak_business_case.png" "hml/assets/anorak_business_case.png"
