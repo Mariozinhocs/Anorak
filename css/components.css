@@ -274,11 +274,52 @@
   font-size: 0.875rem;
 }
 
-/* Projects Grid */
+/* Projects Grid & Google Drive Style List View */
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
   gap: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.projects-grid.list-view {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.75rem !important;
+}
+
+.project-list-row {
+  padding: 1rem 1.5rem;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.5fr 1fr auto;
+  align-items: center;
+  gap: 1.25rem;
+  border-radius: var(--radius-md);
+  background: rgba(13, 19, 33, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-glass);
+  transition: all 0.2s ease;
+}
+
+.project-list-row:hover {
+  background: rgba(13, 19, 33, 0.95);
+  border-color: rgba(0, 242, 254, 0.4);
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
+  transform: translateX(4px);
+}
+
+.list-col-main .list-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+@media (max-width: 1024px) {
+  .project-list-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 }
 
 .project-card {

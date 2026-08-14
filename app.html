@@ -23,10 +23,10 @@
   </script>
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/variables.css?v=1.4">
-  <link rel="stylesheet" href="css/base.css?v=1.4">
-  <link rel="stylesheet" href="css/components.css?v=1.4">
-  <link rel="stylesheet" href="css/animations.css?v=1.4">
+  <link rel="stylesheet" href="css/variables.css?v=1.5">
+  <link rel="stylesheet" href="css/base.css?v=1.5">
+  <link rel="stylesheet" href="css/components.css?v=1.5">
+  <link rel="stylesheet" href="css/animations.css?v=1.5">
 </head>
 <body>
   <!-- Ambient Grid -->
@@ -36,8 +36,8 @@
     <!-- TOP NAVIGATION HUD -->
     <header class="glass-panel anorak-header">
       <a href="index.html" class="brand-section" title="Voltar à Apresentação Pública" style="text-decoration: none;">
-        <div class="avatar-halo floating">
-          <div class="avatar-placeholder">🧙‍♂️</div>
+        <div class="avatar-halo floating" style="width: 44px; height: 44px; padding: 2px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-cyan), var(--accent-purple)); box-shadow: 0 0 15px var(--primary-glow); display: flex; align-items: center; justify-content: center;">
+          <img src="assets/favicon.svg?v=1.4" alt="Anorak Mago" style="width: 100%; height: 100%; border-radius: 50%; object-fit: contain;">
         </div>
         <div class="brand-info">
           <h1 class="brand-title">ANORAK <span style="font-size: 1rem; color: var(--primary-cyan);">🗝️</span></h1>
@@ -130,7 +130,19 @@
           <h2><span>⚡</span> Frentes de Homologação &amp; Status</h2>
           <p>Acompanhe e valide interativamente o avanço dos seus projetos ativos rumo à produção.</p>
         </div>
-        <button type="button" class="btn-secondary" id="btnNewProject">+ Novo Projeto</button>
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <!-- SELETOR DE MODO DE EXIBIÇÃO (GRADE VS LISTA GOOGLE DRIVE) -->
+          <div class="view-toggle-group" style="display: flex; background: rgba(0,0,0,0.4); padding: 3px; border-radius: var(--radius-sm); border: 1px solid var(--border-glass);">
+            <button type="button" class="btn-toggle-view active" id="btnViewGrid" title="Visualização em Grade (Cards)" style="padding: 5px 12px; font-size: 0.8rem; border-radius: 4px; border: none; background: rgba(0,242,254,0.18); color: var(--primary-cyan); cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 5px; transition: all 0.2s;">
+              <span>🏲</span> Grade
+            </button>
+            <button type="button" class="btn-toggle-view" id="btnViewList" title="Visualização em Lista (Estilo Google Drive)" style="padding: 5px 12px; font-size: 0.8rem; border-radius: 4px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 5px; transition: all 0.2s;">
+              <span>☰</span> Lista
+            </button>
+          </div>
+
+          <button type="button" class="btn-secondary" id="btnNewProject">+ Novo Projeto</button>
+        </div>
       </div>
 
       <!-- GRID DE PROJETOS -->
@@ -505,6 +517,6 @@
   </div>
 
   <!-- Main JavaScript App Entrypoint -->
-  <script type="module" src="js/app.js?v=1.3"></script>
+  <script type="module" src="js/app.js?v=1.5"></script>
 </body>
 </html>

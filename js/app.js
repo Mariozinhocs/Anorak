@@ -12,6 +12,7 @@ import { syncEngine } from './sync.js';
 class AnorakApp {
   constructor() {
     this.currentMode = 'operational'; // 'operational' | 'incubator' | 'matrix'
+    this.projectLayoutMode = localStorage.getItem('anorak_project_layout') || 'grid'; // 'grid' | 'list'
     this.currentTagFilter = 'all';
     this.decisionMatrix = new AnorakDecisionMatrix(db);
     this.audioContext = null;
@@ -132,6 +133,14 @@ class AnorakApp {
     // Botão de Novo Projeto
     const btnNewProj = document.getElementById('btnNewProject');
     if (btnNewProj) btnNewProj.addEventListener('click', () => this.openNewProjectModal());
+
+    // Seletor de Exibição (Grade vs Lista estilo Google Drive)
+    const btnGrid = document.getElementById('btnViewGrid');
+    const btnList = document.getElementById('btnViewList');
+    if (btnGrid && btnList) {
+      btnGrid.addEventListener('click', () => this.setProjectLayoutMode('grid'));
+      btnList.addEventListener('click', () => this.setProjectLayoutMode('list'));
+    }
 
     // Botão de Gravação de Voz
     const btnVoice = document.getElementById('btnVoiceRecord');
@@ -302,9 +311,31 @@ class AnorakApp {
   // =========================================================================
   // MODO OPERACIONAL (Checklists e Projetos)
   // =========================================================================
+  setProjectLayoutMode(mode) {
+    this.projectLayoutMode = mode;
+    localStorage.setItem('anorak_project_layout', mode);
+    this.renderOperationalProjects();
+    this.playCyberChime(520, 'sine', 0.1);
+  }
+
   renderOperationalProjects() {
     const container = document.getElementById('projectsContainer');
     if (!container) return;
+
+    // Atualiza botões do seletor de visualização (Grade vs Lista)
+    const btnGrid = document.getElementById('btnViewGrid');
+    const btnList = document.getElementById('btnViewList');
+    if (btnGrid && btnList) {
+      btnGrid.classList.toggle('active', this.projectLayoutMode === 'grid');
+      btnGrid.style.background = this.projectLayoutMode === 'grid' ? 'rgba(0, 242, 254, 0.18)' : 'transparent';
+      btnGrid.style.color = this.projectLayoutMode === 'grid' ? 'var(--primary-cyan)' : 'var(--text-muted)';
+      
+      btnList.classList.toggle('active', this.projectLayoutMode === 'list');
+      btnList.style.background = this.projectLayoutMode === 'list' ? 'rgba(0, 242, 254, 0.18)' : 'transparent';
+      btnList.style.color = this.projectLayoutMode === 'list' ? 'var(--primary-cyan)' : 'var(--text-muted)';
+    }
+
+    container.classList.toggle('list-view', this.projectLayoutMode === 'list');
 
     const projects = db.getByType(ItemType.PROJECT);
     if (projects.length === 0) {
@@ -314,6 +345,62 @@ class AnorakApp {
 
     container.innerHTML = projects.map(proj => {
       const evo = proj.getEvolution();
+
+      // MODO LISTA COMPACTO ESTILO GOOGLE DRIVE
+      if (this.projectLayoutMode === 'list') {
+        return `
+          <article class="glass-panel project-list-row" data-project-id="${proj.id}">
+            <!-- Coluna 1: Título & Descrição com Links de Acesso -->
+            <div class="list-col-main">
+              <div class="list-title-wrap">
+                <h3 class="project-title" style="margin: 0; font-size: 1.05rem;">${this.escapeHTML(proj.title)}</h3>
+                <span class="status-pill status-${proj.status}" style="font-size: 0.68rem; font-weight: bold; text-transform: uppercase; padding: 2px 8px; border-radius: 12px; background: rgba(0, 242, 254, 0.1); color: var(--primary-cyan); border: 1px solid rgba(0, 242, 254, 0.3);">${proj.status}</span>
+              </div>
+              <p class="project-desc" style="margin: 4px 0 0 0; font-size: 0.8rem; color: var(--text-muted);">${this.escapeHTML(proj.description || 'Sem descrição cadastrada.')}</p>
+            </div>
+
+            <!-- Coluna 2: Responsável Técnico -->
+            <div class="list-col-responsible">
+              <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 2px;">Responsável:</span>
+              <select class="responsible-select" onchange="window.anorakApp.handleSetAssignee('${proj.id}', this.value)" style="font-size: 0.8rem; padding: 3px 6px;">
+                <option value="" ${!proj.assignedTo ? 'selected' : ''}>Sem responsável</option>
+                ${(this.usersList || []).map(u => `
+                  <option value="${u}" ${proj.assignedTo === u ? 'selected' : ''}>@${u}</option>
+                `).join('')}
+              </select>
+            </div>
+
+            <!-- Coluna 3: Mini Gauge & Etapas Concluídas -->
+            <div class="list-col-progress" style="display: flex; align-items: center; gap: 0.75rem;">
+              <div class="gauge-holder" style="transform: scale(0.85); flex-shrink: 0;" title="Progresso da Fase: ${evo.percentage}%">
+                ${this.renderMiniGauge(evo.percentage)}
+              </div>
+              <div style="display: flex; flex-direction: column;">
+                <span class="mono" style="font-size: 0.82rem; font-weight: bold; color: var(--primary-cyan);">${evo.completed}/${evo.total} etapas</span>
+                <span style="font-size: 0.72rem; color: var(--text-muted);">${evo.percentage}% concluído</span>
+              </div>
+            </div>
+
+            <!-- Coluna 4: Chaves de Halliday -->
+            <div class="list-col-keys">
+              <div class="halliday-keys-box" style="margin: 0;" title="Conquistas de Estágio: Cobre (Planejamento), Jade (Homologação), Cristal (Produção)">
+                <span class="key-badge copper ${evo.copper ? 'active' : ''}">🗝️</span>
+                <span class="key-badge jade ${evo.jade ? 'active' : ''}">🗝️</span>
+                <span class="key-badge crystal ${evo.crystal ? 'active' : ''}">💎</span>
+              </div>
+            </div>
+
+            <!-- Coluna 5: Ações Rápidas -->
+            <div class="list-col-actions" style="display: flex; gap: 0.4rem; align-items: center;">
+              <button class="btn-secondary" style="padding: 0.3rem 0.65rem; font-size: 0.78rem; color: var(--primary-cyan); border-color: rgba(0,242,254,0.4); background: rgba(0,242,254,0.1); font-weight: 600;" title="Editar Painel" onclick="window.anorakApp.openEditProjectModal('${proj.id}')">✏️ Editar Painel</button>
+              <button class="btn-icon" style="width: 30px; height: 30px; font-size: 0.8rem;" title="Exportar Relatório PDF" onclick="window.anorakApp.exportProjectReport('${proj.id}')">🖨️</button>
+              <button class="btn-icon" style="width: 30px; height: 30px; font-size: 0.8rem;" title="Excluir Projeto" onclick="window.anorakApp.handleDeleteProject('${proj.id}')">🗑️</button>
+            </div>
+          </article>
+        `;
+      }
+
+      // MODO GRADE DE CARDS (PADRÃO)
       return `
         <article class="glass-panel project-card" data-project-id="${proj.id}">
           <div class="project-card-header">
