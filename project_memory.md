@@ -35,7 +35,9 @@
 ## 📂 Estrutura de Arquivos Criados/Modificados
 
 * **Frontend:**
-  * [index.html](file:///g:/Meu%20Drive/Dev's/Anorak/index.html) (Landing page pública de apresentação)
+  * [index.html](file:///g:/Meu%20Drive/Dev's/Anorak/index.html) (Landing page pública com link de navegação para a página de aplicações [CONCLUÍDO])
+  * [aplicacoes.html](file:///g:/Meu%20Drive/Dev's/Anorak/aplicacoes.html) (Página de Casos de Uso/Aplicações multissegmentos com ilustrações cyberpunk [CONCLUÍDO])
+  * [assets/](file:///g:/Meu%20Drive/Dev's/Anorak/assets) (Diretório contendo as ilustrações personalizadas das aplicações [CONCLUÍDO])
   * [login.html](file:///g:/Meu%20Drive/Dev's/Anorak/login.html) (Tela de autenticação com placeholders genéricos)
   * [app.html](file:///g:/Meu%20Drive/Dev's/Anorak/app.html) (Painel restrito de homologação e gestão - com modal de edição de projetos)
   * [admin.html](file:///g:/Meu%20Drive/Dev's/Anorak/admin.html) (Painel administrativo de controle de faturamento, deploy e contas)
