@@ -730,13 +730,13 @@
   height: auto;
   transform: translate(-50%, -50%);
   object-fit: cover;
-  opacity: 0.15;
-  filter: saturate(0.7) blur(1px);
+  opacity: 0.35;
+  filter: saturate(0.85) blur(1px);
 }
 
 .bg-video-overlay {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, rgba(7, 11, 20, 0.4) 0%, rgba(7, 11, 20, 0.95) 100%);
+  background: radial-gradient(circle at center, rgba(7, 11, 20, 0.2) 0%, rgba(7, 11, 20, 0.85) 100%);
   z-index: 1;
 }
