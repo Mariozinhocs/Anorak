@@ -59,11 +59,12 @@
   * [api/auth/logout.php](file:///g:/Meu%20Drive/Dev's/Anorak/api/auth/logout.php) (Endpoint de logout)
   * [db_installer.php](file:///g:/Meu%20Drive/Dev's/Anorak/db_installer.php) (Instalador/migrador web com admin seeding)
   * **Diretório `api/admin/`:** APIs administrativas para usuários, faturamento e deploy.
+  * **Diretório `api/payments/`:** Módulo de integração Mercado Pago (Pix QR Code `create_pix.php`, Webhook `webhook.php`, Checagem de status `check_status.php`).
 
 * **Infraestrutura e Deploys:**
-  * [deploy-hml.ps1](file:///g:/Meu%20Drive/Dev's/Anorak/deploy-hml.ps1) (Deploy para `/hml` atualizado para conter arquivos admin)
-  * [deploy-prod.ps1](file:///g:/Meu%20Drive/Dev's/Anorak/deploy-prod.ps1) (Deploy para raiz atualizado para conter arquivos admin)
-  * [.gitignore](file:///g:/Meu%20Drive/Dev's/Anorak/.gitignore) (Proteção de arquivos sensíveis)
+  * [deploy-hml.ps1](file:///g:/Meu%20Drive/Dev's/Anorak/deploy-hml.ps1) (Deploy para `/hml` atualizado para conter arquivos admin e de pagamentos)
+  * [deploy-prod.ps1](file:///g:/Meu%20Drive/Dev's/Anorak/deploy-prod.ps1) (Deploy para raiz atualizado para conter arquivos admin e de pagamentos)
+  * [.gitignore](file:///g:/Meu%20Drive/Dev's/Anorak/.gitignore) e [.env.example](file:///g:/Meu%20Drive/Dev's/Anorak/.env.example) (Configuração de chaves do Mercado Pago)
 
 ---
 

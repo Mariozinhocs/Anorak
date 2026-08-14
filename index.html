@@ -7,7 +7,7 @@
   <meta name="description" content="Plataforma inteligente de gestão modular de projetos em homologação, repositório ágil de ideias e matriz de decisão inspirada no universo de Jogador Nº 1.">
   
   <!-- Favicon / Theme -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%20%220%22%20%22100%22%20%22100%22><text y=%22.9em%22 font-size=%2290%22>🗝️</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%20%220%22%20%22100%22%20%22100%22><text y=%22.9em%22 font-size=%2290%22>🧙‍♂️</text></svg>">
   <meta name="theme-color" content="#070b14">
 
   <!-- Google Fonts -->
@@ -22,10 +22,10 @@
   </script>
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/variables.css?v=1.0.2">
-  <link rel="stylesheet" href="css/base.css?v=1.0.2">
-  <link rel="stylesheet" href="css/animations.css?v=1.0.2">
-  <link rel="stylesheet" href="css/home.css?v=1.0.2">
+  <link rel="stylesheet" href="css/variables.css?v=1.4">
+  <link rel="stylesheet" href="css/base.css?v=1.4">
+  <link rel="stylesheet" href="css/animations.css?v=1.4">
+  <link rel="stylesheet" href="css/home.css?v=1.4">
 </head>
 <body class="home-body">
   <!-- Ambient Grid -->
@@ -41,15 +41,15 @@
 
   <!-- HEADER NAVIGATION -->
   <header class="home-header">
-    <div style="display: flex; align-items: center; gap: 0.75rem;">
-      <div class="avatar-halo" style="width: 40px; height: 40px;">
-        <div class="avatar-placeholder" style="font-size: 1.25rem;">🧙‍♂️</div>
+    <a href="#" class="header-brand-box" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none;">
+      <div class="avatar-halo glowing-avatar" style="width: 42px; height: 42px;">
+        <div class="avatar-placeholder" style="font-size: 1.3rem;">🧙‍♂️</div>
       </div>
-      <div>
-        <span style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; letter-spacing: 0.05em; color: #fff;">ANORAK</span>
-        <span style="font-size: 0.75rem; color: var(--primary-cyan); display: block; line-height: 1;">OASIS Project Hub</span>
+      <div style="display: flex; flex-direction: column;">
+        <h1 class="brand-title" style="font-size: 1.45rem; margin: 0; line-height: 1.2;">ANORAK <span style="font-size: 1rem; color: var(--primary-cyan);">🗝️</span></h1>
+        <span style="font-size: 0.7rem; color: var(--primary-cyan); display: block; line-height: 1; letter-spacing: 0.05em; margin-top: 2px;">OASIS Project Hub</span>
       </div>
-    </div>
+    </a>
 
     <ul class="home-nav-links">
       <li><a href="#pilares">Pilares</a></li>
@@ -57,6 +57,7 @@
       <li><a href="#chaves">Chaves de Estágio</a></li>
       <li><a href="#aplicacoes">Aplicações</a></li>
       <li><a href="#planos">Planos de Acesso</a></li>
+      <li><a href="help.html">Ajuda &amp; Tutoriais</a></li>
       <li><a href="login.html" class="btn-nav-login">Entrar no OASIS ➔</a></li>
     </ul>
   </header>
@@ -394,8 +395,29 @@
     </div>
 
     <div class="use-cases-grid" style="display: flex; flex-direction: column; gap: 4rem; max-width: 1100px; margin: 0 auto;">
-      <!-- Caso 1 -->
+      <!-- Caso 1: Desenvolvimento de Software -->
       <div class="use-case-row" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 3rem; align-items: center;">
+        <div class="use-case-text" style="text-align: left;">
+          <h3 style="font-size: 1.6rem; color: #fff; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;"><span style="color: var(--primary-cyan);">💻</span> Engenharia &amp; Dev de Software</h3>
+          <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.5rem;">
+            Squads de tecnologia e tech leads controlam cronogramas de entrega de releases, auditoria de segurança estática, cobertura de testes automatizados e logs de deploy.
+          </p>
+          <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.88rem; color: var(--text-muted);">
+            <li style="position: relative; padding-left: 24px;"><span style="position: absolute; left: 0;">🗝️</span> <strong>Planejamento (Cobre):</strong> Mapeamento do backlog técnico, estimativas de esforço e configuração do ambiente local.</li>
+            <li style="position: relative; padding-left: 24px;"><span style="position: absolute; left: 0;">🗝️</span> <strong>Homologação (Jade):</strong> Testes automatizados de integração, checagem de vulnerabilidades (SAST) e logs de build.</li>
+            <li style="position: relative; padding-left: 24px;"><span style="position: absolute; left: 0;">🗝️</span> <strong>Evidências (Cristal):</strong> Branches homologadas no GitHub e links temporários de staging (live preview) anexados diretamente à etapa.</li>
+          </ul>
+        </div>
+        <div class="use-case-img-box" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; height: 280px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+          <img src="assets/anorak_software_case.png" alt="Engenharia de Software" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+      </div>
+
+      <!-- Caso 2: Construção Civil & Reformas -->
+      <div class="use-case-row" style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 3rem; align-items: center;">
+        <div class="use-case-img-box" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; height: 280px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+          <img src="assets/anorak_construction_case.png" alt="Construção e Arquitetura" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
         <div class="use-case-text" style="text-align: left;">
           <h3 style="font-size: 1.6rem; color: #fff; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;"><span style="color: var(--primary-cyan);">⚡</span> Construção Civil &amp; Reformas</h3>
           <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.5rem;">
@@ -407,16 +429,10 @@
             <li style="position: relative; padding-left: 24px;"><span style="position: absolute; left: 0;">🗝️</span> <strong>Evidências:</strong> Fotos do canteiro de obras e relatórios de medição em PDF anexados às etapas.</li>
           </ul>
         </div>
-        <div class="use-case-img-box" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; height: 280px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-          <img src="assets/anorak_construction_case.png" alt="Construção e Arquitetura" style="width: 100%; height: 100%; object-fit: cover;">
-        </div>
       </div>
 
-      <!-- Caso 2 -->
-      <div class="use-case-row" style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 3rem; align-items: center;">
-        <div class="use-case-img-box" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; height: 280px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-          <img src="assets/anorak_creative_case.png" alt="Criadores de Conteúdo" style="width: 100%; height: 100%; object-fit: cover;">
-        </div>
+      <!-- Caso 3: Criadores de Conteúdo & Mídia -->
+      <div class="use-case-row" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 3rem; align-items: center;">
         <div class="use-case-text" style="text-align: left;">
           <h3 style="font-size: 1.6rem; color: #fff; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;"><span style="color: var(--primary-cyan);">💡</span> Criadores de Conteúdo &amp; Mídia</h3>
           <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.5rem;">
@@ -428,23 +444,26 @@
             <li style="position: relative; padding-left: 24px;"><span style="position: absolute; left: 0;">🗝️</span> <strong>Evidências:</strong> Links privados de visualização prévia (YouTube/Vimeo) integrados ao card.</li>
           </ul>
         </div>
+        <div class="use-case-img-box" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; height: 280px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+          <img src="assets/anorak_creative_case.png" alt="Criadores de Conteúdo" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
       </div>
 
-      <!-- Caso 3 -->
-      <div class="use-case-row" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 3rem; align-items: center;">
+      <!-- Caso 4: Gestão de Negócios & Priorização -->
+      <div class="use-case-row" style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 3rem; align-items: center;">
+        <div class="use-case-img-box" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; height: 280px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+          <img src="assets/anorak_business_case.png" alt="Gestão de Negócios" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
         <div class="use-case-text" style="text-align: left;">
           <h3 style="font-size: 1.6rem; color: #fff; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;"><span style="color: var(--primary-cyan);">🧭</span> Gestão de Negócios &amp; Priorização</h3>
           <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.5rem;">
-            Consultorias e novos empreendedores organizam a inauguração de estabelecimentos, licenças governamentais e vistorias sanitárias eliminando fadiga de prioridades.
+            Consultorias e novos empreendedores organizam a inauguracao de estabelecimentos, licenças governamentais e vistorias sanitárias eliminando fadiga de prioridades.
           </p>
           <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.88rem; color: var(--text-muted);">
             <li style="position: relative; padding-left: 24px;"><span style="position: absolute; left: 0;">🗝️</span> <strong>Priorização:</strong> Classificação inteligente baseada na Matriz Halliday de impacto estratégico.</li>
             <li style="position: relative; padding-left: 24px;"><span style="position: absolute; left: 0;">🗝️</span> <strong>Segurança Física:</strong> Acompanhamento rígido de vistorias regulatórias de órgãos públicos.</li>
             <li style="position: relative; padding-left: 24px;"><span style="position: absolute; left: 0;">🗝️</span> <strong>Evidências:</strong> Anexação de certidões, laudos fiscais e alvarás assinados digitalmente.</li>
           </ul>
-        </div>
-        <div class="use-case-img-box" style="border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; height: 280px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-          <img src="assets/anorak_business_case.png" alt="Gestão de Negócios" style="width: 100%; height: 100%; object-fit: cover;">
         </div>
       </div>
     </div>
@@ -462,76 +481,116 @@
       </p>
     </div>
 
-    <div class="pricing-grid">
-      <!-- PLANO 1: EXPLORER (Gratuito / Beta) -->
-      <div class="pricing-card">
-        <div class="pricing-header">
-          <h3>Avatar Explorer</h3>
-          <p class="pricing-desc">Para desenvolvedores individuais validando seus primeiros projetos.</p>
-          <div class="pricing-amount">
-            <span class="currency">R$</span>
-            <span class="val">0</span>
-            <span class="period">/mês</span>
+    <!-- CARROSSEL DE PLANOS (3 Visíveis + Botões + Scroll Automático em Loop) -->
+    <div class="pricing-carousel-wrapper" id="pricingCarouselWrapper">
+      <button type="button" class="carousel-nav-btn prev" id="btnPricingPrev" aria-label="Plano Anterior">❮</button>
+      
+      <div class="pricing-carousel-track-container" id="pricingTrackContainer">
+        <div class="pricing-carousel-track" id="pricingTrack">
+          <!-- PLANO 1: EXPLORER (Gratuito / Beta) -->
+          <div class="pricing-card">
+            <div class="pricing-header">
+              <h3>Avatar Explorer</h3>
+              <p class="pricing-desc">Para desenvolvedores individuais validando seus primeiros projetos.</p>
+              <div class="pricing-amount">
+                <span class="currency">R$</span>
+                <span class="val">0</span>
+                <span class="period">/mês</span>
+              </div>
+            </div>
+
+            <ul class="pricing-features">
+              <li><span class="check">✓</span> <span>1 Frente Ativa de Homologação</span></li>
+              <li><span class="check">✓</span> <span>Incubadora com até 10 ideias</span></li>
+              <li><span class="check">✓</span> <span>Matriz Halliday básica</span></li>
+              <li><span class="check">✓</span> <span>Armazenamento Offline-First</span></li>
+              <li style="opacity: 0.5; text-decoration: line-through;"><span class="check">✗</span> <span>Sem auditoria ou anexos</span></li>
+            </ul>
+
+            <a href="login.html?plan=explorer" class="btn-pricing btn-pricing-secondary">Começar Grátis ➔</a>
+          </div>
+
+          <!-- PLANO 2: CREATOR (Mais Popular) -->
+          <div class="pricing-card featured">
+            <div class="featured-ribbon">🔥 Mais Escolhido</div>
+            <div class="pricing-header">
+              <h3>OASIS Creator</h3>
+              <p class="pricing-desc">Para criadores e engenheiros que gerenciam múltiplos produtos simultâneos.</p>
+              <div class="pricing-amount">
+                <span class="currency">R$</span>
+                <span class="val">49</span>
+                <span class="period">/mês</span>
+              </div>
+            </div>
+
+            <ul class="pricing-features">
+              <li><span class="check">✓</span> <span><strong>Frentes Ilimitadas</strong> de Projetos</span></li>
+              <li><span class="check">✓</span> <span><strong>Captura por Voz com IA</strong> (até 15/dia)</span></li>
+              <li><span class="check">✓</span> <span>Sincronização em Nuvem (MySQL + GitHub)</span></li>
+              <li><span class="check">✓</span> <span>Atribuição de Responsável Técnico</span></li>
+              <li><span class="check">✓</span> <span>Anexos de Evidências (Links Úteis)</span></li>
+            </ul>
+
+            <a href="login.html?plan=creator" class="btn-pricing btn-pricing-primary">Acessar Plano Creator ➔</a>
+          </div>
+
+          <!-- PLANO 3: MASTER / STUDIO -->
+          <div class="pricing-card">
+            <div class="pricing-header">
+              <h3>Halliday Master</h3>
+              <p class="pricing-desc">Para agências, software houses e estúdios com múltiplos ambientes.</p>
+              <div class="pricing-amount">
+                <span class="currency">R$</span>
+                <span class="val">119</span>
+                <span class="period">/mês</span>
+              </div>
+            </div>
+
+            <ul class="pricing-features">
+              <li><span class="check">✓</span> <span>Tudo do plano Creator</span></li>
+              <li><span class="check">✓</span> <span><strong>Trilha de Auditoria Completa</strong></span></li>
+              <li><span class="check">✓</span> <span>Upload de Evidências no Servidor (10MB)</span></li>
+              <li><span class="check">✓</span> <span>Relatórios em PDF para Assinatura</span></li>
+              <li><span class="check">✓</span> <span>Múltiplos Ambientes (DEV, HML, PROD)</span></li>
+            </ul>
+
+            <a href="login.html?plan=master" class="btn-pricing btn-pricing-secondary">Contratar Master ➔</a>
+          </div>
+
+          <!-- PLANO 4: LEGEND / ENTERPRISE -->
+          <div class="pricing-card">
+            <div class="pricing-header">
+              <h3>Anorak Legend</h3>
+              <p class="pricing-desc">Para grandes operações, corporações e ecossistemas escalados no OASIS.</p>
+              <div class="pricing-amount">
+                <span class="currency">R$</span>
+                <span class="val">199</span>
+                <span class="period">/mês</span>
+              </div>
+            </div>
+
+            <ul class="pricing-features">
+              <li><span class="check">✓</span> <span>Tudo do plano Master</span></li>
+              <li><span class="check">✓</span> <span><strong>IA por Voz Expandida</strong> (até 100/dia)</span></li>
+              <li><span class="check">✓</span> <span><strong>Multi-Organizações &amp; White-Label</strong></span></li>
+              <li><span class="check">✓</span> <span>Suporte VIP 24/7 &amp; SLA Dedicado</span></li>
+              <li><span class="check">✓</span> <span>Backup Automático de Auditoria</span></li>
+            </ul>
+
+            <a href="login.html?plan=legend" class="btn-pricing btn-pricing-secondary">Plano Legend ➔</a>
           </div>
         </div>
-
-        <ul class="pricing-features">
-          <li><span class="check">✓</span> 1 Frente Ativa de Homologação</li>
-          <li><span class="check">✓</span> Incubadora com até 10 ideias</li>
-          <li><span class="check">✓</span> Matriz Halliday básica</li>
-          <li><span class="check">✓</span> Armazenamento Offline-First</li>
-          <li style="opacity: 0.5; text-decoration: line-through;"><span class="check">✗</span> Sem auditoria ou anexos</li>
-        </ul>
-
-        <a href="login.html" class="btn-pricing btn-pricing-secondary">Começar Grátis ➔</a>
       </div>
 
-      <!-- PLANO 2: CREATOR (Mais Popular) -->
-      <div class="pricing-card featured">
-        <div class="featured-ribbon">🔥 Mais Escolhido</div>
-        <div class="pricing-header">
-          <h3>OASIS Creator</h3>
-          <p class="pricing-desc">Para criadores e engenheiros que gerenciam múltiplos produtos simultâneos.</p>
-          <div class="pricing-amount">
-            <span class="currency">R$</span>
-            <span class="val">49</span>
-            <span class="period">/mês</span>
-          </div>
-        </div>
+      <button type="button" class="carousel-nav-btn next" id="btnPricingNext" aria-label="Próximo Plano">❯</button>
+    </div>
 
-        <ul class="pricing-features">
-          <li><span class="check">✓</span> <strong>Frentes Ilimitadas</strong> de Projetos</li>
-          <li><span class="check">✓</span> <strong>Captura por Voz com IA</strong> Ilimitada</li>
-          <li><span class="check">✓</span> Sincronização em Nuvem (MySQL + GitHub)</li>
-          <li><span class="check">✓</span> Atribuição de Responsável Técnico</li>
-          <li><span class="check">✓</span> Anexos de Evidências (Links Úteis)</li>
-        </ul>
-
-        <a href="login.html" class="btn-pricing btn-pricing-primary">Acessar Plano Creator ➔</a>
-      </div>
-
-      <!-- PLANO 3: MASTER / STUDIO -->
-      <div class="pricing-card">
-        <div class="pricing-header">
-          <h3>Halliday Master</h3>
-          <p class="pricing-desc">Para agências, software houses e estúdios com múltiplos ambientes.</p>
-          <div class="pricing-amount">
-            <span class="currency">R$</span>
-            <span class="val">119</span>
-            <span class="period">/mês</span>
-          </div>
-        </div>
-
-        <ul class="pricing-features">
-          <li><span class="check">✓</span> Tudo do plano Creator</li>
-          <li><span class="check">✓</span> <strong>Trilha de Auditoria Completa</strong></li>
-          <li><span class="check">✓</span> Upload de Evidências no Servidor (10MB)</li>
-          <li><span class="check">✓</span> Relatórios em PDF para Assinatura</li>
-          <li><span class="check">✓</span> Múltiplos Ambientes (DEV, HML, PROD)</li>
-        </ul>
-
-        <a href="login.html" class="btn-pricing btn-pricing-secondary">Contratar Master ➔</a>
-      </div>
+    <!-- PONTOS DE NAVEGAÇÃO -->
+    <div class="pricing-carousel-dots" id="pricingDots">
+      <span class="dot active" data-index="0" title="Avatar Explorer"></span>
+      <span class="dot" data-index="1" title="OASIS Creator"></span>
+      <span class="dot" data-index="2" title="Halliday Master"></span>
+      <span class="dot" data-index="3" title="Anorak Legend"></span>
     </div>
   </section>
 
@@ -558,7 +617,7 @@
     <p>&copy; 2026 Anorak OASIS Project Hub &bull; Hub Digital 360 &bull; Todos os direitos reservados.</p>
   </footer>
 
-  <!-- Simulator Interactivity Script -->
+  <!-- Simulator & Carousel Interactivity Script -->
   <script>
     class AnorakSimulator {
       constructor() {
@@ -631,7 +690,132 @@
         document.getElementById('sim-advisor-quote').textContent = '"' + this.quotes[quoteIndex] + '"';
       }
     }
-    window.anorakSimulator = new AnorakSimulator();
+
+    // Carrossel Inteligente dos 4 Planos com Rotação Infinita nos 4 Dots
+    class PricingCarousel {
+      constructor() {
+        this.track = document.getElementById('pricingTrack');
+        this.cards = document.querySelectorAll('.pricing-carousel-track .pricing-card');
+        this.btnPrev = document.getElementById('btnPricingPrev');
+        this.btnNext = document.getElementById('btnPricingNext');
+        this.dots = document.querySelectorAll('.pricing-carousel-dots .dot');
+        this.wrapper = document.getElementById('pricingCarouselWrapper');
+        
+        this.currentIndex = 0;
+        this.totalItems = 4; // Os 4 planos originais
+        this.autoScrollTimer = null;
+        this.intervalDuration = 3500; // 3.5s por rotação
+        this.isTransitioning = false;
+
+        this.init();
+      }
+
+      init() {
+        if (!this.track || this.cards.length === 0) return;
+
+        // Duplica os 3 primeiros cards ao final para permitir rotação fluida sem espaços em branco
+        const initialCards = Array.from(this.cards);
+        initialCards.slice(0, 3).forEach(card => {
+          const clone = card.cloneNode(true);
+          clone.classList.add('cloned-card');
+          this.track.appendChild(clone);
+        });
+
+        if (this.btnPrev) this.btnPrev.addEventListener('click', () => this.prev());
+        if (this.btnNext) this.btnNext.addEventListener('click', () => this.next());
+
+        this.dots.forEach((dot) => {
+          dot.addEventListener('click', (e) => {
+            const idx = parseInt(e.target.dataset.index || '0');
+            this.goTo(idx);
+          });
+        });
+
+        // Pausa no Hover do mouse para leitura confortável
+        if (this.wrapper) {
+          this.wrapper.addEventListener('mouseenter', () => this.stopAutoScroll());
+          this.wrapper.addEventListener('mouseleave', () => this.startAutoScroll());
+        }
+
+        window.addEventListener('resize', () => this.updatePosition(false));
+
+        this.updatePosition(false);
+        this.startAutoScroll();
+      }
+
+      next() {
+        if (this.isTransitioning) return;
+        
+        this.currentIndex++;
+        if (this.currentIndex >= this.totalItems) {
+          // Anima até o clone do índice 4
+          this.updatePosition(true);
+          this.isTransitioning = true;
+
+          setTimeout(() => {
+            this.currentIndex = 0;
+            this.updatePosition(false);
+            this.isTransitioning = false;
+          }, 500);
+        } else {
+          this.updatePosition(true);
+        }
+      }
+
+      prev() {
+        if (this.isTransitioning) return;
+
+        if (this.currentIndex === 0) {
+          this.currentIndex = this.totalItems - 1;
+        } else {
+          this.currentIndex--;
+        }
+        this.updatePosition(true);
+      }
+
+      goTo(index) {
+        if (this.isTransitioning) return;
+        this.currentIndex = Math.max(0, Math.min(index, this.totalItems - 1));
+        this.updatePosition(true);
+      }
+
+      updatePosition(animate = true) {
+        const cardElement = this.cards[0];
+        if (cardElement && this.track) {
+          const cardWidth = cardElement.getBoundingClientRect().width;
+          const gapPx = 24; // 1.5rem (24px)
+          const shiftPx = (cardWidth + gapPx) * this.currentIndex;
+          
+          this.track.style.transition = animate ? 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)' : 'none';
+          this.track.style.transform = `translateX(-${shiftPx}px)`;
+        }
+
+        // Ativa sequencialmente todos os 4 dots (0, 1, 2, 3)
+        const activeDotIndex = this.currentIndex % this.totalItems;
+        this.dots.forEach((d, i) => {
+          d.classList.toggle('active', i === activeDotIndex);
+        });
+      }
+
+      startAutoScroll() {
+        this.stopAutoScroll();
+        this.autoScrollTimer = setInterval(() => {
+          this.next();
+        }, this.intervalDuration);
+      }
+
+      stopAutoScroll() {
+        if (this.autoScrollTimer) {
+          clearInterval(this.autoScrollTimer);
+          this.autoScrollTimer = null;
+        }
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      window.anorakSimulator = new AnorakSimulator();
+      window.pricingCarousel = new PricingCarousel();
+    });
   </script>
 </body>
 </html>

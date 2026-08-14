@@ -29,6 +29,35 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.brand-logo-text {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  background: linear-gradient(90deg, #ffffff 20%, var(--primary-cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  text-shadow: 0 0 20px rgba(0, 242, 254, 0.15);
+}
+
+.glowing-avatar {
+  background: linear-gradient(135deg, var(--primary-cyan), var(--accent-purple));
+  box-shadow: 0 0 15px var(--primary-glow);
+  animation: float-pulse-glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes float-pulse-glow {
+  0% {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 0 12px var(--primary-glow);
+  }
+  100% {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 0 22px rgba(0, 242, 254, 0.65), 0 0 15px rgba(138, 43, 226, 0.4);
+  }
+}
+
 .home-nav-links {
   display: flex;
   align-items: center;
@@ -370,16 +399,132 @@
 /* Pricing & Monetization Section */
 .pricing-section {
   padding: 6rem 5%;
-  max-width: 1280px;
+  max-width: 1320px;
   margin: 0 auto;
 }
 
-.pricing-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  margin-top: 3.5rem;
-  align-items: stretch;
+/* Pricing Carousel Slider (3 Cards Visíveis + Loop Automático) */
+.pricing-carousel-wrapper {
+  position: relative;
+  max-width: 1280px;
+  margin: 2.5rem auto 0 auto;
+  padding: 0 55px;
+  box-sizing: border-box;
+}
+
+.pricing-carousel-track-container {
+  overflow: hidden;
+  width: 100%;
+  padding: 1.25rem 0;
+  border-radius: var(--radius-lg);
+}
+
+.pricing-carousel-track {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  gap: 1.5rem;
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  margin-top: 0;
+  width: 100%;
+}
+
+.pricing-carousel-track .pricing-card {
+  flex: 0 0 calc((100% - 3rem) / 3) !important;
+  min-width: calc((100% - 3rem) / 3) !important;
+  max-width: calc((100% - 3rem) / 3) !important;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+  .pricing-carousel-track .pricing-card {
+    flex: 0 0 calc((100% - 1.5rem) / 2) !important;
+    min-width: calc((100% - 1.5rem) / 2) !important;
+    max-width: calc((100% - 1.5rem) / 2) !important;
+  }
+}
+
+@media (max-width: 680px) {
+  .pricing-carousel-wrapper {
+    padding: 0 35px;
+  }
+  .pricing-carousel-track .pricing-card {
+    flex: 0 0 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* Botões Flutuantes de Navegação */
+.carousel-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 15;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(13, 20, 36, 0.92);
+  border: 1px solid var(--primary-cyan);
+  color: var(--primary-cyan);
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(0, 242, 254, 0.35);
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.carousel-nav-btn:hover {
+  background: var(--primary-cyan);
+  color: #050811;
+  box-shadow: 0 0 30px rgba(0, 242, 254, 0.7);
+  transform: translateY(-50%) scale(1.12);
+}
+
+.carousel-nav-btn.prev {
+  left: 0px;
+}
+
+.carousel-nav-btn.next {
+  right: 0px;
+}
+
+@media (max-width: 1300px) {
+  .carousel-nav-btn.prev { left: -10px; }
+  .carousel-nav-btn.next { right: -10px; }
+}
+
+/* Indicadores de Pontos (Dots) */
+.pricing-carousel-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+}
+
+.pricing-carousel-dots .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pricing-carousel-dots .dot:hover {
+  background: rgba(0, 242, 254, 0.5);
+}
+
+.pricing-carousel-dots .dot.active {
+  width: 28px;
+  border-radius: 12px;
+  background: var(--primary-cyan);
+  box-shadow: 0 0 12px var(--primary-cyan);
 }
 
 .pricing-card {
@@ -626,6 +771,11 @@
 @media (max-width: 768px) {
   .home-header {
     padding: 1rem 5%;
+    justify-content: center;
+  }
+  .header-brand-box {
+    justify-content: center;
+    width: 100%;
   }
   .home-nav-links {
     display: none;
@@ -730,13 +880,13 @@
   height: auto;
   transform: translate(-50%, -50%);
   object-fit: cover;
-  opacity: 0.35;
-  filter: saturate(0.85) blur(1px);
+  opacity: 0.55;
+  filter: saturate(0.9) blur(1px);
 }
 
 .bg-video-overlay {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, rgba(7, 11, 20, 0.2) 0%, rgba(7, 11, 20, 0.85) 100%);
+  background: radial-gradient(circle at center, rgba(7, 11, 20, 0.15) 0%, rgba(7, 11, 20, 0.70) 100%);
   z-index: 1;
 }

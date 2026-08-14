@@ -15,7 +15,7 @@ class AnorakApp {
     this.currentTagFilter = 'all';
     this.decisionMatrix = new AnorakDecisionMatrix(db);
     this.audioContext = null;
-    this.soundEnabled = true;
+    this.soundEnabled = false;
   }
 
   async init() {
@@ -322,11 +322,17 @@ class AnorakApp {
               <p class="project-desc">${this.escapeHTML(proj.description || 'Sem descrição cadastrada.')}</p>
             </div>
             
-            <!-- Chaves de Halliday -->
-            <div class="halliday-keys-box" title="Conquistas de Estágio: Cobre (Planejamento), Jade (Homologação), Cristal (Produção)">
-              <span class="key-badge copper ${evo.copper ? 'active' : ''}" title="Chave de Cobre: Arquitetura & Planejamento">🗝️</span>
-              <span class="key-badge jade ${evo.jade ? 'active' : ''}" title="Chave de Jade: Homologação Ativa">🗝️</span>
-              <span class="key-badge crystal ${evo.crystal ? 'active' : ''}" title="Chave de Cristal: Produção Concluída">💎</span>
+            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <button type="button" class="btn-secondary" style="padding: 0.3rem 0.7rem; font-size: 0.8rem; border-color: rgba(0, 242, 254, 0.4); background: rgba(0, 242, 254, 0.1); color: var(--primary-cyan); font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer;" title="Editar Painel e Informações do Projeto" onclick="window.anorakApp.openEditProjectModal('${proj.id}')">
+                ✏️ Editar Painel
+              </button>
+
+              <!-- Chaves de Halliday -->
+              <div class="halliday-keys-box" title="Conquistas de Estágio: Cobre (Planejamento), Jade (Homologação), Cristal (Produção)">
+                <span class="key-badge copper ${evo.copper ? 'active' : ''}" title="Chave de Cobre: Arquitetura & Planejamento">🗝️</span>
+                <span class="key-badge jade ${evo.jade ? 'active' : ''}" title="Chave de Jade: Homologação Ativa">🗝️</span>
+                <span class="key-badge crystal ${evo.crystal ? 'active' : ''}" title="Chave de Cristal: Produção Concluída">💎</span>
+              </div>
             </div>
           </div>
 
@@ -1113,6 +1119,8 @@ class AnorakApp {
       document.getElementById('editProjId').value = project.id;
       document.getElementById('editProjTitle').value = project.title;
       document.getElementById('editProjDesc').value = project.description || '';
+      if (document.getElementById('editProjStatus')) document.getElementById('editProjStatus').value = project.status || 'homologacao';
+      if (document.getElementById('editProjPriority')) document.getElementById('editProjPriority').value = project.priority || 'media';
       document.getElementById('editProjGithub').value = project.contextLinks.githubRepo || '';
       document.getElementById('editProjDrive').value = project.contextLinks.driveFolder || '';
       document.getElementById('editProjLive').value = project.contextLinks.liveUrl || '';
@@ -1125,6 +1133,8 @@ class AnorakApp {
     const id = document.getElementById('editProjId').value;
     const title = document.getElementById('editProjTitle').value.trim();
     const description = document.getElementById('editProjDesc').value.trim();
+    const status = document.getElementById('editProjStatus') ? document.getElementById('editProjStatus').value : 'homologacao';
+    const priority = document.getElementById('editProjPriority') ? document.getElementById('editProjPriority').value : 'media';
     const githubRepo = document.getElementById('editProjGithub').value.trim();
     const driveFolder = document.getElementById('editProjDrive').value.trim();
     const liveUrl = document.getElementById('editProjLive').value.trim();
@@ -1136,6 +1146,8 @@ class AnorakApp {
 
     project.title = title;
     project.description = description;
+    project.status = status;
+    project.priority = priority;
     project.contextLinks.githubRepo = githubRepo;
     project.contextLinks.driveFolder = driveFolder;
     project.contextLinks.liveUrl = liveUrl;

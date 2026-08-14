@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anorak - Central de Ajuda &amp; Tutoriais</title>
+  
+  <!-- Favicon / Theme -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%20%220%22%20%22100%22%20%22100%22><text y=%22.9em%22 font-size=%2290%22>🧙‍♂️</text></svg>">
+  
+  <!-- Fontes do Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS Global & Componentes -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
+  
+  <!-- CSS Específico da Página de Ajuda -->
+  <link rel="stylesheet" href="css/help.css">
+  
+  <style>
+    /* Estilos extras de suporte */
+    .btn-back-hud {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all var(--transition-fast);
+      cursor: pointer;
+      text-decoration: none;
+    }
+    
+    .btn-back-hud:hover {
+      background: rgba(0, 242, 254, 0.1);
+      border-color: var(--primary-cyan);
+      box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+      color: var(--primary-cyan);
+      text-shadow: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Ambient Grid -->
+  <div class="oasis-grid-bg"></div>
+
+  <div class="app-container" style="padding-top: 2rem;">
+    <!-- TOP NAVIGATION HUD -->
+    <header class="help-header">
+      <a href="index.html" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: inherit;">
+        <div class="avatar-halo" style="width: 36px; height: 36px; animation: pulse-glow 2s infinite alternate;">
+          <div class="avatar-placeholder" style="font-size: 1.15rem;">🧙‍♂️</div>
+        </div>
+        <div>
+          <span style="font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; letter-spacing: 0.05em; color: #fff; display: block; line-height: 1.1;">ANORAK</span>
+          <span style="font-size: 0.7rem; color: var(--primary-cyan); letter-spacing: 0.05em;">CENTRAL DE AJUDA &amp; SUPORTE</span>
+        </div>
+      </a>
+      
+      <div>
+        <a href="#" id="btnBackToApp" class="btn-back-hud">
+          <span>➔</span> Voltar ao Sistema
+        </a>
+      </div>
+    </header>
+
+    <!-- SEARCH & MOTIVATION SECTION -->
+    <section class="search-section">
+      <h2 class="search-title">O que você deseja aprender hoje?</h2>
+      <p class="search-subtitle">Explore a documentação do ecossistema, o funcionamento heurístico da Matriz Halliday e dicas de produtividade.</p>
+      
+      <div class="search-box-container">
+        <span class="search-icon-hud">🔍</span>
+        <input type="text" id="helpSearchInput" class="search-input" placeholder="Digite termos como 'matriz', 'voz', 'sincronização'..." autocomplete="off">
+      </div>
+    </section>
+
+    <!-- CATEGORY TABS -->
+    <section class="categories-grid">
+      <button type="button" class="category-tab active" data-category="all">
+        <span class="icon">🌌</span>
+        <span>Todos os Tópicos</span>
+      </button>
+      <button type="button" class="category-tab" data-category="passos">
+        <span class="icon">🚀</span>
+        <span>Primeiros Passos</span>
+      </button>
+      <button type="button" class="category-tab" data-category="matriz">
+        <span class="icon">🧭</span>
+        <span>Matriz Halliday</span>
+      </button>
+      <button type="button" class="category-tab" data-category="chaves">
+        <span class="icon">🗝️</span>
+        <span>Chaves de Estágio</span>
+      </button>
+      <button type="button" class="category-tab" data-category="voz">
+        <span class="icon">🎙️</span>
+        <span>Captura por Voz</span>
+      </button>
+    </section>
+
+    <!-- HELP CONTENT LAYOUT -->
+    <div class="help-container-layout">
+      <!-- ARTIGOS (ACORDEÕES) -->
+      <main class="articles-section" id="faqContainer">
+        <!-- TÓPICO 1: Primeiros Passos -->
+        <div class="faq-item" data-category="passos">
+          <button type="button" class="faq-trigger">
+            <span class="faq-title">
+              <span class="badge-topic">Primeiros Passos</span>
+              Como funciona o ciclo de um projeto no Anorak?
+            </span>
+            <span class="faq-arrow">▶</span>
+          </button>
+          <div class="faq-content">
+            <div class="faq-content-inner">
+              <p>O Anorak organiza o fluxo de desenvolvimento em torno da **maturidade de homologação**. Ao invés de uma lista de tarefas comum, cada projeto percorre três estágios definidos como as **Três Chaves de Halliday**:</p>
+              <ul>
+                <li><strong>Cobre:</strong> O estágio inicial de planejamento e especificação técnica.</li>
+                <li><strong>Jade:</strong> A fase crítica de validação, testes e homologação de requisitos.</li>
+                <li><strong>Cristal:</strong> O estado estável de deploy final ou entrega em produção.</li>
+              </ul>
+              <p>Ao criar um projeto, ele começa no status Planejamento. Conforme você valida as etapas de homologação, ele evolui para liberar os gatilhos de deploy.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-category="passos">
+          <button type="button" class="faq-trigger">
+            <span class="faq-title">
+              <span class="badge-topic">Primeiros Passos</span>
+              O que é a persistência híbrida Offline-First?
+            </span>
+            <span class="faq-arrow">▶</span>
+          </button>
+          <div class="faq-content">
+            <div class="faq-content-inner">
+              <p>O Anorak foi desenhado para nunca interromper seu fluxo criativo. Por isso, possui **persistência híbrida instantânea**:</p>
+              <p>Toda alteração de projeto, checklist ou ideia é salva instantaneamente no seu navegador (IndexedDB/LocalStorage). Quando você está online, o sistema sincroniza os dados silenciosamente com o banco de dados MySQL de forma transparente.</p>
+              <p>Se você perder a conexão com a internet ou se o servidor estiver temporariamente indisponível, você pode continuar trabalhando. Suas alterações serão sincronizadas assim que a conexão for restabelecida.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- TÓPICO 2: Matriz Halliday -->
+        <div class="faq-item" data-category="matriz">
+          <button type="button" class="faq-trigger">
+            <span class="faq-title">
+              <span class="badge-topic">Matriz Halliday</span>
+              Como os quatro quadrantes priorizam minhas tarefas?
+            </span>
+            <span class="faq-arrow">▶</span>
+          </button>
+          <div class="faq-content">
+            <div class="faq-content-inner">
+              <p>A Matriz de Decisão do Anorak divide seus itens em 4 frentes com base no cruzamento de impacto e urgência:</p>
+              <ol>
+                <li><strong>Q1 - Homologação Crítica (Fogo Cruzado):</strong> Alto Impacto &amp; Alta Urgência. Itens críticos que bloqueiam outros processos. Devem ser resolvidos imediatamente.</li>
+                <li><strong>Q2 - Inovação &amp; Chave de Cristal (Ouro Estratégico):</strong> Alto Impacto &amp; Baixa Urgência imediata. É aqui que o valor de longo prazo é construído (novas ideias priorizadas, recursos SaaS premium).</li>
+                <li><strong>Q3 - Refinamento Rápido (Quick Wins):</strong> Baixo Impacto &amp; Alta Urgência. Ajustes rápidos de layout ou correções pontuais que demandam pouco esforço.</li>
+                <li><strong>Q4 - Incubadora &amp; Backlog:</strong> Baixo Impacto &amp; Baixa Urgência. Repositório de ideias futuras para não poluir sua atenção atual.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-category="matriz">
+          <button type="button" class="faq-trigger">
+            <span class="faq-title">
+              <span class="badge-topic">Matriz Halliday</span>
+              O que significa a letra "Q" nas prioridades (Q1, Q2, Q3, Q4)?
+            </span>
+            <span class="faq-arrow">▶</span>
+          </button>
+          <div class="faq-content">
+            <div class="faq-content-inner">
+              <p>A letra <strong>Q</strong> significa <strong>Quadrante</strong>.</p>
+              <p>A Matriz Halliday é uma representação gráfica bidimensional estruturada como uma grade de 2x2. Ela correlaciona o <strong>Impacto</strong> (eixo vertical) e a <strong>Urgência</strong> (eixo horizontal), dividindo o espaço em 4 quadrantes distintos:</p>
+              <ul>
+                <li><strong>Q1:</strong> Quadrante 1 (Homologação Crítica).</li>
+                <li><strong>Q2:</strong> Quadrante 2 (Inovação / Chave de Cristal).</li>
+                <li><strong>Q3:</strong> Quadrante 3 (Refinamento Rápido).</li>
+                <li><strong>Q4:</strong> Quadrante 4 (Incubadora / Backlog).</li>
+              </ul>
+              <p><strong>Relação com a definição de prioridades:</strong> Cada quadrante dita uma diretriz operacional clara. Ao classificar um item em um quadrante específico através da fórmula heurística, o Anorak informa instantaneamente onde investir seu tempo de forma inteligente: apagando incêndios críticos no Q1, focando estrategicamente sem pressa no Q2, executando tarefas simples e rápidas no Q3, ou guardando ideias no Q4 para não sobrecarregar sua mente no momento.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-category="matriz">
+          <button type="button" class="faq-trigger">
+            <span class="faq-title">
+              <span class="badge-topic">Matriz Halliday</span>
+              Qual é a fórmula do Conselheiro do Mago?
+            </span>
+            <span class="faq-arrow">▶</span>
+          </button>
+          <div class="faq-content">
+            <div class="faq-content-inner">
+              <p>O algoritmo heurístico do Mago prioriza itens baseado na seguinte equação:</p>
+              <p style="font-family: var(--font-mono); font-size: 1.1rem; color: var(--primary-cyan); text-align: center; margin: 1rem 0; background: rgba(5, 8, 17, 0.5); padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-glass);">
+                Prioridade = (Impacto &times; Urgência) / Esforço
+              </p>
+              <p>Itens com alto impacto e urgência que demandam baixo esforço técnico sobem rapidamente para o topo da fila de atenção. Você pode usar a ferramenta interativa ao lado para testar e planejar novas frentes de trabalho.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- TÓPICO 3: Chaves de Estágio -->
+        <div class="faq-item" data-category="chaves">
+          <button type="button" class="faq-trigger">
+            <span class="faq-title">
+              <span class="badge-topic">Chaves de Estágio</span>
+              Como avançar de Cobre para Jade e Cristal?
+            </span>
+            <span class="faq-arrow">▶</span>
+          </button>
+          <div class="faq-content">
+            <div class="faq-content-inner">
+              <p>O progresso de um projeto é governado por evidências concretas registradas no checklist:</p>
+              <ul>
+                <li><strong>Cobre ➔ Jade:</strong> Ocorre quando o escopo inicial está definido, as tarefas essenciais de setup estão completas e você anexa o link dos repositórios ou drives do projeto.</li>
+                <li><strong>Jade ➔ Cristal:</strong> Exige que todas as etapas de homologação crítica no checklist de testes sejam validadas e que você faça o upload de uma evidência física (captura de tela do teste, logs de compilação ou PDF com relatório de auditoria).</li>
+              </ul>
+              <p>Para anexar evidências, abra o painel de edição do projeto no Hub Restrito e arraste seus arquivos ou cole URLs de homologação.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- TÓPICO 4: Captura por Voz -->
+        <div class="faq-item" data-category="voz">
+          <button type="button" class="faq-trigger">
+            <span class="faq-title">
+              <span class="badge-topic">Incubadora &amp; Voz</span>
+              Como usar a Captura Rápida de Ideias por Voz?
+            </span>
+            <span class="faq-arrow">▶</span>
+          </button>
+          <div class="faq-content">
+            <div class="faq-content-inner">
+              <p>Para registrar insights sem digitar, clique no botão <strong>🎙️ Capturar Ideia</strong> no topo do Hub ou pressione o atalho global <kbd style="background: rgba(255,255,255,0.1); border: 1px solid var(--border-subtle); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.8rem;">Ctrl + Espaço</kbd>.</p>
+              <p>Fale sua ideia com clareza. O sistema transcreverá a fala em tempo real utilizando a API Web Speech do navegador e criará automaticamente um card na sua Incubadora (Q4). Você pode editar ou promover esse card a projeto quando desejar.</p>
+              <p><em>Nota: Certifique-se de dar permissão de uso do microfone no seu navegador na primeira execução.</em></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- EMPTY STATE SEARCH -->
+        <div class="empty-search-state" id="emptyState">
+          <div style="font-size: 2.5rem; margin-bottom: 1rem;">🛰️</div>
+          <h4 style="color: #fff; margin-bottom: 0.5rem; font-family: var(--font-display);">Nenhum artigo encontrado</h4>
+          <p>Tente buscar por termos mais genéricos como "voz", "matriz", "evidência" ou "chaves".</p>
+        </div>
+      </main>
+
+      <!-- SIDEBAR CALCULADORA DE PRIORIDADES -->
+      <aside class="widget-sidebar">
+        <div class="widget-card">
+          <div class="widget-header">
+            <span>🧙‍♂️</span>
+            <h3>Calculadora Halliday</h3>
+          </div>
+          
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem; line-height: 1.4;">
+            Simule o algoritmo heurístico e descubra em qual quadrante sua nova ideia ou tarefa será alocada.
+          </p>
+
+          <div class="calculator-group">
+            <div class="calc-input-row">
+              <label for="impactSlider">Impacto 
+                <span class="val-indicator" id="lblImpact">5</span>
+              </label>
+              <input type="range" id="impactSlider" class="calc-slider" min="1" max="10" value="5">
+            </div>
+
+            <div class="calc-input-row">
+              <label for="urgencySlider">Urgência 
+                <span class="val-indicator" id="lblUrgency">5</span>
+              </label>
+              <input type="range" id="urgencySlider" class="calc-slider" min="1" max="10" value="5">
+            </div>
+
+            <div class="calc-input-row">
+              <label for="effortSlider">Esforço 
+                <span class="val-indicator" id="lblEffort">5</span>
+              </label>
+              <input type="range" id="effortSlider" class="calc-slider" min="1" max="10" value="5">
+            </div>
+          </div>
+
+          <div class="calc-result-panel" id="calcResultPanel">
+            <div class="calc-score-display" id="calcScoreDisplay">5.00</div>
+            <span class="calc-badge q3" id="calcQuadrantBadge">Q3 &bull; Refinamento</span>
+            <div class="calc-verdict" id="calcVerdictText">Tarefa operacional padrão. Ótima para encaixar entre atividades pesadas.</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- SCRIPT DE INTERAÇÃO -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Botão de retorno inteligente
+      const btnBack = document.getElementById('btnBackToApp');
+      const referrer = document.referrer;
+      
+      if (referrer && (referrer.includes('app.html') || referrer.includes('admin.html') || referrer.includes('index.html'))) {
+        btnBack.href = referrer;
+        btnBack.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.location.href = referrer;
+        });
+      } else {
+        btnBack.href = 'index.html';
+      }
+
+      // 2. Comportamento do Acordeão (FAQ)
+      const faqItems = document.querySelectorAll('.faq-item');
+      
+      faqItems.forEach(item => {
+        const trigger = item.querySelector('.faq-trigger');
+        const content = item.querySelector('.faq-content');
+        
+        trigger.addEventListener('click', () => {
+          const isActive = item.classList.contains('active');
+          
+          // Fecha outros acordeões abertos
+          faqItems.forEach(otherItem => {
+            if (otherItem !== item) {
+              otherItem.classList.remove('active');
+              otherItem.querySelector('.faq-content').style.maxHeight = null;
+            }
+          });
+          
+          if (isActive) {
+            item.classList.remove('active');
+            content.style.maxHeight = null;
+          } else {
+            item.classList.add('active');
+            content.style.maxHeight = content.scrollHeight + 'px';
+          }
+        });
+      });
+
+      // 3. Filtro por abas de categorias
+      const categoryTabs = document.querySelectorAll('.category-tab');
+      
+      categoryTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          // Remove active de todos
+          categoryTabs.forEach(t => t.classList.remove('active'));
+          // Adiciona active no clicado
+          tab.classList.add('active');
+          
+          const targetCategory = tab.getAttribute('data-category');
+          filterArticles(targetCategory, document.getElementById('helpSearchInput').value.trim());
+        });
+      });
+
+      // 4. Busca em Tempo Real
+      const searchInput = document.getElementById('helpSearchInput');
+      const emptyState = document.getElementById('emptyState');
+      
+      searchInput.addEventListener('input', () => {
+        // Encontra a categoria ativa atualmente
+        const activeTab = document.querySelector('.category-tab.active');
+        const currentCategory = activeTab ? activeTab.getAttribute('data-category') : 'all';
+        
+        filterArticles(currentCategory, searchInput.value.trim());
+      });
+
+      // Função de filtragem unificada (Categoria + Termo de Busca)
+      function filterArticles(category, query) {
+        const normalizedQuery = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        let visibleCount = 0;
+        
+        faqItems.forEach(item => {
+          const itemCategory = item.getAttribute('data-category');
+          const titleText = item.querySelector('.faq-title').textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          const contentText = item.querySelector('.faq-content-inner').textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          
+          const matchesCategory = (category === 'all' || itemCategory === category);
+          const matchesSearch = (!normalizedQuery || titleText.includes(normalizedQuery) || contentText.includes(normalizedQuery));
+          
+          if (matchesCategory && matchesSearch) {
+            item.style.display = 'block';
+            visibleCount++;
+            
+            // Se estiver filtrado por busca, mantém aberto se for relevante, caso contrário recolhe
+            if (normalizedQuery && matchesSearch) {
+              item.classList.add('active');
+              const content = item.querySelector('.faq-content');
+              content.style.maxHeight = content.scrollHeight + 'px';
+            } else {
+              item.classList.remove('active');
+              item.querySelector('.faq-content').style.maxHeight = null;
+            }
+          } else {
+            item.style.display = 'none';
+            item.classList.remove('active');
+            item.querySelector('.faq-content').style.maxHeight = null;
+          }
+        });
+        
+        // Controla exibição de estado vazio
+        if (visibleCount === 0) {
+          emptyState.style.display = 'block';
+        } else {
+          emptyState.style.display = 'none';
+        }
+      }
+
+      // 5. Calculadora Heurística da Matriz
+      const sldImpact = document.getElementById('impactSlider');
+      const sldUrgency = document.getElementById('urgencySlider');
+      const sldEffort = document.getElementById('effortSlider');
+      
+      const lblImpact = document.getElementById('lblImpact');
+      const lblUrgency = document.getElementById('lblUrgency');
+      const lblEffort = document.getElementById('lblEffort');
+      
+      const calcScore = document.getElementById('calcScoreDisplay');
+      const calcBadge = document.getElementById('calcQuadrantBadge');
+      const calcVerdict = document.getElementById('calcVerdictText');
+      const calcResultPanel = document.getElementById('calcResultPanel');
+      
+      function updateCalculator() {
+        const impact = parseInt(sldImpact.value);
+        const urgency = parseInt(sldUrgency.value);
+        const effort = parseInt(sldEffort.value);
+        
+        lblImpact.textContent = impact;
+        lblUrgency.textContent = urgency;
+        lblEffort.textContent = effort;
+        
+        // Fórmula heurística: (Impacto * Urgência) / Esforço
+        const score = (impact * urgency) / effort;
+        calcScore.textContent = score.toFixed(2);
+        
+        // Mapeia para Quadrantes e atualiza layout
+        calcBadge.className = 'calc-badge'; // Reset classes
+        
+        if (impact >= 8 && urgency >= 8) {
+          calcBadge.textContent = 'Q1 • Homologação Crítica';
+          calcBadge.classList.add('q1');
+          calcVerdict.textContent = 'Fogo Cruzado! Este item impede outras entregas de irem para produção. Foco imediato necessário.';
+          calcResultPanel.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+        } else if (impact >= 6) {
+          calcBadge.textContent = 'Q2 • Inovação / Cristal';
+          calcBadge.classList.add('q2');
+          calcVerdict.textContent = 'Ouro Estratégico. Item de alto valor de longo prazo. Trabalhe em blocos de foco profundo sem pressa.';
+          calcResultPanel.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+        } else if (urgency >= 6 || score >= 5.0) {
+          calcBadge.textContent = 'Q3 • Refinamento Rápido';
+          calcBadge.classList.add('q3');
+          calcVerdict.textContent = 'Tarefa de retorno rápido (Quick Win). Boa para encaixar entre tarefas pesadas devido ao baixo esforço.';
+          calcResultPanel.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+        } else {
+          calcBadge.textContent = 'Q4 • Incubadora / Backlog';
+          calcBadge.classList.add('q4');
+          calcVerdict.textContent = 'Ideia para futura validação. Perfeita para guardar na Incubadora e não ocupar espaço mental agora.';
+          calcResultPanel.style.borderColor = 'rgba(56, 189, 248, 0.4)';
+        }
+      }
+      
+      // Listeners para a calculadora
+      [sldImpact, sldUrgency, sldEffort].forEach(slider => {
+        slider.addEventListener('input', updateCalculator);
+      });
+      
+      // Executa inicialização
+      updateCalculator();
+    });
+  </script>
+</body>
+</html>

@@ -48,6 +48,7 @@ Create-FtpDirectory "hml/api"
 Create-FtpDirectory "hml/api/auth"
 Create-FtpDirectory "hml/api/users"
 Create-FtpDirectory "hml/api/admin"
+Create-FtpDirectory "hml/api/payments"
 Create-FtpDirectory "hml/assets"
 
 # 2. Configura temporariamente o .env de homologação
@@ -77,11 +78,13 @@ try {
     Upload-File "$localDir\login.html" "hml/login.html"
     Upload-File "$localDir\app.html" "hml/app.html"
     Upload-File "$localDir\admin.html" "hml/admin.html"
+    Upload-File "$localDir\help.html" "hml/help.html"
     Upload-File "$localDir\assets\anorak_construction_case.png" "hml/assets/anorak_construction_case.png"
     Upload-File "$localDir\assets\anorak_creative_case.png" "hml/assets/anorak_creative_case.png"
     Upload-File "$localDir\assets\anorak_business_case.png" "hml/assets/anorak_business_case.png"
+    Upload-File "$localDir\assets\anorak_software_case.png" "hml/assets/anorak_software_case.png"
     Upload-File "$localDir\assets\bg-video.mp4" "hml/assets/bg-video.mp4"
-
+ 
     # 4. Envio dos arquivos CSS
     Upload-File "$localDir\css\variables.css" "hml/css/variables.css"
     Upload-File "$localDir\css\base.css" "hml/css/base.css"
@@ -90,6 +93,7 @@ try {
     Upload-File "$localDir\css\home.css" "hml/css/home.css"
     Upload-File "$localDir\css\login.css" "hml/css/login.css"
     Upload-File "$localDir\css\admin.css" "hml/css/admin.css"
+    Upload-File "$localDir\css\help.css" "hml/css/help.css"
 
     # 5. Envio dos módulos JavaScript
     Upload-File "$localDir\js\models.js" "hml/js/models.js"
@@ -115,7 +119,7 @@ try {
     Upload-File "$localDir\api\auth\recover_password.php" "hml/api/auth/recover_password.php"
     Upload-File "$localDir\api\auth\reset_password.php" "hml/api/auth/reset_password.php"
 
-    # 7. Envio das APIs de Administração
+    # 7. Envio das APIs de Administração e Pagamentos Mercado Pago
     Upload-File "$localDir\api\admin\list_users.php" "hml/api/admin/list_users.php"
     Upload-File "$localDir\api\admin\update_user.php" "hml/api/admin/update_user.php"
     Upload-File "$localDir\api\admin\delete_user.php" "hml/api/admin/delete_user.php"
@@ -125,6 +129,10 @@ try {
     Upload-File "$localDir\api\admin\get_stats.php" "hml/api/admin/get_stats.php"
     Upload-File "$localDir\api\admin\bulk_update.php" "hml/api/admin/bulk_update.php"
     Upload-File "$localDir\api\admin\run_deploy.php" "hml/api/admin/run_deploy.php"
+
+    Upload-File "$localDir\api\payments\create_pix.php" "hml/api/payments/create_pix.php"
+    Upload-File "$localDir\api\payments\webhook.php" "hml/api/payments/webhook.php"
+    Upload-File "$localDir\api\payments\check_status.php" "hml/api/payments/check_status.php"
 
     Write-Host "`n=================================================" -ForegroundColor Green
     Write-Host " Deploy HML finalizado com sucesso!" -ForegroundColor Green

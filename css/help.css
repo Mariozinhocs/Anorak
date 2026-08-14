@@ -1,0 +1,432 @@
+/* ========================================================================= */
+/* CSS DEDICADO - AJUDA & TUTORIAIS (ESTILO HUD CYBERPUNK)                  */
+/* ========================================================================= */
+
+.help-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-hud);
+}
+
+/* Search Bar HUD */
+.search-section {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 3rem;
+  padding: 2.5rem 2rem;
+  background: rgba(10, 15, 29, 0.4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.search-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary-cyan), var(--primary-blue), transparent);
+}
+
+.search-title {
+  font-size: 2rem;
+  color: #fff;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 15px rgba(0, 242, 254, 0.25);
+}
+
+.search-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+.search-box-container {
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.search-input {
+  width: 100%;
+  padding: 1.1rem 1.5rem 1.1rem 3.5rem;
+  background: rgba(5, 8, 17, 0.85);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  color: #fff;
+  font-family: var(--font-main);
+  font-size: 1rem;
+  transition: all var(--transition-smooth);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary-cyan);
+  box-shadow: 0 0 15px var(--primary-glow), inset 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.search-icon-hud {
+  position: absolute;
+  left: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  color: var(--primary-cyan);
+  pointer-events: none;
+  text-shadow: 0 0 8px var(--primary-glow);
+}
+
+/* Category Grid / Tabs */
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  max-width: 1000px;
+  margin: 0 auto 3rem;
+}
+
+.category-tab {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.category-tab:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--primary-blue);
+  transform: translateY(-4px);
+  box-shadow: 0 5px 15px rgba(79, 172, 254, 0.15);
+}
+
+.category-tab.active {
+  background: rgba(0, 242, 254, 0.05);
+  border-color: var(--primary-cyan);
+  box-shadow: 0 0 20px rgba(0, 242, 254, 0.15), inset 0 0 10px rgba(0, 242, 254, 0.05);
+}
+
+.category-tab .icon {
+  font-size: 1.75rem;
+  margin-bottom: 0.25rem;
+  transition: transform var(--transition-bounce);
+}
+
+.category-tab:hover .icon {
+  transform: scale(1.15);
+}
+
+.category-tab span {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.category-tab.active span {
+  color: var(--primary-cyan);
+  text-shadow: 0 0 8px var(--primary-glow);
+}
+
+/* Help Articles & FAQ Accordions */
+.help-container-layout {
+  display: grid;
+  grid-template-columns: 2.2fr 1fr;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.articles-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.faq-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: all var(--transition-smooth);
+}
+
+.faq-item:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--bg-card-hover);
+}
+
+.faq-item.active {
+  border-color: var(--border-glass-hover);
+  box-shadow: var(--shadow-hud);
+}
+
+.faq-trigger {
+  width: 100%;
+  padding: 1.25rem 1.5rem;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  outline: none;
+}
+
+.faq-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: #fff;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.faq-title .badge-topic {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+}
+
+.faq-arrow {
+  color: var(--primary-cyan);
+  font-size: 0.85rem;
+  transition: transform var(--transition-smooth);
+}
+
+.faq-item.active .faq-arrow {
+  transform: rotate(90deg);
+}
+
+.faq-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(5, 8, 17, 0.3);
+}
+
+.faq-content-inner {
+  padding: 1.5rem;
+  border-top: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.faq-content-inner p {
+  margin-bottom: 1rem;
+}
+
+.faq-content-inner p:last-child {
+  margin-bottom: 0;
+}
+
+.faq-content-inner strong {
+  color: #fff;
+}
+
+.faq-content-inner ul, .faq-content-inner ol {
+  margin: 0.75rem 0 0.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.faq-content-inner li {
+  position: relative;
+}
+
+/* Prioritization Calculator Widget */
+.widget-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.widget-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-hud);
+  position: sticky;
+  top: 1.5rem;
+}
+
+.widget-header {
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 1rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.widget-header h3 {
+  font-size: 1.15rem;
+  color: #fff;
+  font-family: var(--font-display);
+}
+
+.calculator-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.calc-input-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.calc-input-row label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  justify-content: space-between;
+}
+
+.calc-input-row label span.val-indicator {
+  color: var(--primary-cyan);
+  font-family: var(--font-mono);
+  font-weight: bold;
+}
+
+.calc-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+  transition: background var(--transition-fast);
+}
+
+.calc-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--primary-cyan);
+  cursor: pointer;
+  box-shadow: 0 0 10px var(--primary-glow);
+  transition: transform var(--transition-fast);
+}
+
+.calc-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.calc-result-panel {
+  background: rgba(5, 8, 17, 0.7);
+  border: 1px dashed var(--border-glass);
+  border-radius: var(--radius-sm);
+  padding: 1.25rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 120px;
+  transition: all var(--transition-smooth);
+}
+
+.calc-score-display {
+  font-family: var(--font-mono);
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: var(--primary-cyan);
+  line-height: 1;
+  text-shadow: 0 0 15px var(--primary-glow);
+}
+
+.calc-badge {
+  font-size: 0.72rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  border-radius: 12px;
+  color: #fff;
+  margin-top: 2px;
+}
+
+.calc-badge.q1 { background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.5); color: #fca5a5; }
+.calc-badge.q2 { background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.5); color: #fde047; }
+.calc-badge.q3 { background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.5); color: #a7f3d0; }
+.calc-badge.q4 { background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.5); color: #bae6fd; }
+
+.calc-verdict {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Empty State Search */
+.empty-search-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--bg-card);
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  display: none;
+}
+
+/* Responsive tweaks */
+@media (max-width: 900px) {
+  .help-container-layout {
+    grid-template-columns: 1fr;
+  }
+  .widget-card {
+    position: relative;
+    top: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .help-header {
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 1.5rem 1rem;
+    text-align: center;
+  }
+  .help-header > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 0.5rem;
+  }
+}

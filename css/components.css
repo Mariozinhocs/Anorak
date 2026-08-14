@@ -35,6 +35,8 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+  text-decoration: none;
+  color: inherit;
 }
 
 .avatar-halo {
@@ -45,6 +47,18 @@
   padding: 2px;
   background: linear-gradient(135deg, var(--primary-cyan), var(--accent-purple));
   box-shadow: 0 0 15px var(--primary-glow);
+  animation: float-pulse-glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes float-pulse-glow {
+  0% {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 0 12px var(--primary-glow);
+  }
+  100% {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 0 22px rgba(0, 242, 254, 0.65), 0 0 15px rgba(138, 43, 226, 0.4);
+  }
 }
 
 .avatar-halo img, .avatar-halo .avatar-placeholder {
@@ -65,14 +79,16 @@
 }
 
 .brand-title {
-  font-size: 1.4rem;
+  font-size: 1.55rem;
   font-weight: 800;
+  letter-spacing: 0.05em;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: linear-gradient(90deg, #ffffff, var(--primary-cyan));
+  background: linear-gradient(90deg, #ffffff 20%, var(--primary-cyan) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 20px rgba(0, 242, 254, 0.15);
 }
 
 .brand-subtitle {
@@ -1186,4 +1202,40 @@
   background: rgba(0, 0, 0, 0.15);
   padding: 2px 6px;
   border-radius: 4px;
+}
+
+/* Mobile Header Adaptations */
+@media (max-width: 768px) {
+  .anorak-header {
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 1.5rem 1rem;
+    border-radius: var(--radius-lg);
+    text-align: center;
+  }
+  .brand-section {
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    gap: 0.5rem;
+  }
+  .brand-info {
+    align-items: center;
+  }
+  .dual-mode-nav {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .dual-mode-nav .mode-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+  .header-actions {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
 }

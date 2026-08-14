@@ -47,6 +47,7 @@ Create-FtpDirectory "api"
 Create-FtpDirectory "api/auth"
 Create-FtpDirectory "api/users"
 Create-FtpDirectory "api/admin"
+Create-FtpDirectory "api/payments"
 Create-FtpDirectory "assets"
 
 # 2. Configura temporariamente o .env de produção se existir
@@ -76,11 +77,13 @@ try {
     Upload-File "$localDir\login.html" "login.html"
     Upload-File "$localDir\app.html" "app.html"
     Upload-File "$localDir\admin.html" "admin.html"
+    Upload-File "$localDir\help.html" "help.html"
     Upload-File "$localDir\assets\anorak_construction_case.png" "assets/anorak_construction_case.png"
     Upload-File "$localDir\assets\anorak_creative_case.png" "assets/anorak_creative_case.png"
     Upload-File "$localDir\assets\anorak_business_case.png" "assets/anorak_business_case.png"
+    Upload-File "$localDir\assets\anorak_software_case.png" "assets/anorak_software_case.png"
     Upload-File "$localDir\assets\bg-video.mp4" "assets/bg-video.mp4"
-
+ 
     # 4. Envio dos arquivos CSS
     Upload-File "$localDir\css\variables.css" "css/variables.css"
     Upload-File "$localDir\css\base.css" "css/base.css"
@@ -89,6 +92,7 @@ try {
     Upload-File "$localDir\css\home.css" "css/home.css"
     Upload-File "$localDir\css\login.css" "css/login.css"
     Upload-File "$localDir\css\admin.css" "css/admin.css"
+    Upload-File "$localDir\css\help.css" "css/help.css"
 
     # 5. Envio dos módulos JavaScript
     Upload-File "$localDir\js\models.js" "js/models.js"
@@ -114,7 +118,7 @@ try {
     Upload-File "$localDir\api\auth\recover_password.php" "api/auth/recover_password.php"
     Upload-File "$localDir\api\auth\reset_password.php" "api/auth/reset_password.php"
 
-    # 7. Envio das APIs de Administração
+    # 7. Envio das APIs de Administração e Pagamentos Mercado Pago
     Upload-File "$localDir\api\admin\list_users.php" "api/admin/list_users.php"
     Upload-File "$localDir\api\admin\update_user.php" "api/admin/update_user.php"
     Upload-File "$localDir\api\admin\delete_user.php" "api/admin/delete_user.php"
@@ -124,6 +128,10 @@ try {
     Upload-File "$localDir\api\admin\get_stats.php" "api/admin/get_stats.php"
     Upload-File "$localDir\api\admin\bulk_update.php" "api/admin/bulk_update.php"
     Upload-File "$localDir\api\admin\run_deploy.php" "api/admin/run_deploy.php"
+
+    Upload-File "$localDir\api\payments\create_pix.php" "api/payments/create_pix.php"
+    Upload-File "$localDir\api\payments\webhook.php" "api/payments/webhook.php"
+    Upload-File "$localDir\api\payments\check_status.php" "api/payments/check_status.php"
 
     Write-Host "`n=================================================" -ForegroundColor Green
     Write-Host " Deploy de PRODUÇÃO finalizado com sucesso!" -ForegroundColor Green
