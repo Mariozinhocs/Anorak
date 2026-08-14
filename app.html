@@ -46,8 +46,11 @@
 
       <!-- DUAL MODE SWITCHER -->
       <nav class="dual-mode-nav" aria-label="Modo de Visualização">
-        <button type="button" class="mode-btn active" data-mode="operational" id="tabOperational">
-          <span>⚡</span> Mapa de Status (3 Projetos)
+        <button type="button" class="mode-btn active" data-mode="operational" id="tabOperational" style="flex-direction: column; gap: 2px; padding: 0.35rem 1.25rem; align-items: center; justify-content: center;">
+          <span style="display: flex; align-items: center; gap: 0.5rem; white-space: nowrap;">
+            <span>⚡</span> Mapa de Status
+          </span>
+          <span style="font-size: 0.72rem; opacity: 0.7; font-weight: 500; display: block; margin-top: 1px;">(3 Projetos)</span>
         </button>
         <button type="button" class="mode-btn" data-mode="incubator" id="tabIncubator">
           <span>💡</span> Incubadora de Ideias
