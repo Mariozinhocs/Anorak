@@ -802,12 +802,22 @@ class AnorakApp {
       const badgeClass = idea.status === IdeaStatus.PRIORITIZED ? 'prioritized' : (idea.status === IdeaStatus.DRAFT ? 'draft' : 'backlog');
       const badgeLabel = idea.status === IdeaStatus.PRIORITIZED ? '⚡ Priorizado' : (idea.status === IdeaStatus.DRAFT ? '📝 Rascunho' : '📦 Backlog');
 
+      const dateStr = idea.createdAt ? new Date(idea.createdAt).toLocaleDateString('pt-BR') : '';
+      const timeStr = idea.createdAt ? new Date(idea.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '';
+      const formattedDate = dateStr ? `📅 ${dateStr} às ${timeStr}` : '';
+
       return `
         <article class="glass-panel idea-card" data-idea-id="${idea.id}">
           <div class="idea-header">
             <h4 class="idea-title">${this.escapeHTML(idea.title)}</h4>
             <span class="badge ${badgeClass}">${badgeLabel}</span>
           </div>
+
+          ${formattedDate ? `
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: -6px; margin-bottom: 8px; font-family: var(--font-mono); display: flex; align-items: center; gap: 4px;">
+              ${formattedDate}
+            </div>
+          ` : ''}
 
           <div class="idea-body">${this.escapeHTML(idea.description)}</div>
 

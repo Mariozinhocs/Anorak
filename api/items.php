@@ -182,5 +182,7 @@ function formatItemJsonFields(&$item) {
     $item['tasks'] = !empty($item['tasks_json']) ? json_decode($item['tasks_json'], true) : [];
     $item['validationHistory'] = !empty($item['validation_history_json']) ? json_decode($item['validation_history_json'], true) : [];
     $item['assignedTo'] = $item['assigned_to'] ?? '';
-    unset($item['tags_json'], $item['context_links_json'], $item['tasks_json'], $item['validation_history_json'], $item['assigned_to']);
+    $item['createdAt'] = !empty($item['created_at']) ? date('c', strtotime($item['created_at'])) : null;
+    $item['updatedAt'] = !empty($item['updated_at']) ? date('c', strtotime($item['updated_at'])) : null;
+    unset($item['tags_json'], $item['context_links_json'], $item['tasks_json'], $item['validation_history_json'], $item['assigned_to'], $item['created_at'], $item['updated_at']);
 }
