@@ -223,13 +223,24 @@ class AnorakAdmin {
         if (result.status === 'success') {
           this.users = result.data;
           this.renderUsers();
+          return;
         }
       }
+      const errText = res.ok ? 'Resposta inválida' : `HTTP ${res.status}`;
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="8" style="text-align: center; color: var(--accent-magenta); padding: 2rem;">
+            ⚠️ Falha ao carregar lista de usuários (${errText}). 
+            <button type="button" class="btn-secondary" style="margin-left: 10px; padding: 4px 10px; font-size: 0.8rem; cursor: pointer;" onclick="window.anorakAdmin.loadUsers()">🔄 Tentar Novamente</button>
+          </td>
+        </tr>
+      `;
     } catch (err) {
       tableBody.innerHTML = `
         <tr>
           <td colspan="8" style="text-align: center; color: var(--accent-magenta); padding: 2rem;">
-            ❌ Falha de comunicação ao carregar usuários.
+            ❌ Falha de comunicação ao carregar usuários. 
+            <button type="button" class="btn-secondary" style="margin-left: 10px; padding: 4px 10px; font-size: 0.8rem; cursor: pointer;" onclick="window.anorakAdmin.loadUsers()">🔄 Tentar Novamente</button>
           </td>
         </tr>
       `;

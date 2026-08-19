@@ -15,6 +15,11 @@ try {
     $users_table = $prefix . 'users';
     $items_table = $prefix . 'items';
 
+    // Auto-migração preventiva caso a coluna billing_cycle não exista no banco
+    try {
+        $pdo->exec("ALTER TABLE `{$users_table}` ADD COLUMN `billing_cycle` ENUM('monthly', 'annual') NOT NULL DEFAULT 'monthly' AFTER `plan_expires_at`");
+    } catch (Exception $e) {}
+
     // Parâmetros de Filtros e Busca
     $search = trim($_GET['search'] ?? '');
     $plan = trim($_GET['plan'] ?? '');
