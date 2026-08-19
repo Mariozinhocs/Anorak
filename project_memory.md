@@ -38,12 +38,13 @@
 5. **Arquitetura e M.O. de Deploy:**
    - **Ambiente de Homologação (`/hml`):** Todo o desenvolvimento e validações sobem para a subpasta `hml/` (`http://anorak.hubdigital360.com/hml/`).
    - **Ambiente de Produção (`root`):** Publicação direta na raiz do domínio via `deploy-prod.ps1`.
-   - **Repositório Git:** Sincronizado no GitHub com `.gitignore` protegendo credenciais e commits etiquetados (v1.5.0).
+   - **Repositório Git:** Sincronizado no GitHub com `.gitignore` protegendo credenciais e commits etiquetados (v1.5.1).
 
-6. **Deploy de Atualização v1.5.0 em Homologação:**
-   - **Checkout Pix & Mercado Pago:** Modal de Checkout (`#modalCheckout`) integrado para simulação/seleção de ciclo de pagamento (Mensal/Anual) e geração direta de cobrança Pix (`api/payments/create_checkout.php`).
-   - **Gestão de Colaboradores & Convites Direct Link:** Modal `#modalShareProject` com link copiável e listagem de colaboradores com permissões.
-   - **Publicação:** Concluído commit `a07bfd0` e deploy FTP realizado via `deploy-hml.ps1` para `http://anorak.hubdigital360.com/hml/`.
+6. **Deploy de Atualização v1.5.1 em Homologação:**
+   - **Correção da Persistência de Links HML & Live:** Normalização do objeto `contextLinks` no modelo `Item` e manipuladores do modal de edição (`openEditProjectModal` / `saveEditProject`) com salvamento correto no LocalStorage e MySQL.
+   - **Ocultação da Função Responsável (Projetos Sem Equipe):** O seletor dropdown de `Responsável:` agora é exibido exclusivamente quando o projeto possui colaboradores convidados (`collaborators.length > 0`). Caso contrário, é indicado o Dono do projeto sem expor seletores desnecessários.
+   - **Convites por Username ou E-mail com Disparo de Convite:** O modal `#modalShareProject` aceita digitação de `@username` ou endereço de e-mail com sugestão via datalist. Caso um e-mail não-cadastrado seja inserido, o sistema solicita confirmação e registra/envia o convite via `api/users/invite.php`.
+   - **Publicação:** Commit `74259ea` publicado no GitHub e deploy FTP realizado via `deploy-hml.ps1` para `http://anorak.hubdigital360.com/hml/`.
 
 ---
 
