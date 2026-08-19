@@ -131,6 +131,7 @@ try {
     Upload-File "$localDir\api\admin\run_deploy.php" "api/admin/run_deploy.php"
 
     Upload-File "$localDir\api\payments\create_pix.php" "api/payments/create_pix.php"
+    Upload-File "$localDir\api\payments\create_checkout.php" "api/payments/create_checkout.php"
     Upload-File "$localDir\api\payments\webhook.php" "api/payments/webhook.php"
     Upload-File "$localDir\api\payments\check_status.php" "api/payments/check_status.php"
 

@@ -90,6 +90,14 @@ try {
     }
     echo "<span class='success'>[OK] Tabelas criadas/atualizadas com sucesso!</span>\n\n";
 
+    // Migração de colunas adicionais se a tabela já existia
+    try {
+        $pdo->exec("ALTER TABLE `{$prefix}items` ADD COLUMN `collaborators_json` JSON NULL AFTER `assigned_to`");
+        echo "<span class='success'>[MIGRATION] Coluna 'collaborators_json' verificada/adicionada com sucesso!</span>\n";
+    } catch (Exception $e) {
+        // Coluna já existe
+    }
+
     // Verificar se a tabela de itens precisa de seeding inicial
     $items_table = $prefix . 'items';
     $count_res = $pdo->query("SELECT COUNT(*) as total FROM `{$items_table}`");
@@ -108,10 +116,13 @@ try {
                 'priority' => 'alta',
                 'impact' => 'alto',
                 'urgency' => 'alta',
+                'assigned_to' => 'admin',
+                'collaborators_json' => json_encode(['mario.henrique', 'convidado']),
                 'tags_json' => json_encode(['Retro', 'VR', 'OASIS', 'Three.js']),
                 'context_links_json' => json_encode([
                     'driveFolder' => 'https://drive.google.com/drive/folders/retroverse-vr',
                     'githubRepo' => 'https://github.com/Mariozinhocs/retroverse-vr.git',
+                    'hmlUrl' => 'https://anorak.hubdigital360.com/hml/retroverse',
                     'liveUrl' => 'https://retroverse.oasis'
                 ]),
                 'tasks_json' => json_encode([
@@ -138,6 +149,7 @@ try {
                 'context_links_json' => json_encode([
                     'driveFolder' => 'https://drive.google.com/drive/folders/oasis-engine',
                     'githubRepo' => 'https://github.com/Mariozinhocs/oasis-engine.git',
+                    'hmlUrl' => 'https://anorak.hubdigital360.com/hml/engine',
                     'liveUrl' => 'https://engine.oasis'
                 ]),
                 'tasks_json' => json_encode([
@@ -162,6 +174,7 @@ try {
                 'context_links_json' => json_encode([
                     'driveFolder' => 'https://drive.google.com/drive/folders/synclink-api',
                     'githubRepo' => 'https://github.com/Mariozinhocs/synclink-api.git',
+                    'hmlUrl' => 'https://anorak.hubdigital360.com/hml/synclink',
                     'liveUrl' => ''
                 ]),
                 'tasks_json' => json_encode([
@@ -225,8 +238,11 @@ try {
     try {
         $col_plan = $pdo->query("SHOW COLUMNS FROM `{$users_table}` LIKE 'plan'");
         if ($col_plan->rowCount() === 0) {
-            $pdo->exec("ALTER TABLE `{$users_table}` ADD COLUMN plan ENUM('explorer', 'creator', 'master') NOT NULL DEFAULT 'creator' AFTER role");
+            $pdo->exec("ALTER TABLE `{$users_table}` ADD COLUMN plan ENUM('explorer', 'creator', 'master', 'legend') NOT NULL DEFAULT 'creator' AFTER role");
             echo " [MIGRATE] Coluna 'plan' adicionada com sucesso na tabela users.\n";
+        } else {
+            $pdo->exec("ALTER TABLE `{$users_table}` MODIFY COLUMN plan ENUM('explorer', 'creator', 'master', 'legend') NOT NULL DEFAULT 'creator'");
+            echo " [MIGRATE] Coluna 'plan' atualizada para suportar plano 'legend'.\n";
         }
         $col_plan_status = $pdo->query("SHOW COLUMNS FROM `{$users_table}` LIKE 'plan_status'");
         if ($col_plan_status->rowCount() === 0) {
@@ -237,6 +253,11 @@ try {
         if ($col_plan_expires->rowCount() === 0) {
             $pdo->exec("ALTER TABLE `{$users_table}` ADD COLUMN plan_expires_at DATETIME NULL DEFAULT NULL AFTER plan_status");
             echo " [MIGRATE] Coluna 'plan_expires_at' adicionada com sucesso na tabela users.\n";
+        }
+        $col_billing = $pdo->query("SHOW COLUMNS FROM `{$users_table}` LIKE 'billing_cycle'");
+        if ($col_billing->rowCount() === 0) {
+            $pdo->exec("ALTER TABLE `{$users_table}` ADD COLUMN billing_cycle ENUM('monthly', 'annual') NOT NULL DEFAULT 'monthly' AFTER plan_expires_at");
+            echo " [MIGRATE] Coluna 'billing_cycle' adicionada com sucesso na tabela users.\n";
         }
         $col_reset_token = $pdo->query("SHOW COLUMNS FROM `{$users_table}` LIKE 'password_reset_token'");
         if ($col_reset_token->rowCount() === 0) {

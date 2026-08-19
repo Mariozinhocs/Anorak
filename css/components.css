@@ -582,16 +582,26 @@
 
 .context-link-btn {
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.35rem;
-  font-size: 0.75rem;
+  justify-content: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  padding: 0.35rem 0.7rem;
-  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--radius-md);
   background: rgba(255, 255, 255, 0.04);
   color: var(--text-secondary);
   border: 1px solid var(--border-subtle);
+  min-width: 58px;
+  min-height: 52px;
+  text-decoration: none;
   transition: all var(--transition-fast);
+}
+
+.context-link-btn svg {
+  display: block;
+  margin-bottom: 2px;
 }
 
 .context-link-btn:hover {
@@ -1279,4 +1289,34 @@
     flex-wrap: wrap;
     gap: 0.75rem;
   }
+}
+
+/* ==========================================================================
+   ANIMAÇÃO DE HIGHLIGHT E NAVEGAÇÃO DE PROJETOS DA MATRIZ
+   ========================================================================== */
+@keyframes neonPulse {
+  0% { box-shadow: 0 0 5px var(--primary-cyan), inset 0 0 5px var(--primary-cyan); }
+  50% { box-shadow: 0 0 25px var(--primary-cyan), 0 0 12px #38bdf8, inset 0 0 15px var(--primary-cyan); border-color: var(--primary-cyan) !important; }
+  100% { box-shadow: none; }
+}
+
+.highlight-pulse {
+  animation: neonPulse 2.5s ease-in-out !important;
+  border-color: var(--primary-cyan) !important;
+}
+
+.quadrant-item {
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 0.4rem;
+}
+
+.quadrant-item:hover {
+  background: rgba(0, 242, 254, 0.12) !important;
+  border-color: rgba(0, 242, 254, 0.4) !important;
+  transform: translateX(4px);
 }

@@ -482,6 +482,18 @@
       </p>
     </div>
 
+    <!-- Alternador de Cobrança Mensal / Anual -->
+    <div class="billing-toggle-container" style="display: flex; justify-content: center; align-items: center; gap: 1.25rem; margin-bottom: 2.5rem; position: relative; z-index: 10;">
+      <span class="billing-label active" id="lblMonthly" style="font-size: 1rem; color: #fff; font-weight: 600; cursor: pointer; transition: all 0.3s;">Mensal</span>
+      <label class="switch" style="position: relative; display: inline-block; width: 56px; height: 28px;">
+        <input type="checkbox" id="billingToggle" style="opacity: 0; width: 0; height: 0;">
+        <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.1); border: 1.5px solid var(--border-subtle); border-radius: 34px; transition: .4s;"></span>
+      </label>
+      <span class="billing-label" id="lblAnnual" style="font-size: 1rem; color: var(--text-secondary); font-weight: 500; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px;">
+        Anual <span class="badge-discount" style="background: var(--primary-cyan); color: #050811; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 12px; text-transform: uppercase;">20% OFF</span>
+      </span>
+    </div>
+
     <!-- CARROSSEL DE PLANOS (3 Visíveis + Botões + Scroll Automático em Loop) -->
     <div class="pricing-carousel-wrapper" id="pricingCarouselWrapper">
       <button type="button" class="carousel-nav-btn prev" id="btnPricingPrev" aria-label="Plano Anterior">❮</button>
@@ -495,8 +507,8 @@
               <p class="pricing-desc">Para desenvolvedores individuais validando seus primeiros projetos.</p>
               <div class="pricing-amount">
                 <span class="currency">R$</span>
-                <span class="val">0</span>
-                <span class="period">/mês</span>
+                <span class="val" id="priceValExplorer">0</span>
+                <span class="period" id="pricePeriodExplorer">/mês</span>
               </div>
             </div>
 
@@ -508,7 +520,7 @@
               <li style="opacity: 0.5; text-decoration: line-through;"><span class="check">✗</span> <span>Sem auditoria ou anexos</span></li>
             </ul>
 
-            <a href="login.html?plan=explorer" class="btn-pricing btn-pricing-secondary">Começar Grátis ➔</a>
+            <a href="login.html?plan=explorer&billing=monthly" class="btn-pricing btn-pricing-secondary" id="btnPlanExplorer">Começar Grátis ➔</a>
           </div>
 
           <!-- PLANO 2: CREATOR (Mais Popular) -->
@@ -519,8 +531,8 @@
               <p class="pricing-desc">Para criadores e engenheiros que gerenciam múltiplos produtos simultâneos.</p>
               <div class="pricing-amount">
                 <span class="currency">R$</span>
-                <span class="val">49</span>
-                <span class="period">/mês</span>
+                <span class="val" id="priceValCreator">49</span>
+                <span class="period" id="pricePeriodCreator">/mês</span>
               </div>
             </div>
 
@@ -532,7 +544,7 @@
               <li><span class="check">✓</span> <span>Anexos de Evidências (Links Úteis)</span></li>
             </ul>
 
-            <a href="login.html?plan=creator" class="btn-pricing btn-pricing-primary">Acessar Plano Creator ➔</a>
+            <a href="login.html?plan=creator&billing=monthly" class="btn-pricing btn-pricing-primary" id="btnPlanCreator">Acessar Plano Creator ➔</a>
           </div>
 
           <!-- PLANO 3: MASTER / STUDIO -->
@@ -542,8 +554,8 @@
               <p class="pricing-desc">Para agências, software houses e estúdios com múltiplos ambientes.</p>
               <div class="pricing-amount">
                 <span class="currency">R$</span>
-                <span class="val">119</span>
-                <span class="period">/mês</span>
+                <span class="val" id="priceValMaster">119</span>
+                <span class="period" id="pricePeriodMaster">/mês</span>
               </div>
             </div>
 
@@ -555,7 +567,7 @@
               <li><span class="check">✓</span> <span>Múltiplos Ambientes (DEV, HML, PROD)</span></li>
             </ul>
 
-            <a href="login.html?plan=master" class="btn-pricing btn-pricing-secondary">Contratar Master ➔</a>
+            <a href="login.html?plan=master&billing=monthly" class="btn-pricing btn-pricing-secondary" id="btnPlanMaster">Contratar Master ➔</a>
           </div>
 
           <!-- PLANO 4: LEGEND / ENTERPRISE -->
@@ -565,8 +577,8 @@
               <p class="pricing-desc">Para grandes operações, corporações e ecossistemas escalados no OASIS.</p>
               <div class="pricing-amount">
                 <span class="currency">R$</span>
-                <span class="val">199</span>
-                <span class="period">/mês</span>
+                <span class="val" id="priceValLegend">199</span>
+                <span class="period" id="pricePeriodLegend">/mês</span>
               </div>
             </div>
 
@@ -578,7 +590,7 @@
               <li><span class="check">✓</span> <span>Backup Automático de Auditoria</span></li>
             </ul>
 
-            <a href="login.html?plan=legend" class="btn-pricing btn-pricing-secondary">Plano Legend ➔</a>
+            <a href="login.html?plan=legend&billing=monthly" class="btn-pricing btn-pricing-secondary" id="btnPlanLegend">Plano Legend ➔</a>
           </div>
         </div>
       </div>
@@ -816,6 +828,75 @@
     document.addEventListener('DOMContentLoaded', () => {
       window.anorakSimulator = new AnorakSimulator();
       window.pricingCarousel = new PricingCarousel();
+
+      // Alternador de Cobrança (Mensal / Anual)
+      const toggle = document.getElementById('billingToggle');
+      const lblMonthly = document.getElementById('lblMonthly');
+      const lblAnnual = document.getElementById('lblAnnual');
+
+      const prices = {
+        monthly: { explorer: '0', creator: '49', master: '119', legend: '199' },
+        annual: { explorer: '0', creator: '490', master: '1190', legend: '1990' }
+      };
+
+      const updatePricing = (isAnnual) => {
+        const cycle = isAnnual ? 'annual' : 'monthly';
+        const periodText = isAnnual ? '/ano' : '/mês';
+
+        if (lblMonthly) {
+          lblMonthly.classList.toggle('active', !isAnnual);
+          lblMonthly.style.color = isAnnual ? 'var(--text-secondary)' : '#fff';
+          lblMonthly.style.fontWeight = isAnnual ? '500' : '600';
+        }
+
+        if (lblAnnual) {
+          lblAnnual.classList.toggle('active', isAnnual);
+          lblAnnual.style.color = isAnnual ? '#fff' : 'var(--text-secondary)';
+          lblAnnual.style.fontWeight = isAnnual ? '600' : '500';
+        }
+
+        // Atualiza valores
+        document.getElementById('priceValExplorer').textContent = prices[cycle].explorer;
+        document.getElementById('priceValCreator').textContent = prices[cycle].creator;
+        document.getElementById('priceValMaster').textContent = prices[cycle].master;
+        document.getElementById('priceValLegend').textContent = prices[cycle].legend;
+
+        // Atualiza períodos
+        document.getElementById('pricePeriodExplorer').textContent = periodText;
+        document.getElementById('pricePeriodCreator').textContent = periodText;
+        document.getElementById('pricePeriodMaster').textContent = periodText;
+        document.getElementById('pricePeriodLegend').textContent = periodText;
+
+        // Atualiza links dos botões
+        document.getElementById('btnPlanExplorer').href = `login.html?plan=explorer&billing=${cycle}`;
+        document.getElementById('btnPlanCreator').href = `login.html?plan=creator&billing=${cycle}`;
+        document.getElementById('btnPlanMaster').href = `login.html?plan=master&billing=${cycle}`;
+        document.getElementById('btnPlanLegend').href = `login.html?plan=legend&billing=${cycle}`;
+      };
+
+      if (toggle) {
+        toggle.addEventListener('change', (e) => {
+          updatePricing(e.target.checked);
+        });
+      }
+
+      if (lblMonthly) {
+        lblMonthly.addEventListener('click', () => {
+          if (toggle && toggle.checked) {
+            toggle.checked = false;
+            updatePricing(false);
+          }
+        });
+      }
+
+      if (lblAnnual) {
+        lblAnnual.addEventListener('click', () => {
+          if (toggle && !toggle.checked) {
+            toggle.checked = true;
+            updatePricing(true);
+          }
+        });
+      }
     });
   </script>
 </body>

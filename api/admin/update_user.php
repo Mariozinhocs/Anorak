@@ -23,6 +23,7 @@ $role = trim($input['role'] ?? 'user');
 $plan = trim($input['plan'] ?? 'explorer');
 $planStatus = trim($input['plan_status'] ?? 'active');
 $planExpiresAt = !empty($input['plan_expires_at']) ? $input['plan_expires_at'] : null;
+$billingCycle = trim($input['billing_cycle'] ?? 'monthly');
 
 // Impede que o próprio admin logado remova seu acesso de admin ou suspenda sua própria conta
 if ($userId === (int) $_SESSION['anorak_user_id']) {
@@ -69,6 +70,7 @@ try {
             plan = :plan,
             plan_status = :status,
             plan_expires_at = :expires,
+            billing_cycle = :billing,
             updated_at = NOW()
         WHERE id = :id
     ");
@@ -80,6 +82,7 @@ try {
         ':plan' => $plan,
         ':status' => $planStatus,
         ':expires' => $formattedExpires,
+        ':billing' => $billingCycle,
         ':id' => $userId
     ]);
 

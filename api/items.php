@@ -54,6 +54,7 @@ try {
             $impact = $input['impact'] ?? 'medio';
             $urgency = $input['urgency'] ?? 'media';
             $assigned_to = $input['assignedTo'] ?? null;
+            $collaborators_json = json_encode($input['collaborators'] ?? []);
             $tags_json = json_encode($input['tags'] ?? []);
             $context_links_json = json_encode($input['contextLinks'] ?? []);
             $tasks_json = json_encode($input['tasks'] ?? []);
@@ -71,9 +72,9 @@ try {
 
             $stmt = $pdo->prepare("
                 INSERT INTO `{$items_table}` 
-                (id, type, title, description, status, priority, impact, urgency, assigned_to, tags_json, context_links_json, tasks_json, validation_history_json, created_at, updated_at)
+                (id, type, title, description, status, priority, impact, urgency, assigned_to, collaborators_json, tags_json, context_links_json, tasks_json, validation_history_json, created_at, updated_at)
                 VALUES 
-                (:id, :type, :title, :description, :status, :priority, :impact, :urgency, :assigned_to, :tags_json, :context_links_json, :tasks_json, :validation_history_json, NOW(), NOW())
+                (:id, :type, :title, :description, :status, :priority, :impact, :urgency, :assigned_to, :collaborators_json, :tags_json, :context_links_json, :tasks_json, :validation_history_json, NOW(), NOW())
                 ON DUPLICATE KEY UPDATE 
                 title = VALUES(title),
                 description = VALUES(description),
@@ -82,6 +83,7 @@ try {
                 impact = VALUES(impact),
                 urgency = VALUES(urgency),
                 assigned_to = VALUES(assigned_to),
+                collaborators_json = VALUES(collaborators_json),
                 tags_json = VALUES(tags_json),
                 context_links_json = VALUES(context_links_json),
                 tasks_json = VALUES(tasks_json),
@@ -99,6 +101,7 @@ try {
                 ':impact' => $impact,
                 ':urgency' => $urgency,
                 ':assigned_to' => $assigned_to,
+                ':collaborators_json' => $collaborators_json,
                 ':tags_json' => $tags_json,
                 ':context_links_json' => $context_links_json,
                 ':tasks_json' => $tasks_json,
@@ -177,6 +180,7 @@ try {
 }
 
 function formatItemJsonFields(&$item) {
+    $item['collaborators'] = !empty($item['collaborators_json']) ? json_decode($item['collaborators_json'], true) : [];
     $item['tags'] = !empty($item['tags_json']) ? json_decode($item['tags_json'], true) : [];
     $item['contextLinks'] = !empty($item['context_links_json']) ? json_decode($item['context_links_json'], true) : [];
     $item['tasks'] = !empty($item['tasks_json']) ? json_decode($item['tasks_json'], true) : [];
@@ -184,5 +188,5 @@ function formatItemJsonFields(&$item) {
     $item['assignedTo'] = $item['assigned_to'] ?? '';
     $item['createdAt'] = !empty($item['created_at']) ? date('c', strtotime($item['created_at'])) : null;
     $item['updatedAt'] = !empty($item['updated_at']) ? date('c', strtotime($item['updated_at'])) : null;
-    unset($item['tags_json'], $item['context_links_json'], $item['tasks_json'], $item['validation_history_json'], $item['assigned_to'], $item['created_at'], $item['updated_at']);
+    unset($item['collaborators_json'], $item['tags_json'], $item['context_links_json'], $item['tasks_json'], $item['validation_history_json'], $item['assigned_to'], $item['created_at'], $item['updated_at']);
 }

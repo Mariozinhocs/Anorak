@@ -183,7 +183,13 @@
           if (res.ok) {
             const data = await res.json();
             if (data.authenticated) {
-              window.location.replace('app.html');
+              const plan = urlParams.get('plan');
+              const billing = urlParams.get('billing');
+              let targetUrl = 'app.html';
+              if (plan) {
+                targetUrl += `?checkout=${encodeURIComponent(plan)}` + (billing ? `&billing=${encodeURIComponent(billing)}` : '');
+              }
+              window.location.replace(targetUrl);
             }
           }
         } catch (e) {}
@@ -246,7 +252,13 @@
         if (res.ok && data.status === 'success') {
           showAlert('Acesso autorizado! Redirecionando para o OASIS...', 'success');
           setTimeout(() => {
-            window.location.href = 'app.html';
+            const plan = urlParams.get('plan');
+            const billing = urlParams.get('billing');
+            let targetUrl = 'app.html';
+            if (plan) {
+              targetUrl += `?checkout=${encodeURIComponent(plan)}` + (billing ? `&billing=${encodeURIComponent(billing)}` : '');
+            }
+            window.location.href = targetUrl;
           }, 500);
         } else {
           showAlert(data.message || 'Credenciais inválidas. Verifique usuário e senha.');

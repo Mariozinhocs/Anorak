@@ -64,6 +64,11 @@ try {
     Upload-File "$localDir\index.html" "hml/index.html"
     Upload-File "$localDir\login.html" "hml/login.html"
     Upload-File "$localDir\app.html" "hml/app.html"
+    Upload-File "$localDir\test_save.php" "hml/test_save.php"
+    Upload-File "$localDir\test_columns.php" "hml/test_columns.php"
+    Upload-File "$localDir\test_get_items.php" "hml/test_get_items.php"
+    Upload-File "$localDir\test_post_save.php" "hml/test_post_save.php"
+    Upload-File "$localDir\test_api_integration.php" "hml/test_api_integration.php"
 
     # 4. Envio dos arquivos CSS
     Upload-File "$localDir\css\variables.css" "hml/css/variables.css"
@@ -132,6 +137,7 @@ try {
     Upload-File "$localDir\api\admin\run_deploy.php" "hml/api/admin/run_deploy.php"
 
     Upload-File "$localDir\api\payments\create_pix.php" "hml/api/payments/create_pix.php"
+    Upload-File "$localDir\api\payments\create_checkout.php" "hml/api/payments/create_checkout.php"
     Upload-File "$localDir\api\payments\webhook.php" "hml/api/payments/webhook.php"
     Upload-File "$localDir\api\payments\check_status.php" "hml/api/payments/check_status.php"
 

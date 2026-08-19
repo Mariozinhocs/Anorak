@@ -10,7 +10,8 @@
      - **Seção Comercial de Planos SaaS:** Carrossel infinito dos 4 Planos com ativação sequencial dos 4 dots indicadores (*Avatar Explorer* Grátis, *OASIS Creator* R$ 49/mês, *Halliday Master* R$ 119/mês e *Anorak Legend* R$ 199/mês).
    - **Área Privada Protegida ([app.html](file:///g:/Meu%20Drive/Dev's/Anorak/app.html)):** Painel completo de gestão com guarda de rota obrigatória (redireciona para `login.html` se não autenticado) e botão de Logout.
      - **Visualização Dual (Grade vs Lista estilo Google Drive):** Alternância instantânea no topo das Frentes de Homologação entre Modo Grade (Cards) e Modo Lista (Tabela horizontal compacta estilo Google Drive), com salvamento de preferência no `localStorage`.
-     - **Edição Completa de Projetos:** Botão **`✏️ Editar Painel`** e Mini Gauge de evolução (SVG) para edição de Nome, Descrição, Status, Prioridade e Links externos (Drive, GitHub, Live).
+     - **Edição Completa & Links de Acesso:** Botão **`✏️ Editar Painel`** e Mini Gauge de evolução (SVG) para edição de Nome, Descrição, Status, Prioridade e Links externos desmembrados em **Homologação (HML)** (🧪) e **Ambiente Live / Produção** (🚀).
+     - **Gestão de Colaboradores & Convites (`🤝 Colaboradores`):** Modal dedicado `#modalShareProject` para convidar usuários registrados como colaboradores, remoção de membros, exibição de avatares/badges nos Cards e Modo Lista e geração de link direto.
    - **Tela de Login / Autenticação ([login.html](file:///g:/Meu%20Drive/Dev's/Anorak/login.html)):** Interface de identificação com feedback visual, bloqueio de submissão dupla e redirecionamento dinâmico.
 
 2. **Backend de Autenticação, Pagamentos Mercado Pago e Banco (PHP + MySQL):**

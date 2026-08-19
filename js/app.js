@@ -14,6 +14,7 @@ class AnorakApp {
     this.currentMode = 'operational'; // 'operational' | 'incubator' | 'matrix'
     this.projectLayoutMode = localStorage.getItem('anorak_project_layout') || 'grid'; // 'grid' | 'list'
     this.currentTagFilter = 'all';
+    this.currentStatusFilter = 'todos';
     this.decisionMatrix = new AnorakDecisionMatrix(db);
     this.audioContext = null;
     this.soundEnabled = false;
@@ -34,6 +35,15 @@ class AnorakApp {
     this.render();
     this.renderDecisionMatrix();
     this.checkGitHubSync();
+
+    // Verifica parâmetros de checkout na URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const checkoutPlan = urlParams.get('checkout');
+    const checkoutBilling = urlParams.get('billing') || 'monthly';
+    if (checkoutPlan) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+      this.openCheckoutModal(checkoutPlan, checkoutBilling);
+    }
   }
 
   async verifyAuth() {
@@ -46,6 +56,51 @@ class AnorakApp {
           const userEl = document.getElementById('currentUserName');
           if (userEl) userEl.textContent = `👤 ${data.user.username}`;
           
+          // Atualiza o Badge do Plano do Usuário
+          const planBadge = document.getElementById('currentUserPlanBadge');
+          if (planBadge) {
+            const planName = data.user.plan === 'explorer' ? 'Grátis' : data.user.plan.toUpperCase();
+            const cycleText = data.user.plan === 'explorer' ? '' : (data.user.billing_cycle === 'annual' ? ' ANUAL' : ' MENSAL');
+            planBadge.textContent = planName + cycleText;
+            
+            // Estilização cyberpunk correspondente ao plano
+            planBadge.className = `plan-badge ${data.user.plan}`;
+            planBadge.style.fontSize = '0.7rem';
+            planBadge.style.padding = '2px 8px';
+            planBadge.style.borderRadius = '10px';
+            planBadge.style.fontWeight = 'bold';
+            planBadge.style.textTransform = 'uppercase';
+            planBadge.style.letterSpacing = '0.05em';
+            planBadge.style.border = '1px solid';
+
+            if (data.user.plan === 'explorer') {
+              planBadge.style.borderColor = 'rgba(255,255,255,0.2)';
+              planBadge.style.background = 'rgba(255,255,255,0.05)';
+              planBadge.style.color = '#94a3b8';
+            } else if (data.user.plan === 'creator') {
+              planBadge.style.borderColor = 'var(--primary-cyan)';
+              planBadge.style.background = 'rgba(0, 242, 254, 0.15)';
+              planBadge.style.color = '#00f2fe';
+              planBadge.style.boxShadow = '0 0 10px rgba(0, 242, 254, 0.2)';
+            } else if (data.user.plan === 'master') {
+              planBadge.style.borderColor = 'var(--accent-purple)';
+              planBadge.style.background = 'rgba(168, 85, 247, 0.15)';
+              planBadge.style.color = '#d8b4fe';
+              planBadge.style.boxShadow = '0 0 10px rgba(168, 85, 247, 0.2)';
+            } else if (data.user.plan === 'legend') {
+              planBadge.style.borderColor = 'var(--accent-magenta)';
+              planBadge.style.background = 'rgba(236, 72, 153, 0.15)';
+              planBadge.style.color = '#fbcfe8';
+              planBadge.style.boxShadow = '0 0 10px rgba(236, 72, 153, 0.2)';
+            }
+          }
+
+          // Exibe/oculta botão de upgrade (não exibe se já for Legend)
+          const upgradeBtn = document.getElementById('btnUpgradeAccount');
+          if (upgradeBtn) {
+            upgradeBtn.style.display = data.user.plan === 'legend' ? 'none' : 'inline-flex';
+          }
+
           const adminLink = document.getElementById('btnAdminLink');
           if (adminLink && data.user.role === 'admin') {
             adminLink.style.display = 'inline-flex';
@@ -148,12 +203,49 @@ class AnorakApp {
       btnVoice.addEventListener('click', () => this.toggleVoiceRecording());
     }
 
+    // Modal Share & Collaborators listeners
+    const btnAddColab = document.getElementById('btnAddCollaborator');
+    if (btnAddColab) {
+      btnAddColab.addEventListener('click', () => this.handleAddCollaborator());
+    }
+
+    const btnCopyShare = document.getElementById('btnCopyShareLink');
+    if (btnCopyShare) {
+      btnCopyShare.addEventListener('click', () => this.copyShareLink());
+    }
+
+    // Filtro por Status Dropdown
+    const filterStatus = document.getElementById('filterStatus');
+    if (filterStatus) {
+      filterStatus.addEventListener('change', (e) => {
+        this.currentStatusFilter = e.target.value;
+        this.render();
+      });
+    }
+
     // Modal Close buttons
     document.querySelectorAll('.modal-close, .btn-modal-cancel').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('active'));
-        voiceRecorder.stop();
+        if (typeof voiceRecorder !== 'undefined' && voiceRecorder.stop) voiceRecorder.stop();
       });
+    });
+
+    // Fechar modais ao clicar no backdrop (fora da caixa) ou ao pressionar ESC
+    document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+      backdrop.addEventListener('click', (e) => {
+        if (!e.target.closest('.modal-container')) {
+          backdrop.classList.remove('active');
+          if (typeof voiceRecorder !== 'undefined' && voiceRecorder.stop) voiceRecorder.stop();
+        }
+      });
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('active'));
+        if (typeof voiceRecorder !== 'undefined' && voiceRecorder.stop) voiceRecorder.stop();
+      }
     });
 
     // Form Quick Capture Submit
@@ -189,6 +281,15 @@ class AnorakApp {
       formEditProj.addEventListener('submit', (e) => {
         e.preventDefault();
         this.saveEditProject();
+      });
+    }
+
+    // Form Edit Idea Submit
+    const formEditIdea = document.getElementById('formEditIdea');
+    if (formEditIdea) {
+      formEditIdea.addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.saveEditIdea();
       });
     }
 
@@ -253,6 +354,51 @@ class AnorakApp {
       });
     }
 
+    // Modal de Checkout / Upgrade
+    const btnUpgrade = document.getElementById('btnUpgradeAccount');
+    if (btnUpgrade) {
+      btnUpgrade.addEventListener('click', () => {
+        this.openCheckoutModal();
+      });
+    }
+
+    const selectPlan = document.getElementById('checkoutPlan');
+    const radioBillings = document.querySelectorAll('input[name="checkoutBilling"]');
+    const radioMethods = document.querySelectorAll('input[name="checkoutMethod"]');
+
+    if (selectPlan) selectPlan.addEventListener('change', () => this.updateCheckoutPrice());
+    radioBillings.forEach(r => r.addEventListener('change', () => this.updateCheckoutPrice()));
+    radioMethods.forEach(r => r.addEventListener('change', () => this.updateCheckoutPrice()));
+
+    const btnConfirm = document.getElementById('btnConfirmCheckout');
+    if (btnConfirm) {
+      btnConfirm.addEventListener('click', () => this.processCheckout());
+    }
+
+    const btnCopy = document.getElementById('btnCopyPix');
+    if (btnCopy) {
+      btnCopy.addEventListener('click', () => {
+        const input = document.getElementById('pixCopyPaste');
+        if (input) {
+          input.select();
+          navigator.clipboard.writeText(input.value);
+          this.showToast('Código Pix copiado!');
+        }
+      });
+    }
+
+    const btnCancelPix = document.getElementById('btnCancelPix');
+    if (btnCancelPix) {
+      btnCancelPix.addEventListener('click', () => {
+        if (this.pixInterval) {
+          clearInterval(this.pixInterval);
+          this.pixInterval = null;
+        }
+        document.getElementById('checkoutPixContent').style.display = 'none';
+        document.getElementById('checkoutFormContent').style.display = 'block';
+      });
+    }
+
     // Escuta atualizações do DB
     window.addEventListener('anorak-db-updated', () => {
       this.render();
@@ -285,15 +431,27 @@ class AnorakApp {
 
   renderStatsBar() {
     const items = db.getAll();
-    const projects = items.filter(i => i.type === ItemType.PROJECT);
+    const allProjects = items.filter(i => i.type === ItemType.PROJECT);
     const ideas = items.filter(i => i.type === ItemType.IDEA);
 
+    // 1. Topo (Aba): Total Geral de Projetos (incluindo concluídos)
+    const elTabProjCount = document.getElementById('tabOperationalProjectCount');
+    if (elTabProjCount) {
+      elTabProjCount.textContent = `(${allProjects.length} Projeto${allProjects.length === 1 ? '' : 's'})`;
+    }
+
+    // 2. Card do HUD: Apenas Projetos Abertos (Em Homologação / Planejamento)
+    const openProjects = allProjects.filter(p => {
+      const st = (p.status || '').toLowerCase();
+      return st !== 'concluido' && !st.includes('conclui') && !st.includes('produc');
+    });
+
     const elProjCount = document.getElementById('statActiveProjects');
-    if (elProjCount) elProjCount.textContent = projects.length;
+    if (elProjCount) elProjCount.textContent = openProjects.length;
 
     let totalTasks = 0;
     let completedTasks = 0;
-    projects.forEach(p => {
+    allProjects.forEach(p => {
       totalTasks += p.tasks.length;
       completedTasks += p.tasks.filter(t => t.completed).length;
     });
@@ -337,9 +495,34 @@ class AnorakApp {
 
     container.classList.toggle('list-view', this.projectLayoutMode === 'list');
 
-    const projects = db.getByType(ItemType.PROJECT);
+    const filterSelect = document.getElementById('filterStatus');
+    if (filterSelect) {
+      filterSelect.value = this.currentStatusFilter || 'todos';
+    }
+
+    let projects = db.getByType(ItemType.PROJECT);
+    if (this.currentStatusFilter && this.currentStatusFilter !== 'todos') {
+      const filterKey = this.currentStatusFilter.toLowerCase();
+      projects = projects.filter(p => {
+        const pStatus = (p.status || '').toLowerCase();
+        if (filterKey === 'homologacao') {
+          return pStatus.includes('homolog') || pStatus === 'homologacao';
+        }
+        if (filterKey === 'concluido') {
+          return pStatus.includes('conclui') || pStatus.includes('produc') || pStatus === 'concluido';
+        }
+        if (filterKey === 'pausado') {
+          return pStatus.includes('paus') || pStatus === 'pausado';
+        }
+        if (filterKey === 'planejamento') {
+          return pStatus.includes('plan') || pStatus === 'planejamento';
+        }
+        return pStatus === filterKey;
+      });
+    }
+
     if (projects.length === 0) {
-      container.innerHTML = `<div class="glass-panel" style="padding: 2rem; text-align: center; color: var(--text-muted);">Nenhum projeto cadastrado. Crie um projeto ou promova uma ideia na Incubadora!</div>`;
+      container.innerHTML = `<div class="glass-panel" style="padding: 2rem; text-align: center; color: var(--text-muted);">Nenhum projeto encontrado para o filtro selecionado.</div>`;
       return;
     }
 
@@ -352,9 +535,11 @@ class AnorakApp {
           <article class="glass-panel project-list-row" data-project-id="${proj.id}">
             <!-- Coluna 1: Título & Descrição com Links de Acesso -->
             <div class="list-col-main">
-              <div class="list-title-wrap">
+              <div class="list-title-wrap" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                 <h3 class="project-title" style="margin: 0; font-size: 1.05rem;">${this.escapeHTML(proj.title)}</h3>
                 <span class="status-pill status-${proj.status}" style="font-size: 0.68rem; font-weight: bold; text-transform: uppercase; padding: 2px 8px; border-radius: 12px; background: rgba(0, 242, 254, 0.1); color: var(--primary-cyan); border: 1px solid rgba(0, 242, 254, 0.3);">${proj.status}</span>
+                ${proj.contextLinks.hmlUrl ? `<a href="${proj.contextLinks.hmlUrl}" target="_blank" rel="noopener" class="context-link-btn" title="Homologação (HML)" style="padding: 2px 6px; font-size: 0.7rem; border-color: rgba(234, 179, 8, 0.4); color: #facc15;">🧪 HML</a>` : ''}
+                ${proj.contextLinks.liveUrl ? `<a href="${proj.contextLinks.liveUrl}" target="_blank" rel="noopener" class="context-link-btn" title="Ambiente Live (Produção)" style="padding: 2px 6px; font-size: 0.7rem; border-color: rgba(16, 185, 129, 0.4); color: #10b981;">🚀 Live</a>` : ''}
               </div>
               <p class="project-desc" style="margin: 4px 0 0 0; font-size: 0.8rem; color: var(--text-muted);">${this.escapeHTML(proj.description || 'Sem descrição cadastrada.')}</p>
             </div>
@@ -392,6 +577,7 @@ class AnorakApp {
 
             <!-- Coluna 5: Ações Rápidas -->
             <div class="list-col-actions" style="display: flex; gap: 0.4rem; align-items: center;">
+              <button class="btn-icon" style="width: 30px; height: 30px; font-size: 0.8rem;" title="Compartilhar &amp; Colaboradores" onclick="window.anorakApp.openShareModal('${proj.id}')">🤝</button>
               <button class="btn-secondary" style="padding: 0.3rem 0.65rem; font-size: 0.78rem; color: var(--primary-cyan); border-color: rgba(0,242,254,0.4); background: rgba(0,242,254,0.1); font-weight: 600;" title="Editar Painel" onclick="window.anorakApp.openEditProjectModal('${proj.id}')">✏️ Editar Painel</button>
               <button class="btn-icon" style="width: 30px; height: 30px; font-size: 0.8rem;" title="Exportar Relatório PDF" onclick="window.anorakApp.exportProjectReport('${proj.id}')">🖨️</button>
               <button class="btn-icon" style="width: 30px; height: 30px; font-size: 0.8rem;" title="Excluir Projeto" onclick="window.anorakApp.handleDeleteProject('${proj.id}')">🗑️</button>
@@ -423,15 +609,27 @@ class AnorakApp {
             </div>
           </div>
 
-          <!-- Linha de Responsável (Governança) -->
-          <div class="project-responsible-row">
-            <span>Responsável:</span>
-            <select class="responsible-select" onchange="window.anorakApp.handleSetAssignee('${proj.id}', this.value)">
-              <option value="" ${!proj.assignedTo ? 'selected' : ''}>Sem responsável</option>
-              ${(this.usersList || []).map(u => `
-                <option value="${u}" ${proj.assignedTo === u ? 'selected' : ''}>@${u}</option>
+          <!-- Linha de Responsável & Colaboradores (Governança) -->
+          <div class="project-responsible-row" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span>Responsável:</span>
+              <select class="responsible-select" onchange="window.anorakApp.handleSetAssignee('${proj.id}', this.value)">
+                <option value="" ${!proj.assignedTo ? 'selected' : ''}>Sem responsável</option>
+                ${(this.usersList || []).map(u => `
+                  <option value="${u}" ${proj.assignedTo === u ? 'selected' : ''}>@${u}</option>
+                `).join('')}
+              </select>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.35rem;">
+              <span style="font-size: 0.72rem; color: var(--text-muted);">Equipe:</span>
+              ${(proj.collaborators || []).length === 0 ? `
+                <button type="button" class="btn-secondary" style="padding: 2px 6px; font-size: 0.7rem; border-color: rgba(255,255,255,0.1); color: var(--text-muted); cursor: pointer;" onclick="window.anorakApp.openShareModal('${proj.id}')">+ Convidar</button>
+              ` : (proj.collaborators || []).map(c => `
+                <span class="status-pill" style="font-size: 0.68rem; padding: 2px 6px; border-radius: 10px; background: rgba(56, 189, 248, 0.1); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);" title="Colaborador do projeto">@${this.escapeHTML(c)}</span>
               `).join('')}
-            </select>
+              <button type="button" class="btn-icon" style="width: 22px; height: 22px; font-size: 0.7rem;" title="Gerenciar Colaboradores" onclick="window.anorakApp.openShareModal('${proj.id}')">🤝</button>
+            </div>
           </div>
 
           <!-- Barra de Progresso de Homologação com Mini Gauge -->
@@ -490,23 +688,32 @@ class AnorakApp {
             <div class="context-links">
               ${proj.contextLinks.githubRepo ? `
                 <a href="${proj.contextLinks.githubRepo}" target="_blank" rel="noopener" class="context-link-btn" title="Repositório GitHub">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                  GitHub
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                  <span>GitHub</span>
                 </a>
               ` : ''}
               ${proj.contextLinks.driveFolder ? `
                 <a href="${proj.contextLinks.driveFolder}" target="_blank" rel="noopener" class="context-link-btn" title="Pasta no Drive">
-                  📁 Drive
+                  <span style="font-size: 1.1rem; line-height: 1;">📁</span>
+                  <span>Drive</span>
+                </a>
+              ` : ''}
+              ${proj.contextLinks.hmlUrl ? `
+                <a href="${proj.contextLinks.hmlUrl}" target="_blank" rel="noopener" class="context-link-btn" title="Ambiente de Homologação (HML)" style="border-color: rgba(234, 179, 8, 0.4); color: #facc15;">
+                  <span style="font-size: 1.1rem; line-height: 1;">🧪</span>
+                  <span>HML</span>
                 </a>
               ` : ''}
               ${proj.contextLinks.liveUrl ? `
-                <a href="${proj.contextLinks.liveUrl}" target="_blank" rel="noopener" class="context-link-btn" title="Ambiente de Homologação / Live">
-                  🌐 Live
+                <a href="${proj.contextLinks.liveUrl}" target="_blank" rel="noopener" class="context-link-btn" title="Ambiente Live (Produção)" style="border-color: rgba(16, 185, 129, 0.4); color: #10b981;">
+                  <span style="font-size: 1.1rem; line-height: 1;">🚀</span>
+                  <span>Live</span>
                 </a>
               ` : ''}
             </div>
             
-            <div style="display: flex; gap: 0.5rem;">
+            <div style="display: flex; gap: 0.4rem;">
+              <button class="btn-icon" style="width: 28px; height: 28px; font-size: 0.8rem;" title="Compartilhar &amp; Colaboradores" onclick="window.anorakApp.openShareModal('${proj.id}')">🤝</button>
               <button class="btn-icon" style="width: 28px; height: 28px; font-size: 0.8rem;" title="Editar Projeto" onclick="window.anorakApp.openEditProjectModal('${proj.id}')">✏️</button>
               <button class="btn-icon" style="width: 28px; height: 28px; font-size: 0.8rem;" title="Exportar Relatório PDF" onclick="window.anorakApp.exportProjectReport('${proj.id}')">🖨️</button>
               <button class="btn-icon" style="width: 28px; height: 28px; font-size: 0.8rem;" title="Excluir Projeto" onclick="window.anorakApp.handleDeleteProject('${proj.id}')">🗑️</button>
@@ -924,7 +1131,10 @@ class AnorakApp {
             <button class="btn-promote" onclick="window.anorakApp.openPromoteModal('${idea.id}')">
               <span>🚀 Promover a Projeto</span>
             </button>
-            <button class="btn-icon" style="width: 28px; height: 28px; font-size: 0.75rem;" title="Excluir Ideia" onclick="window.anorakApp.handleDeleteIdea('${idea.id}')">🗑️</button>
+            <div style="display: flex; gap: 0.4rem;">
+              <button class="btn-icon" style="width: 28px; height: 28px; font-size: 0.75rem;" title="Editar Ideia" onclick="window.anorakApp.openEditIdeaModal('${idea.id}')">✏️</button>
+              <button class="btn-icon" style="width: 28px; height: 28px; font-size: 0.75rem;" title="Excluir Ideia" onclick="window.anorakApp.handleDeleteIdea('${idea.id}')">🗑️</button>
+            </div>
           </div>
         </article>
       `;
@@ -942,6 +1152,64 @@ class AnorakApp {
       this.showToast('Ideia excluída.');
       this.render();
     }
+  }
+
+  openEditIdeaModal(ideaId) {
+    const idea = db.getById(ideaId);
+    if (!idea) return;
+
+    const modal = document.getElementById('modalEditIdea');
+    if (modal) {
+      document.getElementById('editIdeaId').value = idea.id;
+      document.getElementById('editIdeaTitle').value = idea.title;
+      document.getElementById('editIdeaDesc').value = idea.description || '';
+      document.getElementById('editIdeaTags').value = (idea.tags || []).join(', ');
+      
+      const prioritySelect = document.getElementById('editIdeaPriority');
+      if (prioritySelect) {
+        if (idea.status === IdeaStatus.PRIORITIZED) {
+          prioritySelect.value = 'alta';
+        } else if (idea.status === IdeaStatus.DRAFT) {
+          prioritySelect.value = 'media';
+        } else {
+          prioritySelect.value = 'baixa';
+        }
+      }
+      modal.classList.add('active');
+    }
+  }
+
+  saveEditIdea() {
+    const id = document.getElementById('editIdeaId').value;
+    const title = document.getElementById('editIdeaTitle').value.trim();
+    const description = document.getElementById('editIdeaDesc').value.trim();
+    const tagsInput = document.getElementById('editIdeaTags').value;
+    const priority = document.getElementById('editIdeaPriority').value;
+
+    if (!title) return;
+
+    const idea = db.getById(id);
+    if (!idea) return;
+
+    idea.title = title;
+    idea.description = description;
+    idea.tags = tagsInput.split(',').map(t => t.trim()).filter(Boolean);
+    
+    if (priority === 'alta') {
+      idea.status = IdeaStatus.PRIORITIZED;
+      idea.priority = 'alta';
+    } else if (priority === 'baixa') {
+      idea.status = IdeaStatus.BACKLOG;
+      idea.priority = 'baixa';
+    } else {
+      idea.status = IdeaStatus.DRAFT;
+      idea.priority = 'media';
+    }
+
+    db.save(idea);
+    document.getElementById('modalEditIdea').classList.remove('active');
+    this.showToast(`Ideia "${title}" atualizada!`);
+    this.render();
   }
 
   // =========================================================================
@@ -1023,7 +1291,7 @@ class AnorakApp {
     const renderList = (items) => {
       if (!items || items.length === 0) return '<div style="font-size: 0.75rem; color: var(--text-muted);">Nenhum item nesta zona.</div>';
       return items.map(i => `
-        <div class="quadrant-item">
+        <div class="quadrant-item" onclick="window.anorakApp.navigateToProject('${i.id}')" title="Clique para navegar até o projeto">
           <strong>${this.escapeHTML(i.title)}</strong>
         </div>
       `).join('');
@@ -1043,6 +1311,31 @@ class AnorakApp {
     if (adviceQuoteEl) {
       adviceQuoteEl.textContent = `"${advice.message}"`;
     }
+  }
+
+  navigateToProject(projectId) {
+    if (!projectId) return;
+
+    // 1. Alterna para o modo operacional se estiver na incubadora ou matriz
+    this.switchMode('operational');
+
+    // 2. Reseta o filtro de status para garantir visibilidade
+    const filterSelect = document.getElementById('filterStatus');
+    if (filterSelect && filterSelect.value !== 'todos') {
+      filterSelect.value = 'todos';
+      this.currentStatusFilter = 'todos';
+      this.render();
+    }
+
+    // 3. Rola suavemente até o projeto e aplica o destaque neon
+    setTimeout(() => {
+      const card = document.querySelector(`[data-project-id="${projectId}"]`);
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        card.classList.add('highlight-pulse');
+        setTimeout(() => card.classList.remove('highlight-pulse'), 2500);
+      }
+    }, 120);
   }
 
   // =========================================================================
@@ -1175,6 +1468,8 @@ class AnorakApp {
     const description = document.getElementById('newProjDesc').value.trim();
     const driveFolder = document.getElementById('newProjDrive').value.trim();
     const githubRepo = document.getElementById('newProjGithub').value.trim();
+    const hmlUrl = document.getElementById('newProjHml') ? document.getElementById('newProjHml').value.trim() : '';
+    const liveUrl = document.getElementById('newProjLive') ? document.getElementById('newProjLive').value.trim() : '';
 
     if (!title) return;
 
@@ -1183,7 +1478,7 @@ class AnorakApp {
       title,
       description,
       status: ProjectStatus.HOMOLOGATION,
-      contextLinks: { driveFolder, githubRepo, liveUrl: '' },
+      contextLinks: { driveFolder, githubRepo, hmlUrl, liveUrl },
       tasks: [
         { id: 't_init_1', title: 'Configuração inicial do repositório e ambiente', category: 'Ambiente', completed: true, validatedAt: new Date().toISOString() },
         { id: 't_init_2', title: 'Testes de homologação de funcionalidades principais', category: 'QA', completed: false },
@@ -1210,7 +1505,8 @@ class AnorakApp {
       if (document.getElementById('editProjPriority')) document.getElementById('editProjPriority').value = project.priority || 'media';
       document.getElementById('editProjGithub').value = project.contextLinks.githubRepo || '';
       document.getElementById('editProjDrive').value = project.contextLinks.driveFolder || '';
-      document.getElementById('editProjLive').value = project.contextLinks.liveUrl || '';
+      if (document.getElementById('editProjHml')) document.getElementById('editProjHml').value = project.contextLinks.hmlUrl || '';
+      if (document.getElementById('editProjLive')) document.getElementById('editProjLive').value = project.contextLinks.liveUrl || '';
       
       modal.classList.add('active');
     }
@@ -1224,7 +1520,8 @@ class AnorakApp {
     const priority = document.getElementById('editProjPriority') ? document.getElementById('editProjPriority').value : 'media';
     const githubRepo = document.getElementById('editProjGithub').value.trim();
     const driveFolder = document.getElementById('editProjDrive').value.trim();
-    const liveUrl = document.getElementById('editProjLive').value.trim();
+    const hmlUrl = document.getElementById('editProjHml') ? document.getElementById('editProjHml').value.trim() : '';
+    const liveUrl = document.getElementById('editProjLive') ? document.getElementById('editProjLive').value.trim() : '';
 
     if (!title) return;
 
@@ -1237,12 +1534,110 @@ class AnorakApp {
     project.priority = priority;
     project.contextLinks.githubRepo = githubRepo;
     project.contextLinks.driveFolder = driveFolder;
+    project.contextLinks.hmlUrl = hmlUrl;
     project.contextLinks.liveUrl = liveUrl;
 
     db.save(project);
     document.getElementById('modalEditProject').classList.remove('active');
     this.showToast(`Projeto "${title}" atualizado!`);
     this.render();
+  }
+
+  // =========================================================================
+  // GESTÃO DE COLABORADORES & COMPARTILHAMENTO
+  // =========================================================================
+  openShareModal(projectId) {
+    const project = db.getById(projectId);
+    if (!project) return;
+
+    const modal = document.getElementById('modalShareProject');
+    if (!modal) return;
+
+    document.getElementById('shareProjId').value = project.id;
+    document.getElementById('shareProjTitle').innerText = project.title;
+
+    // Populate user select dropdown
+    const userSelect = document.getElementById('shareUserSelect');
+    if (userSelect) {
+      const activeColabs = project.collaborators || [];
+      userSelect.innerHTML = '<option value="">Selecione um usuário...</option>' + 
+        (this.usersList || [])
+          .filter(u => u !== project.assignedTo && !activeColabs.includes(u))
+          .map(u => `<option value="${u}">@${u}</option>`).join('');
+    }
+
+    // Direct link
+    const directLinkInput = document.getElementById('shareDirectLink');
+    if (directLinkInput) {
+      directLinkInput.value = `${window.location.origin}${window.location.pathname}?project=${project.id}`;
+    }
+
+    this.renderCollaboratorsList(project);
+    modal.classList.add('active');
+  }
+
+  renderCollaboratorsList(project) {
+    const listContainer = document.getElementById('collaboratorsList');
+    if (!listContainer) return;
+
+    const collaborators = project.collaborators || [];
+    if (collaborators.length === 0) {
+      listContainer.innerHTML = `<div style="font-size: 0.8rem; color: var(--text-muted); padding: 0.5rem; text-align: center; background: rgba(0,0,0,0.2); border-radius: 6px;">Nenhum colaborador adicionado ainda.</div>`;
+      return;
+    }
+
+    listContainer.innerHTML = collaborators.map(colab => `
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.4rem 0.75rem; background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); border-radius: 6px;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 0.9rem;">👤</span>
+          <span style="font-size: 0.85rem; font-weight: 600; color: #38bdf8;">@${this.escapeHTML(colab)}</span>
+          <span style="font-size: 0.7rem; color: var(--text-muted); background: rgba(0,0,0,0.3); padding: 1px 6px; border-radius: 4px;">Colaborador</span>
+        </div>
+        <button type="button" class="btn-icon" style="width: 24px; height: 24px; font-size: 0.75rem; color: #f87171;" title="Remover Colaborador" onclick="window.anorakApp.handleRemoveCollaborator('${project.id}', '${colab}')">❌</button>
+      </div>
+    `).join('');
+  }
+
+  handleAddCollaborator() {
+    const projectId = document.getElementById('shareProjId').value;
+    const userSelect = document.getElementById('shareUserSelect');
+    const selectedUser = userSelect ? userSelect.value : '';
+
+    if (!selectedUser) {
+      this.showToast('Selecione um usuário para convidar.');
+      return;
+    }
+
+    const project = db.getById(projectId);
+    if (!project) return;
+
+    if (!project.collaborators) project.collaborators = [];
+    if (!project.collaborators.includes(selectedUser)) {
+      project.collaborators.push(selectedUser);
+      db.save(project);
+      this.showToast(`@${selectedUser} adicionado como colaborador!`);
+      this.openShareModal(projectId); // Refresh dropdown and list
+      this.render();
+    }
+  }
+
+  handleRemoveCollaborator(projectId, username) {
+    const project = db.getById(projectId);
+    if (!project || !project.collaborators) return;
+
+    project.collaborators = project.collaborators.filter(u => u !== username);
+    db.save(project);
+    this.showToast(`@${username} removido dos colaboradores.`);
+    this.openShareModal(projectId);
+    this.render();
+  }
+
+  copyShareLink() {
+    const linkInput = document.getElementById('shareDirectLink');
+    if (linkInput && linkInput.value) {
+      navigator.clipboard.writeText(linkInput.value);
+      this.showToast('Link direto copiado para a área de transferência!');
+    }
   }
 
   // =========================================================================
@@ -1355,6 +1750,213 @@ class AnorakApp {
         <text x="50" y="77" text-anchor="middle" fill="#00f2fe" font-family="monospace" font-size="10" font-weight="bold" filter="url(#gauge-neon-cyan)" style="letter-spacing: -0.5px;">${percentage}%</text>
       </svg>
     `;
+  }
+
+  // =========================================================================
+  // CHECKOUT E UPGRADE DE PLANO (MERCADO PAGO)
+  // =========================================================================
+  openCheckoutModal(selectedPlan = 'creator', selectedBilling = 'monthly') {
+    const modal = document.getElementById('modalCheckout');
+    if (!modal) return;
+
+    // explorer não é contratável por aqui
+    if (selectedPlan === 'explorer') {
+      selectedPlan = 'creator';
+    }
+
+    const selectPlan = document.getElementById('checkoutPlan');
+    if (selectPlan) selectPlan.value = selectedPlan;
+
+    const radioBilling = document.querySelector(`input[name="checkoutBilling"][value="${selectedBilling}"]`);
+    if (radioBilling) {
+      radioBilling.checked = true;
+    }
+
+    // Reset views
+    document.getElementById('checkoutFormContent').style.display = 'block';
+    document.getElementById('checkoutLoadingContent').style.display = 'none';
+    document.getElementById('checkoutPixContent').style.display = 'none';
+
+    if (this.pixInterval) {
+      clearInterval(this.pixInterval);
+      this.pixInterval = null;
+    }
+
+    this.updateCheckoutPrice();
+    modal.classList.add('active');
+  }
+
+  updateCheckoutPrice() {
+    const plan = document.getElementById('checkoutPlan').value;
+    const billing = document.querySelector('input[name="checkoutBilling"]:checked').value;
+    const method = document.querySelector('input[name="checkoutMethod"]:checked').value;
+
+    const prices = {
+      monthly: { creator: 49.00, master: 119.00, legend: 199.00 },
+      annual: { creator: 490.00, master: 1190.00, legend: 1990.00 }
+    };
+
+    const amount = prices[billing][plan];
+    const formattedPrice = amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+    const priceText = document.getElementById('checkoutPriceText');
+    if (priceText) priceText.textContent = formattedPrice;
+
+    const billingText = document.getElementById('checkoutBillingText');
+    if (billingText) {
+      if (method === 'pix') {
+        billingText.textContent = `Pagamento único via Pix (${billing === 'annual' ? 'Anual' : 'Mensal'})`;
+      } else {
+        billingText.textContent = `Assinatura recorrente autorrecarga (${billing === 'annual' ? 'Anual' : 'Mensal'})`;
+      }
+    }
+  }
+
+  async processCheckout() {
+    const plan = document.getElementById('checkoutPlan').value;
+    const billing = document.querySelector('input[name="checkoutBilling"]:checked').value;
+    const method = document.querySelector('input[name="checkoutMethod"]:checked').value;
+
+    const formContent = document.getElementById('checkoutFormContent');
+    const loadingContent = document.getElementById('checkoutLoadingContent');
+    const loadingText = document.getElementById('checkoutLoadingText');
+
+    if (formContent) formContent.style.display = 'none';
+    if (loadingContent) loadingContent.style.display = 'block';
+    if (loadingText) loadingText.textContent = 'Gerando solicitação de pagamento no Mercado Pago...';
+
+    try {
+      const res = await fetch('api/payments/create_checkout.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plan,
+          billing,
+          method,
+          email: this.currentUser ? this.currentUser.email : '',
+          username: this.currentUser ? this.currentUser.username : ''
+        })
+      });
+
+      if (!res.ok) {
+        throw new Error('Erro ao processar requisição no servidor.');
+      }
+
+      const result = await res.json();
+
+      if (result.status === 'success') {
+        const isSimulated = result.mode === 'simulated';
+        
+        if (method === 'pix') {
+          // Pix: Exibe QR code e copia e cola
+          if (loadingContent) loadingContent.style.display = 'none';
+          document.getElementById('checkoutPixContent').style.display = 'block';
+
+          const qrImg = document.getElementById('pixQrImage');
+          if (qrImg) {
+            qrImg.src = isSimulated ? 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + encodeURIComponent(result.data.qr_code) : (result.data.qr_code_base64 ? 'data:image/png;base64,' + result.data.qr_code_base64 : result.data.ticket_url);
+          }
+
+          const inputCopy = document.getElementById('pixCopyPaste');
+          if (inputCopy) inputCopy.value = result.data.qr_code;
+
+          this.startPixPolling(result.data.payment_id, isSimulated);
+        } else {
+          // Cartão de crédito: Redireciona para o Mercado Pago
+          if (loadingText) loadingText.textContent = 'Redirecionando para o ambiente de faturamento seguro...';
+          setTimeout(() => {
+            window.location.href = result.data.init_point;
+          }, 1000);
+        }
+      } else {
+        alert(result.message || 'Erro ao gerar checkout.');
+        if (formContent) formContent.style.display = 'block';
+        if (loadingContent) loadingContent.style.display = 'none';
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Falha na comunicação com a API de Pagamentos: ' + err.message);
+      if (formContent) formContent.style.display = 'block';
+      if (loadingContent) loadingContent.style.display = 'none';
+    }
+  }
+
+  startPixPolling(paymentId, isSimulated = false) {
+    if (this.pixInterval) clearInterval(this.pixInterval);
+    let counter = 0;
+
+    this.pixInterval = setInterval(async () => {
+      counter++;
+
+      // Simulação rápida para desenvolvedor em sandbox
+      if (isSimulated && counter >= 3) {
+        clearInterval(this.pixInterval);
+        this.pixInterval = null;
+        this.completeSimulatedPayment(paymentId);
+        return;
+      }
+
+      try {
+        const res = await fetch(`api/payments/check_status.php?payment_id=${paymentId}`);
+        if (res.ok) {
+          const check = await res.json();
+          if (check.status === 'success' && check.approved) {
+            clearInterval(this.pixInterval);
+            this.pixInterval = null;
+            this.handlePaymentSuccess(check.plan);
+          }
+        }
+      } catch (err) {
+        console.warn('Erro ao pollar status de pagamento:', err);
+      }
+    }, 3000);
+  }
+
+  async completeSimulatedPayment(paymentId) {
+    this.showToast('Simulando aprovação de pagamento no banco local...');
+    try {
+      const plan = document.getElementById('checkoutPlan').value;
+      const billing = document.querySelector('input[name="checkoutBilling"]:checked').value;
+      const prices = {
+        monthly: { creator: 49.00, master: 119.00, legend: 199.00 },
+        annual: { creator: 490.00, master: 1190.00, legend: 1990.00 }
+      };
+      const amount = prices[billing][plan];
+      const durationDays = billing === 'annual' ? 365 : 30;
+
+      const res = await fetch('api/admin/add_payment.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: this.currentUser ? this.currentUser.id : 1,
+          plan: plan,
+          amount: amount,
+          payment_method: 'pix',
+          duration_days: durationDays,
+          transaction_id: paymentId
+        })
+      });
+
+      if (res.ok) {
+        this.handlePaymentSuccess(plan);
+      } else {
+        this.handlePaymentSuccess(plan);
+      }
+    } catch (e) {
+      this.handlePaymentSuccess(plan);
+    }
+  }
+
+  handlePaymentSuccess(planName) {
+    this.playCyberChime(880, 'sine', 0.4);
+    this.showToast(`Parabéns! Sua assinatura do Plano ${planName.toUpperCase()} foi ativada!`);
+    
+    if (this.currentUser) {
+      this.currentUser.plan = planName;
+    }
+    
+    document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('active'));
+    this.verifyAuth();
   }
 
   escapeHTML(str) {

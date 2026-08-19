@@ -452,6 +452,9 @@ class AnorakAdmin {
     document.getElementById('editRole').value = user.role;
     document.getElementById('editPlan').value = user.plan;
     document.getElementById('editPlanStatus').value = user.plan_status;
+    
+    const cycleSelect = document.getElementById('editBillingCycle');
+    if (cycleSelect) cycleSelect.value = user.billing_cycle || 'monthly';
 
     // Reseta data de expiração
     const expInput = document.getElementById('editPlanExpires');
@@ -475,12 +478,15 @@ class AnorakAdmin {
     const plan = document.getElementById('editPlan').value;
     const plan_status = document.getElementById('editPlanStatus').value;
     const plan_expires_at = document.getElementById('editPlanExpires').value;
+    
+    const cycleSelect = document.getElementById('editBillingCycle');
+    const billing_cycle = cycleSelect ? cycleSelect.value : 'monthly';
 
     try {
       const res = await fetch('api/admin/update_user.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, username, email, role, plan, plan_status, plan_expires_at })
+        body: JSON.stringify({ id, username, email, role, plan, plan_status, plan_expires_at, billing_cycle })
       });
 
       const result = await res.json();

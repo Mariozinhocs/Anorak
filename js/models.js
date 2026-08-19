@@ -42,8 +42,9 @@ export class Item {
     impact = 'medio',   // 'baixo', 'medio', 'alto'
     urgency = 'media',  // 'baixa', 'media', 'alta'
     assignedTo = '',    // Responsável atribuído
+    collaborators = [], // Lista de colaboradores convidados
     tags = [],
-    contextLinks = { driveFolder: '', githubRepo: '', liveUrl: '' },
+    contextLinks = { driveFolder: '', githubRepo: '', hmlUrl: '', liveUrl: '' },
     tasks = [],
     validationHistory = [],
     createdAt = new Date().toISOString(),
@@ -54,10 +55,12 @@ export class Item {
     this.title = title;
     this.description = description;
     this.assignedTo = assignedTo;
+    this.collaborators = Array.isArray(collaborators) ? collaborators : [];
     this.tags = Array.isArray(tags) ? tags : [];
     this.contextLinks = {
       driveFolder: contextLinks.driveFolder || '',
       githubRepo: contextLinks.githubRepo || '',
+      hmlUrl: contextLinks.hmlUrl || '',
       liveUrl: contextLinks.liveUrl || ''
     };
     this.priority = priority;

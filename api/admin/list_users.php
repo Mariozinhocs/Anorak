@@ -51,7 +51,7 @@ try {
 
     // Consulta para listar usuários com contagem de projetos atribuídos
     $sql = "
-        SELECT u.id, u.username, u.email, u.role, u.plan, u.plan_status, u.plan_expires_at, u.created_at, u.deleted_at,
+        SELECT u.id, u.username, u.email, u.role, u.plan, u.plan_status, u.plan_expires_at, u.billing_cycle, u.created_at, u.deleted_at,
                (SELECT COUNT(*) FROM `{$items_table}` WHERE assigned_to = u.username AND type = 'project') as projects_count,
                (SELECT COUNT(*) FROM `{$items_table}` WHERE assigned_to = u.username AND type = 'idea') as ideas_count
         FROM `{$users_table}` u

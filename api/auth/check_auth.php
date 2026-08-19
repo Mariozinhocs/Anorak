@@ -17,7 +17,7 @@ try {
     $db_prefix = getenv('DB_TABLE_PREFIX') ?: '';
     $users_table = $db_prefix . 'users';
 
-    $stmt = $pdo->prepare("SELECT id, username, email, role, timezone, deleted_at FROM `{$users_table}` WHERE id = :id LIMIT 1");
+    $stmt = $pdo->prepare("SELECT id, username, email, role, plan, plan_status, plan_expires_at, billing_cycle, timezone, deleted_at FROM `{$users_table}` WHERE id = :id LIMIT 1");
     $stmt->execute([':id' => $_SESSION['anorak_user_id']]);
     $user = $stmt->fetch();
 
@@ -37,6 +37,10 @@ try {
             'username' => $user['username'],
             'email' => $user['email'],
             'role' => $user['role'],
+            'plan' => $user['plan'] ?? 'creator',
+            'plan_status' => $user['plan_status'] ?? 'active',
+            'plan_expires_at' => $user['plan_expires_at'] ?? null,
+            'billing_cycle' => $user['billing_cycle'] ?? 'monthly',
             'timezone' => $user['timezone'] ?? 'America/Sao_Paulo'
         ]
     ], JSON_UNESCAPED_UNICODE);

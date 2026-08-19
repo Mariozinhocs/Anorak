@@ -49,7 +49,7 @@
           <span>💳</span> Histórico de Pagamentos
         </button>
         <button type="button" class="mode-btn" data-tab="deploy" id="btnTabDeploy">
-          <span>⚙️</span> Deploy &amp; Banco
+          <span>💎</span> Administrador de Planos &amp; Banco
         </button>
       </nav>
 
@@ -196,30 +196,22 @@
     </section>
 
     <!-- ===================================================================== -->
-    <!-- ABA 3: DEPLOY & BANCO -->
+    <!-- ABA 3: BANCO & MANUTENÇÃO -->
     <!-- ===================================================================== -->
     <section class="view-section" id="viewDeploy" style="display: none;">
       <div class="view-header">
         <div>
-          <h2><span>⚙️</span> Deploy e Sincronização do Servidor</h2>
-          <p>Execute migrações estruturais do banco ou envie atualizações de código para homologação.</p>
+          <h2><span>💎</span> Administrador de Planos &amp; Banco de Dados</h2>
+          <p>Gerencie permissões de assinaturas, verificação de integridade estrutural das tabelas e migrações do sistema.</p>
         </div>
       </div>
 
-      <div class="deploy-controls-grid">
+      <div class="deploy-controls-grid" style="grid-template-columns: 1fr;">
         <div class="glass-panel deploy-action-card">
           <h3>🔮 Migrações de Banco de Dados</h3>
-          <p>Roda a verificação de integridade estrutural das tabelas e migrações (incluindo seedings).</p>
-          <button type="button" class="btn-magic" id="btnRunMigrations" style="margin-top: 1rem;">
+          <p>Roda a verificação de integridade estrutural das tabelas e migrações (incluindo seedings de administradores e tabelas).</p>
+          <button type="button" class="btn-magic" id="btnRunMigrations" style="margin-top: 1rem; width: auto; max-width: 300px;">
             <span>🚀</span> Rodar db_installer.php
-          </button>
-        </div>
-
-        <div class="glass-panel deploy-action-card">
-          <h3>⚡ Deploy para Homologação</h3>
-          <p>Dispara o script local PowerShell para atualizar os arquivos do site no FTP de homologação.</p>
-          <button type="button" class="btn-magic" id="btnRunDeploy" style="margin-top: 1rem; background: linear-gradient(135deg, var(--key-copper), var(--accent-purple)); color: #fff; box-shadow: 0 0 15px var(--key-copper-glow);">
-            <span>📤</span> Iniciar Deploy HML
           </button>
         </div>
       </div>
@@ -287,10 +279,18 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="editPlanExpires">Data de Expiração</label>
-            <input type="datetime-local" id="editPlanExpires" class="form-input">
-            <span style="font-size: 0.7rem; color: var(--text-muted);">Deixe em branco para acesso permanente.</span>
+            <label for="editBillingCycle">Ciclo de Faturamento</label>
+            <select id="editBillingCycle" class="form-select" required>
+              <option value="monthly">Mensal</option>
+              <option value="annual">Anual</option>
+            </select>
           </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 0.75rem;">
+          <label for="editPlanExpires">Data de Expiração</label>
+          <input type="datetime-local" id="editPlanExpires" class="form-input">
+          <span style="font-size: 0.7rem; color: var(--text-muted);">Deixe em branco para acesso permanente.</span>
         </div>
 
         <div class="modal-actions" style="margin-top: 1.5rem; justify-content: space-between;">

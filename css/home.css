@@ -884,9 +884,63 @@
   filter: saturate(0.9) blur(1px);
 }
 
-.bg-video-overlay {
-  position: absolute;
-  inset: 0;
   background: radial-gradient(circle at center, rgba(7, 11, 20, 0.15) 0%, rgba(7, 11, 20, 0.70) 100%);
   z-index: 1;
 }
+
+/* ==========================================================================
+   Billing Toggle Switch Styling
+   ========================================================================== */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 56px;
+  height: 28px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-subtle);
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #fff;
+  transition: .4s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.switch input:checked + .slider {
+  background-color: var(--primary-cyan);
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
+}
+
+.switch input:checked + .slider:before {
+  transform: translateX(28px);
+}
+
+.billing-label.active {
+  color: #fff !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+

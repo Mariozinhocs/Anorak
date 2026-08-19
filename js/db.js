@@ -127,9 +127,12 @@ export class AnorakDB {
         impact: 'alto',
         urgency: 'alta',
         tags: ['Retro', 'VR', 'OASIS', 'Three.js'],
+        assignedTo: 'admin',
+        collaborators: ['mario.henrique', 'convidado'],
         contextLinks: {
           driveFolder: 'https://drive.google.com/drive/folders/retroverse-vr',
           githubRepo: 'https://github.com/Mariozinhocs/retroverse-vr.git',
+          hmlUrl: 'https://anorak.hubdigital360.com/hml/retroverse',
           liveUrl: 'https://retroverse.oasis'
         },
         tasks: [
@@ -155,6 +158,7 @@ export class AnorakDB {
         contextLinks: {
           driveFolder: 'https://drive.google.com/drive/folders/oasis-engine',
           githubRepo: 'https://github.com/Mariozinhocs/oasis-engine.git',
+          hmlUrl: 'https://anorak.hubdigital360.com/hml/engine',
           liveUrl: 'https://engine.oasis'
         },
         tasks: [
@@ -180,6 +184,7 @@ export class AnorakDB {
         contextLinks: {
           driveFolder: 'https://drive.google.com/drive/folders/synclink-api',
           githubRepo: 'https://github.com/Mariozinhocs/synclink-api.git',
+          hmlUrl: 'https://anorak.hubdigital360.com/hml/synclink',
           liveUrl: ''
         },
         tasks: [
