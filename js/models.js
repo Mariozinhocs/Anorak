@@ -57,11 +57,12 @@ export class Item {
     this.assignedTo = assignedTo;
     this.collaborators = Array.isArray(collaborators) ? collaborators : [];
     this.tags = Array.isArray(tags) ? tags : [];
+    const cl = contextLinks || {};
     this.contextLinks = {
-      driveFolder: contextLinks.driveFolder || '',
-      githubRepo: contextLinks.githubRepo || '',
-      hmlUrl: contextLinks.hmlUrl || '',
-      liveUrl: contextLinks.liveUrl || ''
+      driveFolder: cl.driveFolder || cl.drive_folder || cl.drive || '',
+      githubRepo: cl.githubRepo || cl.github_repo || cl.github || '',
+      hmlUrl: cl.hmlUrl || cl.hml_url || cl.hml || '',
+      liveUrl: cl.liveUrl || cl.live_url || cl.live || ''
     };
     this.priority = priority;
     this.impact = impact;

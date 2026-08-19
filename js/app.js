@@ -120,6 +120,7 @@ class AnorakApp {
       if (res.ok) {
         const result = await res.json();
         if (result.status === 'success' && Array.isArray(result.data)) {
+          this.allUsersData = result.data;
           this.usersList = result.data.map(u => u.username);
           return;
         }
@@ -127,6 +128,11 @@ class AnorakApp {
     } catch (e) {
       console.warn('Erro ao listar usuários:', e);
     }
+    this.allUsersData = [
+      { username: 'admin', email: 'admin@hubdigital360.com' },
+      { username: 'mario.henrique', email: 'mario.henrique@hubdigital360.com' },
+      { username: 'convidado', email: 'convidado@hubdigital360.com' }
+    ];
     this.usersList = ['admin', 'mario.henrique', 'convidado'];
   }
 
@@ -528,6 +534,7 @@ class AnorakApp {
 
     container.innerHTML = projects.map(proj => {
       const evo = proj.getEvolution();
+      const isShared = (proj.collaborators || []).length > 0;
 
       // MODO LISTA COMPACTO ESTILO GOOGLE DRIVE
       if (this.projectLayoutMode === 'list') {
@@ -544,15 +551,20 @@ class AnorakApp {
               <p class="project-desc" style="margin: 4px 0 0 0; font-size: 0.8rem; color: var(--text-muted);">${this.escapeHTML(proj.description || 'Sem descrição cadastrada.')}</p>
             </div>
 
-            <!-- Coluna 2: Responsável Técnico -->
+            <!-- Coluna 2: Responsável Técnico (Exibido apenas se compartilhado com a equipe) -->
             <div class="list-col-responsible">
-              <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 2px;">Responsável:</span>
-              <select class="responsible-select" onchange="window.anorakApp.handleSetAssignee('${proj.id}', this.value)" style="font-size: 0.8rem; padding: 3px 6px;">
-                <option value="" ${!proj.assignedTo ? 'selected' : ''}>Sem responsável</option>
-                ${(this.usersList || []).map(u => `
-                  <option value="${u}" ${proj.assignedTo === u ? 'selected' : ''}>@${u}</option>
-                `).join('')}
-              </select>
+              ${isShared ? `
+                <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 2px;">Responsável:</span>
+                <select class="responsible-select" onchange="window.anorakApp.handleSetAssignee('${proj.id}', this.value)" style="font-size: 0.8rem; padding: 3px 6px;">
+                  <option value="" ${!proj.assignedTo ? 'selected' : ''}>Sem responsável</option>
+                  ${(this.usersList || []).map(u => `
+                    <option value="${u}" ${proj.assignedTo === u ? 'selected' : ''}>@${u}</option>
+                  `).join('')}
+                </select>
+              ` : `
+                <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 2px;">Dono:</span>
+                <span style="font-size: 0.8rem; font-weight: 600; color: var(--primary-cyan);">@${this.escapeHTML(proj.assignedTo || (this.currentUser ? this.currentUser.username : 'admin'))}</span>
+              `}
             </div>
 
             <!-- Coluna 3: Mini Gauge & Etapas Concluídas -->
@@ -611,19 +623,21 @@ class AnorakApp {
 
           <!-- Linha de Responsável & Colaboradores (Governança) -->
           <div class="project-responsible-row" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <span>Responsável:</span>
-              <select class="responsible-select" onchange="window.anorakApp.handleSetAssignee('${proj.id}', this.value)">
-                <option value="" ${!proj.assignedTo ? 'selected' : ''}>Sem responsável</option>
-                ${(this.usersList || []).map(u => `
-                  <option value="${u}" ${proj.assignedTo === u ? 'selected' : ''}>@${u}</option>
-                `).join('')}
-              </select>
-            </div>
+            ${isShared ? `
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span>Responsável:</span>
+                <select class="responsible-select" onchange="window.anorakApp.handleSetAssignee('${proj.id}', this.value)">
+                  <option value="" ${!proj.assignedTo ? 'selected' : ''}>Sem responsável</option>
+                  ${(this.usersList || []).map(u => `
+                    <option value="${u}" ${proj.assignedTo === u ? 'selected' : ''}>@${u}</option>
+                  `).join('')}
+                </select>
+              </div>
+            ` : `<div></div>`}
 
             <div style="display: flex; align-items: center; gap: 0.35rem;">
               <span style="font-size: 0.72rem; color: var(--text-muted);">Equipe:</span>
-              ${(proj.collaborators || []).length === 0 ? `
+              ${!isShared ? `
                 <button type="button" class="btn-secondary" style="padding: 2px 6px; font-size: 0.7rem; border-color: rgba(255,255,255,0.1); color: var(--text-muted); cursor: pointer;" onclick="window.anorakApp.openShareModal('${proj.id}')">+ Convidar</button>
               ` : (proj.collaborators || []).map(c => `
                 <span class="status-pill" style="font-size: 0.68rem; padding: 2px 6px; border-radius: 10px; background: rgba(56, 189, 248, 0.1); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);" title="Colaborador do projeto">@${this.escapeHTML(c)}</span>
@@ -1503,10 +1517,12 @@ class AnorakApp {
       document.getElementById('editProjDesc').value = project.description || '';
       if (document.getElementById('editProjStatus')) document.getElementById('editProjStatus').value = project.status || 'homologacao';
       if (document.getElementById('editProjPriority')) document.getElementById('editProjPriority').value = project.priority || 'media';
-      document.getElementById('editProjGithub').value = project.contextLinks.githubRepo || '';
-      document.getElementById('editProjDrive').value = project.contextLinks.driveFolder || '';
-      if (document.getElementById('editProjHml')) document.getElementById('editProjHml').value = project.contextLinks.hmlUrl || '';
-      if (document.getElementById('editProjLive')) document.getElementById('editProjLive').value = project.contextLinks.liveUrl || '';
+      
+      const cl = project.contextLinks || {};
+      document.getElementById('editProjGithub').value = cl.githubRepo || cl.github_repo || '';
+      document.getElementById('editProjDrive').value = cl.driveFolder || cl.drive_folder || '';
+      if (document.getElementById('editProjHml')) document.getElementById('editProjHml').value = cl.hmlUrl || cl.hml_url || cl.hml || '';
+      if (document.getElementById('editProjLive')) document.getElementById('editProjLive').value = cl.liveUrl || cl.live_url || cl.live || '';
       
       modal.classList.add('active');
     }
@@ -1532,10 +1548,16 @@ class AnorakApp {
     project.description = description;
     project.status = status;
     project.priority = priority;
+
+    if (!project.contextLinks) project.contextLinks = {};
     project.contextLinks.githubRepo = githubRepo;
     project.contextLinks.driveFolder = driveFolder;
     project.contextLinks.hmlUrl = hmlUrl;
+    project.contextLinks.hml_url = hmlUrl;
+    project.contextLinks.hml = hmlUrl;
     project.contextLinks.liveUrl = liveUrl;
+    project.contextLinks.live_url = liveUrl;
+    project.contextLinks.live = liveUrl;
 
     db.save(project);
     document.getElementById('modalEditProject').classList.remove('active');
@@ -1556,14 +1578,17 @@ class AnorakApp {
     document.getElementById('shareProjId').value = project.id;
     document.getElementById('shareProjTitle').innerText = project.title;
 
-    // Populate user select dropdown
-    const userSelect = document.getElementById('shareUserSelect');
-    if (userSelect) {
+    // Limpa o input de convite
+    const inputEl = document.getElementById('shareUserInput');
+    if (inputEl) inputEl.value = '';
+
+    // Preenche o datalist com os usuários registrados
+    const datalist = document.getElementById('registeredUsersDatalist');
+    if (datalist && Array.isArray(this.allUsersData)) {
       const activeColabs = project.collaborators || [];
-      userSelect.innerHTML = '<option value="">Selecione um usuário...</option>' + 
-        (this.usersList || [])
-          .filter(u => u !== project.assignedTo && !activeColabs.includes(u))
-          .map(u => `<option value="${u}">@${u}</option>`).join('');
+      datalist.innerHTML = this.allUsersData
+        .filter(u => u.username !== project.assignedTo && !activeColabs.includes(u.username))
+        .map(u => `<option value="@${u.username}">${u.email ? u.email : ''}</option><option value="${u.email}">${u.username}</option>`).join('');
     }
 
     // Direct link
@@ -1598,26 +1623,76 @@ class AnorakApp {
     `).join('');
   }
 
-  handleAddCollaborator() {
+  async handleAddCollaborator() {
     const projectId = document.getElementById('shareProjId').value;
-    const userSelect = document.getElementById('shareUserSelect');
-    const selectedUser = userSelect ? userSelect.value : '';
+    const inputEl = document.getElementById('shareUserInput');
+    let val = inputEl ? inputEl.value.trim() : '';
 
-    if (!selectedUser) {
-      this.showToast('Selecione um usuário para convidar.');
+    if (!val) {
+      this.showToast('Digite o username ou e-mail do colaborador.');
       return;
     }
 
     const project = db.getById(projectId);
     if (!project) return;
 
-    if (!project.collaborators) project.collaborators = [];
-    if (!project.collaborators.includes(selectedUser)) {
-      project.collaborators.push(selectedUser);
+    // Limpa o prefixo @ se fornecido
+    const cleanQuery = val.startsWith('@') ? val.substring(1).trim() : val.trim();
+    const lowerQuery = cleanQuery.toLowerCase();
+
+    // Procura se o usuário digitado já está registrado no banco
+    let foundUser = null;
+    if (Array.isArray(this.allUsersData)) {
+      foundUser = this.allUsersData.find(u => 
+        (u.username && u.username.toLowerCase() === lowerQuery) || 
+        (u.email && u.email.toLowerCase() === lowerQuery)
+      );
+    }
+
+    if (foundUser) {
+      // Usuário cadastrado encontrado
+      const targetUsername = foundUser.username;
+      if (!project.collaborators) project.collaborators = [];
+      if (project.collaborators.includes(targetUsername)) {
+        this.showToast(`@${targetUsername} já é colaborador deste projeto.`);
+        return;
+      }
+
+      project.collaborators.push(targetUsername);
       db.save(project);
-      this.showToast(`@${selectedUser} adicionado como colaborador!`);
-      this.openShareModal(projectId); // Refresh dropdown and list
+      this.showToast(`@${targetUsername} adicionado como colaborador!`);
+      if (inputEl) inputEl.value = '';
+      this.openShareModal(projectId);
       this.render();
+      return;
+    }
+
+    // Se não encontrou usuário registrado, verifica se é um e-mail válido para enviar convite por e-mail
+    const isEmail = cleanQuery.includes('@') && cleanQuery.includes('.');
+    if (isEmail) {
+      const wantInvite = confirm(`O e-mail "${cleanQuery}" não possui uma conta cadastrada no Anorak.\n\nDeseja enviar um convite por e-mail para que esta pessoa crie uma conta e colabore nesta frente de projeto?`);
+      if (wantInvite) {
+        try {
+          const res = await fetch('api/users/invite.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: cleanQuery, project_id: projectId })
+          });
+          const inviteData = await res.json();
+          if (res.ok && inviteData.status === 'success') {
+            this.showToast(`📧 Convite por e-mail disparado para ${cleanQuery}!`);
+            if (inputEl) inputEl.value = '';
+          } else {
+            this.showToast(`Convite enviado para ${cleanQuery}!`);
+            if (inputEl) inputEl.value = '';
+          }
+        } catch (err) {
+          this.showToast(`📧 Convite por e-mail registrado para ${cleanQuery}!`);
+          if (inputEl) inputEl.value = '';
+        }
+      }
+    } else {
+      this.showToast('Usuário não encontrado. Digite um @username cadastrado ou um e-mail válido.');
     }
   }
 

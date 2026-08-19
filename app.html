@@ -553,11 +553,12 @@
 
         <!-- Formulário Adicionar Colaborador -->
         <div class="form-group" style="margin-bottom: 1.25rem;">
-          <label style="font-size: 0.82rem; margin-bottom: 0.5rem; display: block;">Convidar Colaborador (Usuário registrado)</label>
+          <label for="shareUserInput" style="font-size: 0.82rem; margin-bottom: 0.5rem; display: block;">Convidar Colaborador (Username ou E-mail)</label>
           <div style="display: flex; gap: 0.5rem;">
-            <select id="shareUserSelect" class="form-select" style="flex: 1;">
-              <option value="">Selecione um usuário...</option>
-            </select>
+            <input type="text" id="shareUserInput" list="registeredUsersDatalist" class="form-input" placeholder="Digite @username ou e-mail..." style="flex: 1; font-size: 0.85rem;" autocomplete="off">
+            <datalist id="registeredUsersDatalist">
+              <!-- Preenchido dinamicamente via JS -->
+            </datalist>
             <button type="button" class="btn-magic" id="btnAddCollaborator" style="padding: 0.5rem 1rem; font-size: 0.85rem; white-space: nowrap;">
               <span>+</span> Convidar
             </button>
