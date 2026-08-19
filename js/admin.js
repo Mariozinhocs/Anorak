@@ -53,21 +53,30 @@ class AnorakAdmin {
   }
 
   setupEventListeners() {
+    const bindClick = (id, fn) => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('click', fn);
+    };
+    const bindEvent = (id, event, fn) => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener(event, fn);
+    };
+
     // Alternância de Abas
-    document.getElementById('btnTabAccounts').addEventListener('click', () => this.switchTab('accounts'));
-    document.getElementById('btnTabPayments').addEventListener('click', () => this.switchTab('payments'));
-    document.getElementById('btnTabDeploy').addEventListener('click', () => this.switchTab('deploy'));
+    bindClick('btnTabAccounts', () => this.switchTab('accounts'));
+    bindClick('btnTabPayments', () => this.switchTab('payments'));
+    bindClick('btnTabDeploy', () => this.switchTab('deploy'));
 
     // Busca e Filtros
-    document.getElementById('inputSearchUsers').addEventListener('input', () => {
+    bindEvent('inputSearchUsers', 'input', () => {
       clearTimeout(this.searchTimeout);
       this.searchTimeout = setTimeout(() => this.loadUsers(), 300);
     });
-    document.getElementById('selectFilterPlan').addEventListener('change', () => this.loadUsers());
-    document.getElementById('selectFilterStatus').addEventListener('change', () => this.loadUsers());
+    bindEvent('selectFilterPlan', 'change', () => this.loadUsers());
+    bindEvent('selectFilterStatus', 'change', () => this.loadUsers());
 
     // Checkbox de Selecionar Todos
-    document.getElementById('chkSelectAllUsers').addEventListener('change', (e) => {
+    bindEvent('chkSelectAllUsers', 'change', (e) => {
       const checked = e.target.checked;
       document.querySelectorAll('.chk-user-select').forEach(chk => {
         chk.checked = checked;
@@ -89,38 +98,39 @@ class AnorakAdmin {
     });
 
     // Form Submits
-    document.getElementById('formEditUser').addEventListener('submit', (e) => {
+    bindEvent('formEditUser', 'submit', (e) => {
       e.preventDefault();
       this.saveUserSettings();
     });
 
-    document.getElementById('formResetPassword').addEventListener('submit', (e) => {
+    bindEvent('formResetPassword', 'submit', (e) => {
       e.preventDefault();
       this.saveUserPassword();
     });
 
-    document.getElementById('formAddPayment').addEventListener('submit', (e) => {
+    bindEvent('formAddPayment', 'submit', (e) => {
       e.preventDefault();
       this.saveManualPayment();
     });
 
-    document.getElementById('formBatchEdit').addEventListener('submit', (e) => {
+    bindEvent('formBatchEdit', 'submit', (e) => {
       e.preventDefault();
       this.saveBatchSettings();
     });
 
     // Ações Lote Clicks
-    document.getElementById('btnBatchEdit').addEventListener('click', () => this.openBatchEditModal());
-    document.getElementById('btnBatchDelete').addEventListener('click', () => this.executeBatchDelete());
-    document.getElementById('btnBatchRestore').addEventListener('click', () => this.executeBatchRestore());
+    bindClick('btnBatchEdit', () => this.openBatchEditModal());
+    bindClick('btnBatchDelete', () => this.executeBatchDelete());
+    bindClick('btnBatchRestore', () => this.executeBatchRestore());
 
     // Registrar Pagamento Manual click
-    document.getElementById('btnOpenAddPayment').addEventListener('click', () => this.openAddPaymentModal());
+    bindClick('btnOpenAddPayment', () => this.openAddPaymentModal());
 
     // Gerador de Senha no modal de redefinição
-    document.getElementById('btnGeneratePwd').addEventListener('click', () => {
+    bindClick('btnGeneratePwd', () => {
       const randomPwd = Math.random().toString(36).substring(2, 10);
-      document.getElementById('newPasswordInput').value = randomPwd;
+      const input = document.getElementById('newPasswordInput');
+      if (input) input.value = randomPwd;
     });
 
     // Ajustar opções de expiração em lote
@@ -133,22 +143,24 @@ class AnorakAdmin {
     }
 
     // Botão de Deletar Físico no Modal de Edição
-    document.getElementById('btnDeleteUserPhysical').addEventListener('click', () => {
-      const id = parseInt(document.getElementById('editUserId').value);
-      if (confirm('ATENÇÃO: Isso excluirá permanentemente a conta e TODOS os dados deste usuário no sistema. Deseja prosseguir?')) {
+    bindClick('btnDeleteUserPhysical', () => {
+      const input = document.getElementById('editUserId');
+      const id = input ? parseInt(input.value) : null;
+      if (id && confirm('ATENÇÃO: Isso excluirá permanentemente a conta e TODOS os dados deste usuário no sistema. Deseja prosseguir?')) {
         this.executeDeleteUser(id, 'hard_delete');
       }
     });
 
     // Deploy & Migrações Listeners
-    document.getElementById('btnRunMigrations').addEventListener('click', () => this.runDatabaseMigrations());
-    document.getElementById('btnRunDeploy').addEventListener('click', () => this.runServerDeploy());
-    document.getElementById('btnClearConsole').addEventListener('click', () => {
-      document.getElementById('consoleOutput').textContent = 'Console limpo. Pronto para execução de tarefas...';
+    bindClick('btnRunMigrations', () => this.runDatabaseMigrations());
+    bindClick('btnRunDeploy', () => this.runServerDeploy());
+    bindClick('btnClearConsole', () => {
+      const consoleOut = document.getElementById('consoleOutput');
+      if (consoleOut) consoleOut.textContent = 'Console limpo. Pronto para execução de tarefas...';
     });
 
     // Logout
-    document.getElementById('btnLogout').addEventListener('click', async () => {
+    bindClick('btnLogout', async () => {
       if (confirm('Deseja realmente sair da sessão administrativa?')) {
         try {
           await fetch('api/auth/logout.php');
