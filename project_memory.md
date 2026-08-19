@@ -38,7 +38,12 @@
 5. **Arquitetura e M.O. de Deploy:**
    - **Ambiente de Homologação (`/hml`):** Todo o desenvolvimento e validações sobem para a subpasta `hml/` (`http://anorak.hubdigital360.com/hml/`).
    - **Ambiente de Produção (`root`):** Publicação direta na raiz do domínio via `deploy-prod.ps1`.
-   - **Repositório Git:** Sincronizado no GitHub com `.gitignore` protegendo credenciais e commits estáveis etiquetados (v1.4.1).
+   - **Repositório Git:** Sincronizado no GitHub com `.gitignore` protegendo credenciais e commits etiquetados (v1.5.0).
+
+6. **Deploy de Atualização v1.5.0 em Homologação:**
+   - **Checkout Pix & Mercado Pago:** Modal de Checkout (`#modalCheckout`) integrado para simulação/seleção de ciclo de pagamento (Mensal/Anual) e geração direta de cobrança Pix (`api/payments/create_checkout.php`).
+   - **Gestão de Colaboradores & Convites Direct Link:** Modal `#modalShareProject` com link copiável e listagem de colaboradores com permissões.
+   - **Publicação:** Concluído commit `a07bfd0` e deploy FTP realizado via `deploy-hml.ps1` para `http://anorak.hubdigital360.com/hml/`.
 
 ---
 
