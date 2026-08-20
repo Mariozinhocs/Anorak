@@ -24,9 +24,11 @@ try {
         GROUP BY plan
     ")->fetchAll();
 
-    $plans = ['explorer' => 0, 'creator' => 0, 'master' => 0];
+    $plans = ['explorer' => 0, 'creator' => 0, 'master' => 0, 'legend' => 0];
     foreach ($plan_counts as $row) {
-        $plans[$row['plan']] = (int) $row['count'];
+        if (isset($row['plan'])) {
+            $plans[$row['plan']] = (int) $row['count'];
+        }
     }
 
     // 2. Contagem de usuários por status de plano
@@ -51,6 +53,7 @@ try {
     // 4. Calcular MRR Estimado (Mensal Recorrente)
     // Creator = R$ 49.00/mês
     // Master = R$ 119.00/mês
+    // Legend = R$ 199.00/mês
     // Apenas contas ativas e sem expiração pendente ou cuja expiração é futura
     $mrr_stmt = $pdo->query("
         SELECT plan, COUNT(*) as count
@@ -68,6 +71,8 @@ try {
             $mrr += $row['count'] * 49.00;
         } elseif ($row['plan'] === 'master') {
             $mrr += $row['count'] * 119.00;
+        } elseif ($row['plan'] === 'legend') {
+            $mrr += $row['count'] * 199.00;
         }
     }
 

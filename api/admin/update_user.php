@@ -44,6 +44,11 @@ try {
     $prefix = getenv('DB_TABLE_PREFIX') ?: '';
     $users_table = $prefix . 'users';
 
+    // Auto-migração preventiva caso a coluna billing_cycle não exista no banco
+    try {
+        $pdo->exec("ALTER TABLE `{$users_table}` ADD COLUMN `billing_cycle` ENUM('monthly', 'annual') NOT NULL DEFAULT 'monthly' AFTER `plan_expires_at`");
+    } catch (Exception $e) {}
+
     // Se fornecidos email e username, verifica se já existem em outra conta
     if ($username !== '' || $email !== '') {
         $stmt_check = $pdo->prepare("SELECT id, username, email FROM `{$users_table}` WHERE (username = :u OR email = :e) AND id != :id LIMIT 1");
