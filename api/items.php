@@ -70,11 +70,21 @@ try {
                 }
             } catch (Exception $e) {}
 
+            // Lê datas geradas no cliente (sincronização LWW)
+            $created_at = null;
+            if (!empty($input['createdAt'])) {
+                $created_at = date('Y-m-d H:i:s', strtotime($input['createdAt']));
+            }
+            $updated_at = null;
+            if (!empty($input['updatedAt'])) {
+                $updated_at = date('Y-m-d H:i:s', strtotime($input['updatedAt']));
+            }
+
             $stmt = $pdo->prepare("
                 INSERT INTO `{$items_table}` 
                 (id, type, title, description, status, priority, impact, urgency, assigned_to, collaborators_json, tags_json, context_links_json, tasks_json, validation_history_json, created_at, updated_at)
                 VALUES 
-                (:id, :type, :title, :description, :status, :priority, :impact, :urgency, :assigned_to, :collaborators_json, :tags_json, :context_links_json, :tasks_json, :validation_history_json, NOW(), NOW())
+                (:id, :type, :title, :description, :status, :priority, :impact, :urgency, :assigned_to, :collaborators_json, :tags_json, :context_links_json, :tasks_json, :validation_history_json, COALESCE(:created_at, NOW()), COALESCE(:updated_at, NOW()))
                 ON DUPLICATE KEY UPDATE 
                 title = VALUES(title),
                 description = VALUES(description),
@@ -88,7 +98,7 @@ try {
                 context_links_json = VALUES(context_links_json),
                 tasks_json = VALUES(tasks_json),
                 validation_history_json = VALUES(validation_history_json),
-                updated_at = NOW()
+                updated_at = VALUES(updated_at)
             ");
 
             $stmt->execute([
@@ -105,24 +115,17 @@ try {
                 ':tags_json' => $tags_json,
                 ':context_links_json' => $context_links_json,
                 ':tasks_json' => $tasks_json,
-                ':validation_history_json' => $validation_history_json
+                ':validation_history_json' => $validation_history_json,
+                ':created_at' => $created_at,
+                ':updated_at' => $updated_at
             ]);
 
-            // Grava log de atividade
-            try {
-                $logs_table = $db_prefix . 'activity_logs';
-                $username_session = $_SESSION['anorak_username'] ?? 'sistema';
-                $ip = $_SERVER['REMOTE_ADDR'] ?? '';
-
-                $log_stmt = $pdo->prepare("INSERT INTO `{$logs_table}` (item_id, username, action, details, ip_address, created_at) VALUES (:item_id, :username, :action, :details, :ip, NOW())");
-                $log_stmt->execute([
-                    ':item_id' => $id,
-                    ':username' => $username_session,
-                    ':action' => $action_type,
-                    ':details' => json_encode(['title' => $title, 'type' => $type, 'status' => $status], JSON_UNESCAPED_UNICODE),
-                    ':ip' => $ip
-                ]);
-            } catch (Exception $e) {}
+            // Grava log de atividade com Trace-ID via AnorakLogger
+            AnorakLogger::audit($pdo, $action_type, [
+                'title'  => $title,
+                'type'   => $type,
+                'status' => $status
+            ], (int)$id);
 
             echo json_encode(['status' => 'success', 'message' => 'Item salvo com sucesso', 'id' => $id], JSON_UNESCAPED_UNICODE);
             break;
@@ -151,32 +154,27 @@ try {
             $stmt = $pdo->prepare("DELETE FROM `{$items_table}` WHERE id = :id");
             $stmt->execute([':id' => $id]);
 
-            // Grava log de exclusão
-            try {
-                $logs_table = $db_prefix . 'activity_logs';
-                $username_session = $_SESSION['anorak_username'] ?? 'sistema';
-                $ip = $_SERVER['REMOTE_ADDR'] ?? '';
-
-                $log_stmt = $pdo->prepare("INSERT INTO `{$logs_table}` (item_id, username, action, details, ip_address, created_at) VALUES (:item_id, :username, 'item_deleted', :details, :ip, NOW())");
-                $log_stmt->execute([
-                    ':item_id' => $id,
-                    ':username' => $username_session,
-                    ':details' => json_encode(['title' => $item_title, 'type' => $item_type], JSON_UNESCAPED_UNICODE),
-                    ':ip' => $ip
-                ]);
-            } catch (Exception $e) {}
+            // Grava log de exclusão com Trace-ID via AnorakLogger
+            AnorakLogger::audit($pdo, 'item_deleted', [
+                'title' => $item_title,
+                'type'  => $item_type
+            ], (int)$id);
 
             echo json_encode(['status' => 'success', 'message' => 'Item excluído com sucesso'], JSON_UNESCAPED_UNICODE);
             break;
 
         default:
             http_response_code(405);
-            echo json_encode(['status' => 'error', 'message' => 'Método HTTP não suportado'], JSON_UNESCAPED_UNICODE);
+            echo json_encode(['status' => 'error', 'message' => 'Método HTTP não permitido'], JSON_UNESCAPED_UNICODE);
             break;
     }
 } catch (Exception $e) {
+    AnorakLogger::error('Erro operacional na API de itens: ' . $e->getMessage(), [
+        'method'    => $method,
+        'exception' => $e->getMessage()
+    ]);
     http_response_code(500);
-    echo json_encode(['status' => 'error', 'message' => $e->getMessage()], JSON_UNESCAPED_UNICODE);
+    echo json_encode(['status' => 'error', 'message' => 'Erro no servidor: ' . $e->getMessage()], JSON_UNESCAPED_UNICODE);
 }
 
 function formatItemJsonFields(&$item) {

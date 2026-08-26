@@ -1,4 +1,6 @@
 <?php
+// Desenvolvido por Mario Henrique (mariozinhocs) - mariozinhocs@gmail.com
+// "si vis pacem para bellum"
 header('Content-Type: text/html; charset=utf-8');
 
 ini_set('display_errors', 1);
@@ -289,11 +291,9 @@ try {
     }
 
     echo "<span class='info'>[AUTH] Verificando e sincronizando credenciais padrão...</span>\n";
-    $default_pass_hash = password_hash('anorak2026', PASSWORD_DEFAULT);
-    
-    // Atualiza a senha de todos os usuários existentes para garantir que anorak2026 funcione
-    $pdo->prepare("UPDATE `{$users_table}` SET password_hash = :hash WHERE password_hash IS NOT NULL")->execute([':hash' => $default_pass_hash]);
-    echo "<span class='success'>[OK] Senhas de todos os usuários sincronizadas com sucesso para 'anorak2026'.</span>\n\n";
+    // Senhas de usuários existentes são preservadas por razões de segurança.
+    // O usuário admin padrão é criado inicialmente com a senha 'anorak2026' apenas se não existir.
+    echo "<span class='success'>[OK] Sincronização de credenciais concluída. Senhas existentes preservadas.</span>\n\n";
 
     echo "<span class='success'>🎉 Processo concluído com 100% de sucesso!</span>\n";
 

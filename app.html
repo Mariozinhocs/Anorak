@@ -1,3 +1,7 @@
+<!--
+  Desenvolvido por Mario Henrique (mariozinhocs) - mariozinhocs@gmail.com
+  "si vis pacem para bellum"
+-->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -258,6 +262,11 @@
         </div>
       </div>
     </section>
+
+    <!-- FOOTER -->
+    <footer class="app-footer" style="text-align: center; padding: 2.5rem 0; margin-top: 3rem; border-top: 1px solid var(--border-subtle); color: var(--text-muted); font-size: 0.85rem; width: 100%;">
+      <p>&copy; 2026 Anorak OASIS Project Hub &bull; Hub Digital 360 &bull; Todos os direitos reservados.</p>
+    </footer>
   </div>
 
   <!-- ===================================================================== -->
@@ -747,6 +756,47 @@
         <div class="modal-actions" style="margin-top: 1.5rem;">
           <button type="button" class="btn-secondary" id="btnCancelPix">Cancelar</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: AJUDA DE TOKEN DO GITHUB (PRIVADO) -->
+  <!-- ===================================================================== -->
+  <div class="modal-backdrop" id="modalGithubTokenHelp" role="dialog" aria-modal="true">
+    <div class="modal-container" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3><span>🐙</span> Repositório Privado do GitHub</h3>
+        <button type="button" class="modal-close" aria-label="Fechar" onclick="document.getElementById('modalGithubTokenHelp').classList.remove('active')">&times;</button>
+      </div>
+
+      <div class="modal-body" style="padding: 0.5rem 0 0 0;">
+        <div style="background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.25); border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 1.25rem; font-size: 0.85rem; color: #d8b4fe; line-height: 1.4;">
+          🧙‍♂️ <strong>Nota do Mago:</strong> Este repositório do GitHub parece ser privado. Para que o Anorak consiga ler e sincronizar suas issues como tarefas, precisamos de um Token de Acesso Pessoal (PAT).
+        </div>
+
+        <h4 style="font-size: 0.9rem; color: #fff; margin-bottom: 0.5rem;">Como obter seu Token em 3 Passos:</h4>
+        <ol style="font-size: 0.82rem; color: var(--text-secondary); padding-left: 1.25rem; margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem;">
+          <li>Acesse seu GitHub e vá em <strong>Settings ➔ Developer Settings ➔ Personal Access Tokens ➔ Tokens (classic)</strong>.</li>
+          <li>Clique em <strong>Generate new token (classic)</strong>, escolha um nome e marque a caixa de seleção <strong>repo</strong>.</li>
+          <li>Clique em <strong>Generate token</strong> na parte inferior, copie o token gerado (começa com <code>ghp_</code>) e cole abaixo:</li>
+        </ol>
+
+        <form id="formGithubToken" onsubmit="event.preventDefault(); window.anorakApp.saveGithubToken();">
+          <div class="form-group">
+            <label for="githubTokenInput">Seu Personal Access Token (PAT)</label>
+            <input type="password" id="githubTokenInput" class="form-input" placeholder="Cole seu token ghp_..." style="font-family: monospace;" autocomplete="current-password">
+          </div>
+
+          <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.5rem;">
+            🔒 Seu token é armazenado de forma segura apenas localmente no seu navegador.
+          </div>
+
+          <div class="modal-actions" style="margin-top: 1.5rem;">
+            <button type="button" class="btn-secondary" onclick="document.getElementById('modalGithubTokenHelp').classList.remove('active')">Cancelar</button>
+            <button type="submit" class="btn-magic">💾 Salvar e Sincronizar</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

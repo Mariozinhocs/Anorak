@@ -1,11 +1,18 @@
 /**
  * ANORAK - Storage Layer
  * Persistência reativa com IndexedDB e LocalStorage, com suporte a backup JSON
+ * 
+ * Desenvolvido por Mario Henrique (mariozinhocs) - mariozinhocs@gmail.com
+ * "si vis pacem para bellum"
  */
 
 import { Item, ItemType, ProjectStatus, IdeaStatus } from './models.js';
 
 const STORAGE_KEY = 'anorak_core_db_v1';
+
+function generateTraceId() {
+  return 'tr-fe-' + Math.random().toString(36).substring(2, 10) + '-' + Date.now().toString(36);
+}
 
 export class AnorakDB {
   constructor() {
@@ -38,19 +45,75 @@ export class AnorakDB {
 
   async syncWithServer() {
     try {
-      const res = await fetch('api/items.php');
+      const traceId = generateTraceId();
+      const res = await fetch('api/items.php', {
+        headers: {
+          'X-Correlation-ID': traceId,
+          'X-Trace-ID': traceId
+        }
+      });
       if (res.ok) {
         const result = await res.json();
-        if (result.status === 'success' && Array.isArray(result.data) && result.data.length > 0) {
-          this.items = result.data.map(data => new Item(data));
-          this.saveToStorage(false); // Salva sem disparar re-sync
-          window.dispatchEvent(new CustomEvent('anorak-db-updated', { detail: { count: this.items.length } }));
+        if (result.status === 'success' && Array.isArray(result.data)) {
+          const serverItems = result.data.map(data => new Item(data));
+          let hasChanges = false;
+
+          const serverMap = new Map(serverItems.map(item => [item.id, item]));
+          const localMap = new Map(this.items.map(item => [item.id, item]));
+
+          // 1. Processa itens vindos do servidor
+          for (const serverItem of serverItems) {
+            const localItem = localMap.get(serverItem.id);
+            if (!localItem) {
+              // Item novo no servidor, adiciona localmente
+              this.items.push(serverItem);
+              hasChanges = true;
+            } else {
+              // Conflito: ambos existem. Compara timestamps (LWW)
+              const localTime = new Date(localItem.updatedAt || 0).getTime();
+              const serverTime = new Date(serverItem.updatedAt || 0).getTime();
+
+              if (serverTime > localTime) {
+                // Versão do servidor é mais nova, atualiza local
+                const idx = this.items.findIndex(i => i.id === serverItem.id);
+                if (idx >= 0) this.items[idx] = serverItem;
+                hasChanges = true;
+              } else if (localTime > serverTime) {
+                // Versão local é mais nova, envia pro servidor em background
+                this.syncItemToServer(localItem);
+              }
+            }
+          }
+
+          // 2. Processa itens criados localmente offline que não estão no servidor
+          for (const localItem of this.items) {
+            if (!serverMap.has(localItem.id)) {
+              this.syncItemToServer(localItem);
+            }
+          }
+
+          if (hasChanges) {
+            this.saveToStorage(false); // Salva localmente
+          }
         }
       }
     } catch (err) {
       // Servidor ou API offline; mantém dados locais do LocalStorage
       console.log('Operando em modo offline/local:', err.message);
     }
+  }
+
+  syncItemToServer(itemInstance) {
+    const traceId = generateTraceId();
+    fetch('api/items.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Correlation-ID': traceId,
+        'X-Trace-ID': traceId
+      },
+      body: JSON.stringify(itemInstance)
+    }).catch(err => console.warn('Sync server save falhou (offline):', err.message));
   }
 
   saveToStorage(syncServer = true) {
@@ -93,13 +156,7 @@ export class AnorakDB {
     }
 
     this.saveToStorage();
-
-    // Sincroniza de forma não-bloqueante com o MySQL via API
-    fetch('api/items.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(itemInstance)
-    }).catch(err => console.warn('Sync server save falhou (offline):', err.message));
+    this.syncItemToServer(itemInstance);
 
     return itemInstance;
   }
@@ -108,9 +165,14 @@ export class AnorakDB {
     this.items = this.items.filter(item => item.id !== id);
     this.saveToStorage();
 
-    // Sincroniza exclusão no MySQL via API
+    // Sincroniza exclusão no MySQL via API com Trace-ID
+    const traceId = generateTraceId();
     fetch(`api/items.php?id=${encodeURIComponent(id)}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        'X-Correlation-ID': traceId,
+        'X-Trace-ID': traceId
+      }
     }).catch(err => console.warn('Sync server delete falhou (offline):', err.message));
   }
 

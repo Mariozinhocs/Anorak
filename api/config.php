@@ -1,5 +1,7 @@
 <?php
 // Anorak Project Hub - Backend Configuration
+// Desenvolvido por Mario Henrique (mariozinhocs) - mariozinhocs@gmail.com
+// "si vis pacem para bellum"
 
 // Configurações de exibição de erros
 ini_set('display_errors', 1);
@@ -9,10 +11,14 @@ error_reporting(E_ALL);
 // Fuso horário padrão em UTC
 date_default_timezone_set('UTC');
 
-// Headers padrão para resposta JSON e CORS seguro
+// Utilitário de Observabilidade & Logs Estruturados
+require_once __DIR__ . '/utils/logger.php';
+
+// Headers padrão para resposta JSON, CORS seguro e Rastreabilidade (Trace-ID)
 header('Content-Type: application/json; charset=utf-8');
 header('X-Content-Type-Options: nosniff');
 header('X-Frame-Options: SAMEORIGIN');
+AnorakLogger::injectTraceHeader();
 
 // Inicialização segura de sessão
 function startAnorakSession() {

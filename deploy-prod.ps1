@@ -48,6 +48,7 @@ Create-FtpDirectory "api/auth"
 Create-FtpDirectory "api/users"
 Create-FtpDirectory "api/admin"
 Create-FtpDirectory "api/payments"
+Create-FtpDirectory "api/utils"
 Create-FtpDirectory "assets"
 
 # 2. Configura temporariamente o .env de produção se existir
@@ -112,7 +113,9 @@ try {
     Upload-File "$localDir\api\items.php" "api/items.php"
     Upload-File "$localDir\api\upload_evidence.php" "api/upload_evidence.php"
     Upload-File "$localDir\api\activity_logs.php" "api/activity_logs.php"
+    Upload-File "$localDir\api\utils\logger.php" "api/utils/logger.php"
     Upload-File "$localDir\api\users\list.php" "api/users/list.php"
+    Upload-File "$localDir\api\users\invite.php" "api/users/invite.php"
     Upload-File "$localDir\api\auth\login.php" "api/auth/login.php"
     Upload-File "$localDir\api\auth\check_auth.php" "api/auth/check_auth.php"
     Upload-File "$localDir\api\auth\logout.php" "api/auth/logout.php"

@@ -1,4 +1,6 @@
 # Script de Deploy Automático para Homologação (HML) via FTP
+# Desenvolvido por Mario Henrique (mariozinhocs) - mariozinhocs@gmail.com
+# "si vis pacem para bellum"
 $ftpHost = "ftp://ftp.anorak.hubdigital360.com"
 $username = "u576215103.anorak"
 $password = ":jJbLt|E5"
@@ -49,6 +51,7 @@ Create-FtpDirectory "hml/api/auth"
 Create-FtpDirectory "hml/api/users"
 Create-FtpDirectory "hml/api/admin"
 Create-FtpDirectory "hml/api/payments"
+Create-FtpDirectory "hml/api/utils"
 Create-FtpDirectory "hml/assets"
 
 # 2. Configura temporariamente o .env de homologação
@@ -118,7 +121,9 @@ try {
     Upload-File "$localDir\api\items.php" "hml/api/items.php"
     Upload-File "$localDir\api\upload_evidence.php" "hml/api/upload_evidence.php"
     Upload-File "$localDir\api\activity_logs.php" "hml/api/activity_logs.php"
+    Upload-File "$localDir\api\utils\logger.php" "hml/api/utils/logger.php"
     Upload-File "$localDir\api\users\list.php" "hml/api/users/list.php"
+    Upload-File "$localDir\api\users\invite.php" "hml/api/users/invite.php"
     Upload-File "$localDir\api\auth\login.php" "hml/api/auth/login.php"
     Upload-File "$localDir\api\auth\check_auth.php" "hml/api/auth/check_auth.php"
     Upload-File "$localDir\api\auth\logout.php" "hml/api/auth/logout.php"

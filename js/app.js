@@ -1,6 +1,9 @@
 /**
  * ANORAK - Main Application Controller
  * OASIS HUD, Dual-Mode Switcher, Checklists Reativos, Incubadora & IA Matrix
+ * 
+ * Desenvolvido por Mario Henrique (mariozinhocs) - mariozinhocs@gmail.com
+ * "si vis pacem para bellum"
  */
 
 import { db } from './db.js';
@@ -551,20 +554,15 @@ class AnorakApp {
               <p class="project-desc" style="margin: 4px 0 0 0; font-size: 0.8rem; color: var(--text-muted);">${this.escapeHTML(proj.description || 'Sem descrição cadastrada.')}</p>
             </div>
 
-            <!-- Coluna 2: Responsável Técnico (Exibido apenas se compartilhado com a equipe) -->
+            <!-- Coluna 2: Responsável Técnico -->
             <div class="list-col-responsible">
-              ${isShared ? `
-                <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 2px;">Responsável:</span>
-                <select class="responsible-select" onchange="window.anorakApp.handleSetAssignee('${proj.id}', this.value)" style="font-size: 0.8rem; padding: 3px 6px;">
-                  <option value="" ${!proj.assignedTo ? 'selected' : ''}>Sem responsável</option>
-                  ${(this.usersList || []).map(u => `
-                    <option value="${u}" ${proj.assignedTo === u ? 'selected' : ''}>@${u}</option>
-                  `).join('')}
-                </select>
-              ` : `
-                <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 2px;">Dono:</span>
-                <span style="font-size: 0.8rem; font-weight: 600; color: var(--primary-cyan);">@${this.escapeHTML(proj.assignedTo || (this.currentUser ? this.currentUser.username : 'admin'))}</span>
-              `}
+              <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 2px;">Responsável:</span>
+              <select class="responsible-select" onchange="window.anorakApp.handleSetAssignee('${proj.id}', this.value)" style="font-size: 0.8rem; padding: 3px 6px;">
+                <option value="" ${!proj.assignedTo ? 'selected' : ''}>Sem responsável</option>
+                ${(this.usersList || []).map(u => `
+                  <option value="${u}" ${proj.assignedTo === u ? 'selected' : ''}>@${u}</option>
+                `).join('')}
+              </select>
             </div>
 
             <!-- Coluna 3: Mini Gauge & Etapas Concluídas -->
@@ -623,17 +621,15 @@ class AnorakApp {
 
           <!-- Linha de Responsável & Colaboradores (Governança) -->
           <div class="project-responsible-row" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
-            ${isShared ? `
-              <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <span>Responsável:</span>
-                <select class="responsible-select" onchange="window.anorakApp.handleSetAssignee('${proj.id}', this.value)">
-                  <option value="" ${!proj.assignedTo ? 'selected' : ''}>Sem responsável</option>
-                  ${(this.usersList || []).map(u => `
-                    <option value="${u}" ${proj.assignedTo === u ? 'selected' : ''}>@${u}</option>
-                  `).join('')}
-                </select>
-              </div>
-            ` : `<div></div>`}
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span>Responsável:</span>
+              <select class="responsible-select" onchange="window.anorakApp.handleSetAssignee('${proj.id}', this.value)">
+                <option value="" ${!proj.assignedTo ? 'selected' : ''}>Sem responsável</option>
+                ${(this.usersList || []).map(u => `
+                  <option value="${u}" ${proj.assignedTo === u ? 'selected' : ''}>@${u}</option>
+                `).join('')}
+              </select>
+            </div>
 
             <div style="display: flex; align-items: center; gap: 0.35rem;">
               <span style="font-size: 0.72rem; color: var(--text-muted);">Equipe:</span>
@@ -666,7 +662,12 @@ class AnorakApp {
           <div class="checklist-section">
             <div class="checklist-title">
               <span>Etapas de Homologação</span>
-              <button class="btn-icon" style="width: 24px; height: 24px; font-size: 0.8rem;" title="Adicionar Etapa" onclick="window.anorakApp.promptAddTask('${proj.id}')">+</button>
+              <div style="display: flex; gap: 0.4rem; align-items: center;">
+                ${proj.contextLinks.githubRepo ? `
+                  <button type="button" class="btn-icon github-sync-btn" style="width: 24px; height: 24px; font-size: 0.8rem; border-color: rgba(56, 189, 248, 0.4); color: #38bdf8; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;" title="Sincronizar Tasks do GitHub" onclick="window.anorakApp.syncGithubTasks('${proj.id}', event)">🔄</button>
+                ` : ''}
+                <button type="button" class="btn-icon" style="width: 24px; height: 24px; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;" title="Adicionar Etapa" onclick="window.anorakApp.promptAddTask('${proj.id}')">+</button>
+              </div>
             </div>
             <div class="checklist-items">
               ${proj.tasks.length === 0 ? '<div style="font-size: 0.8rem; color: var(--text-muted); padding: 0.5rem;">Nenhuma etapa de validação cadastrada.</div>' : ''}
@@ -698,35 +699,33 @@ class AnorakApp {
           </div>
 
           <!-- Context Links & Ações -->
-          <div class="project-footer">
-            <div class="context-links">
-              ${proj.contextLinks.githubRepo ? `
-                <a href="${proj.contextLinks.githubRepo}" target="_blank" rel="noopener" class="context-link-btn" title="Repositório GitHub">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                  <span>GitHub</span>
-                </a>
-              ` : ''}
-              ${proj.contextLinks.driveFolder ? `
-                <a href="${proj.contextLinks.driveFolder}" target="_blank" rel="noopener" class="context-link-btn" title="Pasta no Drive">
-                  <span style="font-size: 1.1rem; line-height: 1;">📁</span>
-                  <span>Drive</span>
-                </a>
-              ` : ''}
-              ${proj.contextLinks.hmlUrl ? `
-                <a href="${proj.contextLinks.hmlUrl}" target="_blank" rel="noopener" class="context-link-btn" title="Ambiente de Homologação (HML)" style="border-color: rgba(234, 179, 8, 0.4); color: #facc15;">
-                  <span style="font-size: 1.1rem; line-height: 1;">🧪</span>
-                  <span>HML</span>
-                </a>
-              ` : ''}
-              ${proj.contextLinks.liveUrl ? `
-                <a href="${proj.contextLinks.liveUrl}" target="_blank" rel="noopener" class="context-link-btn" title="Ambiente Live (Produção)" style="border-color: rgba(16, 185, 129, 0.4); color: #10b981;">
-                  <span style="font-size: 1.1rem; line-height: 1;">🚀</span>
-                  <span>Live</span>
-                </a>
-              ` : ''}
-            </div>
+          <div class="project-footer" style="display: flex; align-items: center; justify-content: flex-start; gap: 0.5rem; flex-wrap: wrap;">
+            ${proj.contextLinks.githubRepo ? `
+              <a href="${proj.contextLinks.githubRepo}" target="_blank" rel="noopener" class="context-link-btn" title="Repositório GitHub">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                <span>GitHub</span>
+              </a>
+            ` : ''}
+            ${proj.contextLinks.driveFolder ? `
+              <a href="${proj.contextLinks.driveFolder}" target="_blank" rel="noopener" class="context-link-btn" title="Pasta no Drive">
+                <span style="font-size: 1.1rem; line-height: 1;">📁</span>
+                <span>Drive</span>
+              </a>
+            ` : ''}
+            ${proj.contextLinks.hmlUrl ? `
+              <a href="${proj.contextLinks.hmlUrl}" target="_blank" rel="noopener" class="context-link-btn" title="Ambiente de Homologação (HML)" style="border-color: rgba(234, 179, 8, 0.4); color: #facc15;">
+                <span style="font-size: 1.1rem; line-height: 1;">🧪</span>
+                <span>HML</span>
+              </a>
+            ` : ''}
+            ${proj.contextLinks.liveUrl ? `
+              <a href="${proj.contextLinks.liveUrl}" target="_blank" rel="noopener" class="context-link-btn" title="Ambiente Live (Produção)" style="border-color: rgba(16, 185, 129, 0.4); color: #10b981;">
+                <span style="font-size: 1.1rem; line-height: 1;">🚀</span>
+                <span>Live</span>
+              </a>
+            ` : ''}
             
-            <div style="display: flex; gap: 0.4rem;">
+            <div style="display: flex; gap: 0.4rem; align-items: center;">
               <button class="btn-icon" style="width: 28px; height: 28px; font-size: 0.8rem;" title="Compartilhar &amp; Colaboradores" onclick="window.anorakApp.openShareModal('${proj.id}')">🤝</button>
               <button class="btn-icon" style="width: 28px; height: 28px; font-size: 0.8rem;" title="Editar Projeto" onclick="window.anorakApp.openEditProjectModal('${proj.id}')">✏️</button>
               <button class="btn-icon" style="width: 28px; height: 28px; font-size: 0.8rem;" title="Exportar Relatório PDF" onclick="window.anorakApp.exportProjectReport('${proj.id}')">🖨️</button>
@@ -1727,6 +1726,206 @@ class AnorakApp {
           console.log(`[Anorak Passivo] GitHub Sync para ${proj.title}: Último commit em ${pingResult.lastCommitDate}`);
         }
       }
+    }
+  }
+
+  // =========================================================================
+  // SINCRONIZADOR INTEGRADO DO GITHUB (SQUAD A-TEAM)
+  // =========================================================================
+  /*
+    Desenvolvido por Mario Henrique (mariozinhocs) - mariozinhocs@gmail.com
+    "si vis pacem para bellum"
+  */
+  async syncGithubTasks(projectId, event) {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+
+    const project = db.getById(projectId);
+    if (!project) return;
+
+    if (!project.contextLinks || !project.contextLinks.githubRepo) {
+      this.showToast('Este projeto não possui um repositório GitHub associado.');
+      return;
+    }
+
+    const parsed = syncEngine.parseGitHubUrl(project.contextLinks.githubRepo);
+    if (!parsed) {
+      this.showToast('URL do GitHub inválida. Verifique o formato.');
+      return;
+    }
+
+    // Procura o botão no DOM para aplicar a animação de rotação (spin)
+    let syncBtn = null;
+    if (event && event.currentTarget) {
+      syncBtn = event.currentTarget;
+    } else {
+      syncBtn = document.querySelector(`[data-project-id="${projectId}"] .github-sync-btn`);
+    }
+
+    if (syncBtn) {
+      if (syncBtn.classList.contains('spin-animation')) return; // Evita cliques múltiplos paralelos
+      syncBtn.classList.add('spin-animation');
+      syncBtn.style.opacity = '0.5';
+    }
+
+    // Lê o Token salvo no LocalStorage
+    const savedToken = localStorage.getItem('anorak_github_token');
+    const headers = {
+      'Accept': 'application/vnd.github.v3+json'
+    };
+    if (savedToken) {
+      headers['Authorization'] = `token ${savedToken}`;
+    }
+
+    try {
+      const response = await fetch(`https://api.github.com/repos/${parsed.owner}/${parsed.repo}/issues?state=all&per_page=100`, { headers });
+
+      if (!response.ok) {
+        // Se der erro de acesso (404/403/401), pode ser repositório privado
+        if (response.status === 404 || response.status === 403 || response.status === 401) {
+          this.pendingSyncProjectId = projectId;
+          const tokenModal = document.getElementById('modalGithubTokenHelp');
+          if (tokenModal) {
+            const tokenInput = document.getElementById('githubTokenInput');
+            if (tokenInput) tokenInput.value = savedToken || '';
+            tokenModal.classList.add('active');
+          } else {
+            this.showToast('Erro ao abrir o modal auxiliar do GitHub.');
+          }
+          return;
+        } else {
+          throw new Error(`Erro HTTP: ${response.status}`);
+        }
+      }
+
+      const issues = await response.json();
+      
+      // Filtra Pull Requests, pois a API de Issues do GitHub retorna ambos juntos
+      const issuesOnly = issues.filter(issue => !issue.pull_request);
+
+      if (issuesOnly.length === 0) {
+        this.showToast('Nenhuma tarefa/issue encontrada no repositório do GitHub.');
+        return;
+      }
+
+      // Preserva tarefas normais (geradas localmente sem o ID "git_")
+      const localTasks = (project.tasks || []).filter(t => !t.id.startsWith('git_'));
+
+      // Cria dicionário de tarefas locais já existentes do tipo "git_" para persistir notas
+      const existingGitTasks = {};
+      (project.tasks || []).forEach(t => {
+        if (t.id.startsWith('git_')) {
+          existingGitTasks[t.id] = t;
+        }
+      });
+
+      // Mapeia as issues retornadas do GitHub
+      const gitTasks = issuesOnly.map(issue => {
+        const gitId = `git_issue_${issue.number}`;
+        const isClosed = issue.state === 'closed';
+        const existingTask = existingGitTasks[gitId] || {};
+
+        // Mapeia labels do GitHub para categorias correspondentes do Anorak
+        let category = 'GitHub';
+        if (issue.labels && issue.labels.length > 0) {
+          const validCategories = ['Planejamento', 'Ambiente', 'Desenvolvimento', 'Deploy', 'QA', 'Integração', 'Segurança', 'Validação'];
+          const matchedLabel = issue.labels.find(l => 
+            validCategories.some(vc => vc.toLowerCase() === l.name.toLowerCase())
+          );
+          if (matchedLabel) {
+            category = matchedLabel.name;
+          } else {
+            category = issue.labels[0].name;
+          }
+        }
+
+        return {
+          id: gitId,
+          title: `[#${issue.number}] ${issue.title}`,
+          category: category,
+          completed: isClosed,
+          status: isClosed ? 'concluido' : 'pendente',
+          validatedAt: isClosed ? (issue.closed_at || new Date().toISOString()) : null,
+          notes: existingTask.notes || '',
+          evidence: isClosed ? { type: 'link', path: issue.html_url, name: `GitHub Issue #${issue.number}` } : null
+        };
+      });
+
+      // Ordena tarefas por número da issue do GitHub
+      gitTasks.sort((a, b) => {
+        const numA = parseInt(a.id.replace('git_issue_', ''), 10);
+        const numB = parseInt(b.id.replace('git_issue_', ''), 10);
+        return numA - numB;
+      });
+
+      // Junta as tarefas manuais locais com as do Git (Merge Não-Destrutivo)
+      project.tasks = [...localTasks, ...gitTasks];
+      project.updatedAt = new Date().toISOString();
+
+      // Ajusta status do projeto com base nas tarefas homologadas
+      const evo = project.getEvolution();
+      if (evo.percentage === 100 && project.status === 'homologacao') {
+        project.status = 'producao';
+      } else if (evo.percentage < 100 && project.status === 'producao') {
+        project.status = 'homologacao';
+      }
+
+      // Trilha de auditoria da governança
+      if (!project.validationHistory) project.validationHistory = [];
+      project.validationHistory.unshift({
+        timestamp: new Date().toISOString(),
+        action: 'Sincronização do GitHub',
+        taskTitle: 'Importação de Issues',
+        taskId: 'github_sync',
+        details: `Sincronizadas ${gitTasks.length} tarefas obtidas do GitHub.`,
+        by: this.currentUser ? this.currentUser.username : 'sistema'
+      });
+
+      // Salva via DB (atualiza local e envia para Hostinger MySQL em background)
+      db.save(project);
+
+      // Feedback visual & sonoro
+      this.playCyberChime(880, 'sine', 0.2);
+      this.showToast(`Sincronização realizada: ${gitTasks.length} tarefas do GitHub carregadas!`);
+      this.render();
+      this.renderDecisionMatrix();
+
+    } catch (err) {
+      console.error(err);
+      this.showToast(`Erro de sincronização: ${err.message}`);
+    } finally {
+      if (syncBtn) {
+        syncBtn.classList.remove('spin-animation');
+        syncBtn.style.opacity = '1';
+      }
+    }
+  }
+
+  saveGithubToken() {
+    const tokenInput = document.getElementById('githubTokenInput');
+    if (!tokenInput) return;
+
+    const token = tokenInput.value.trim();
+    if (token) {
+      localStorage.setItem('anorak_github_token', token);
+      this.showToast('Token de Acesso do GitHub salvo com sucesso!');
+    } else {
+      localStorage.removeItem('anorak_github_token');
+      this.showToast('Token de Acesso removido do navegador.');
+    }
+
+    const tokenModal = document.getElementById('modalGithubTokenHelp');
+    if (tokenModal) {
+      tokenModal.classList.remove('active');
+    }
+
+    // Se havia uma sincronização bloqueada pendente, reinicia agora com o token
+    if (this.pendingSyncProjectId) {
+      const pid = this.pendingSyncProjectId;
+      this.pendingSyncProjectId = null;
+      setTimeout(() => this.syncGithubTasks(pid), 300);
     }
   }
 

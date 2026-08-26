@@ -1320,3 +1320,22 @@
   border-color: rgba(0, 242, 254, 0.4) !important;
   transform: translateX(4px);
 }
+
+/* ==========================================================================
+   ANIMAÇÃO DE ROTAÇÃO E EFEITOS DO SQUAD A-TEAM
+   ========================================================================== */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spin-animation {
+  animation: spin 1s linear infinite !important;
+}
+
+/* Assinatura de Autoria nos Comentários do CSS */
+/*
+  Desenvolvido por Mario Henrique (mariozinhocs) - mariozinhocs@gmail.com
+  "si vis pacem para bellum"
+*/
+

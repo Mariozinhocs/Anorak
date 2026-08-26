@@ -1,6 +1,18 @@
 # Memória do Projeto: Anorak - OASIS Project Hub
 
+> **Status Atual:** Em Desenvolvimento (Homologação Ativa / Framework A-Team v2.0)  
+> **Última Atualização:** 26 de Agosto de 2026  
+> **Squad:** A-Team (PO: Mario Henrique / Agent: Antigravity AI)  
+> **Tagline Oficial:** *"Anorak — OASIS Project Hub & Hybrid Sync"*
+
+---
+
 ## 📌 Status Atual do Desenvolvimento
+
+0. **Framework Operacional A-Team v2.0 & Observabilidade (M.E.L.T.):**
+   - **Diretrizes Universais de Engenharia ([AGENTS.md](file:///g:/Meu%20Drive/Dev's/Anorak/AGENTS.md)):** Estabelecidas normas mandatórias para todos os projetos cobrindo Observabilidade, Agentes Especialistas On-Demand (SecOps, HighScale, FinOps, AI, UX/UI), Arquitetura SaaS-Ready e Política Zero Trust.
+   - **Motor de Observabilidade Backend (`api/utils/logger.php` & `api/config.php`):** Emissão de logs estruturados JSON, injeção e leitura de cabeçalhos de rastreamento (`X-Trace-ID` / `X-Correlation-ID`) e método de auditoria imutável `AnorakLogger::audit()`.
+   - **Rastreabilidade no Frontend (`js/db.js`):** Injeção automática de `X-Trace-ID` e `X-Correlation-ID` em todas as requisições assíncronas de sincronização e exclusão.
 
 1. **Separação de Camadas (Home Pública vs. Área Privada):**
    - **Landing Page Pública ([index.html](file:///g:/Meu%20Drive/Dev's/Anorak/index.html)):** Apresentação imersiva do ecossistema Anorak contendo:
@@ -88,4 +100,28 @@
 
 - **Usuário:** `admin` (ou `admin@hubdigital360.com`)
 - **Senha Padrão Inicial:** `anorak2026`
+
+
+---
+
+## 📌 7. Rotinas e Rituais Operacionais do A-Team
+O squad A-Team segue rituais estritos para garantir entregas com alta previsibilidade e zero regressão, integrando as regras do [Playbook.md](file:///g:/Meu%20Drive/Dev's/Playbook.md) à rotina:
+1. **Refinamento & Meta**: O PO define o objetivo ou reporta falhas. O Agent analisa o impacto e planeja as alterações.
+2. **Aprovação do Plano**: O Agent documenta as mudanças no `implementation_plan.md` e aguarda o aceite do PO.
+3. **Desenvolvimento Incremental**: O Agent executa as tarefas listadas em `task.md` em commits isolados.
+4. **Ciclo CVCC e Auditoria**: O Agent realiza os testes descritos no plano, registra evidências em `walkthrough.md` e anexa os logs de auditoria correspondentes.
+5. **Homologação e Homologação Real**: O Agent executa `deploy-hml.ps1` e o PO testa diretamente o ambiente `/hml`.
+6. **Entrega Estável**: Após homologação aprovada, o Agent promove a versão estável, atualiza este documento (`project_memory.md`) com o histórico de alterações e faz o deploy de produção.
+
+## 📌 8. Padrão de Autoria e Identidade de Código
+Para todos os projetos do squad A-Team, fica estabelecido que:
+- **Assinatura e Frase nos Arquivos**: Todo arquivo de código criado ou modificado (HTML, CSS, JS, PHP, PowerShell) deve conter nos comentários a seguinte identificação do autor:
+  `Desenvolvido por Mario Henrique (mariozinhocs) - mariozinhocs@gmail.com`
+  `"si vis pacem para bellum"`
+- **Restrição de Exibição Pública**: Esta identificação e frase latina são destinadas exclusivamente aos comentários do código-fonte e logs de repositório. Nenhuma assinatura de créditos ou frase deve ser renderizada visualmente aos clientes finais nas interfaces públicas (como o rodapé da landing page `index.html`), mantendo o design do produto 100% limpo e focado no usuário.
+
+---
+*Desenvolvido por Mario Henrique (mariozinhocs) - mariozinhocs@gmail.com*  
+*"si vis pacem para bellum"*  
+
 
