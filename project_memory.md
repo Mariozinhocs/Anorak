@@ -58,6 +58,12 @@
    - **Convites por Username ou E-mail com Disparo de Convite:** O modal `#modalShareProject` aceita digitação de `@username` ou endereço de e-mail com sugestão via datalist. Caso um e-mail não-cadastrado seja inserido, o sistema solicita confirmação e registra/envia o convite via `api/users/invite.php`.
    - **Publicação:** Commit `74259ea` publicado no GitHub e deploy FTP realizado via `deploy-hml.ps1` para `http://anorak.hubdigital360.com/hml/`.
 
+7. **Sincronizador e Consulta Autônoma do Git (Telemetria do Repositório v1.6):**
+   - **Consulta Autônoma (*Auto-Fetch*):** Ao renderizar os cards e ao salvar/editar projetos com URL de Git, o Anorak dispara automaticamente chamadas assíncronas ao GitHub sem bloquear a UI.
+   - **Widget de Telemetria Git no Card:** Exibe o status do repositório (🟢 Online / 🟡 Privado / Limite de API), hash curto do último commit com link direto, mensagem resumida, autor e data relativa amigável (*ex: "há 20 min por @mariozinhocs"*).
+   - **Botão Manual de Atualização:** Botão `🔄 Atualizar Git` com animação de rotação (*spin*) e notificação toast no Card e no Modo Lista.
+   - **Motor `AnorakSyncEngine` ([js/sync.js](file:///g:/Meu%20Drive/Dev's/Anorak/js/sync.js)):** Suporte a bypass de cache para recarga forçada, cálculo de tempo relativo e integração com token autenticado.
+
 ---
 
 ## 📂 Estrutura de Arquivos Criados/Modificados

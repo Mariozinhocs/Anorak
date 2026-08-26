@@ -1333,6 +1333,136 @@
   animation: spin 1s linear infinite !important;
 }
 
+/* ==========================================================================
+   GIT TELEMETRY & AUTO-SYNC WIDGET
+   ========================================================================== */
+.git-telemetry-box {
+  background: rgba(13, 17, 23, 0.75);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 8px;
+  padding: 0.55rem 0.8rem;
+  margin: 0.6rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  transition: all 0.25s ease;
+}
+
+.git-telemetry-box:hover {
+  border-color: rgba(56, 189, 248, 0.45);
+  background: rgba(13, 17, 23, 0.9);
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.1);
+}
+
+.git-telemetry-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.git-status-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #38bdf8;
+  font-family: var(--font-mono, monospace);
+}
+
+.git-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  display: inline-block;
+}
+
+.git-pulse-dot.warning {
+  background: #f59e0b;
+  box-shadow: 0 0 8px #f59e0b;
+}
+
+.git-pulse-dot.error {
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+}
+
+.git-pulse-dot.loading {
+  background: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
+  animation: neonPulse 1s infinite alternate;
+}
+
+.git-commit-info {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.git-commit-sha {
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.git-commit-sha:hover {
+  background: rgba(56, 189, 248, 0.25);
+  color: #ffffff;
+}
+
+.git-commit-msg {
+  color: #e2e8f0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.git-meta-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.btn-git-sync {
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
+  padding: 0.25rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.2s ease;
+}
+
+.btn-git-sync:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
 /* Assinatura de Autoria nos Comentários do CSS */
 /*
   Desenvolvido por Mario Henrique (mariozinhocs) - mariozinhocs@gmail.com

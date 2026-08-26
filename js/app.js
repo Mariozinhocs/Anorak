@@ -21,6 +21,7 @@ class AnorakApp {
     this.decisionMatrix = new AnorakDecisionMatrix(db);
     this.audioContext = null;
     this.soundEnabled = false;
+    this.gitTelemetryCache = new Map();
   }
 
   async init() {
@@ -543,11 +544,16 @@ class AnorakApp {
       if (this.projectLayoutMode === 'list') {
         return `
           <article class="glass-panel project-list-row" data-project-id="${proj.id}">
-            <!-- Coluna 1: Título & Descrição com Links de Acesso -->
+            <!-- Coluna 1: Título & Descrição com Links de Acesso e Git -->
             <div class="list-col-main">
               <div class="list-title-wrap" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                 <h3 class="project-title" style="margin: 0; font-size: 1.05rem;">${this.escapeHTML(proj.title)}</h3>
                 <span class="status-pill status-${proj.status}" style="font-size: 0.68rem; font-weight: bold; text-transform: uppercase; padding: 2px 8px; border-radius: 12px; background: rgba(0, 242, 254, 0.1); color: var(--primary-cyan); border: 1px solid rgba(0, 242, 254, 0.3);">${proj.status}</span>
+                ${proj.contextLinks.githubRepo ? `
+                  <button type="button" class="btn-git-sync github-sync-btn" style="padding: 2px 7px; font-size: 0.7rem;" title="Consultar e Atualizar Status do Git" onclick="window.anorakApp.handleRefreshGit('${proj.id}', event)">
+                    🔄 Git
+                  </button>
+                ` : ''}
                 ${proj.contextLinks.hmlUrl ? `<a href="${proj.contextLinks.hmlUrl}" target="_blank" rel="noopener" class="context-link-btn" title="Homologação (HML)" style="padding: 2px 6px; font-size: 0.7rem; border-color: rgba(234, 179, 8, 0.4); color: #facc15;">🧪 HML</a>` : ''}
                 ${proj.contextLinks.liveUrl ? `<a href="${proj.contextLinks.liveUrl}" target="_blank" rel="noopener" class="context-link-btn" title="Ambiente Live (Produção)" style="padding: 2px 6px; font-size: 0.7rem; border-color: rgba(16, 185, 129, 0.4); color: #10b981;">🚀 Live</a>` : ''}
               </div>
@@ -658,6 +664,9 @@ class AnorakApp {
             </div>
           </div>
 
+          <!-- Widget de Telemetria e Status do Git (Squad A-Team) -->
+          ${this.renderGitTelemetry(proj)}
+
           <!-- Checklist Interativo de Homologação -->
           <div class="checklist-section">
             <div class="checklist-title">
@@ -705,6 +714,9 @@ class AnorakApp {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
                 <span>GitHub</span>
               </a>
+              <button type="button" class="btn-git-sync github-sync-btn" style="padding: 0.28rem 0.65rem; font-size: 0.74rem;" title="Consultar e Atualizar Status do Git" onclick="window.anorakApp.handleRefreshGit('${proj.id}', event)">
+                🔄 Atualizar Git
+              </button>
             ` : ''}
             ${proj.contextLinks.driveFolder ? `
               <a href="${proj.contextLinks.driveFolder}" target="_blank" rel="noopener" class="context-link-btn" title="Pasta no Drive">
@@ -762,6 +774,150 @@ class AnorakApp {
         </article>
       `;
     }).join('');
+
+    // Dispara a consulta autônoma de telemetria do Git em segundo plano para todos os projetos
+    this.initGitAutoFetch();
+  }
+
+  // =========================================================================
+  // TELEMETRIA E AUTO-FETCH DO GIT (SQUAD A-TEAM)
+  // =========================================================================
+  renderGitTelemetry(proj) {
+    if (!proj.contextLinks || !proj.contextLinks.githubRepo) {
+      return '';
+    }
+
+    const cached = this.gitTelemetryCache.get(proj.id);
+    if (!cached) {
+      return `
+        <div class="git-telemetry-box" data-git-telemetry="${proj.id}">
+          <div class="git-telemetry-header">
+            <span class="git-status-tag">
+              <span class="git-pulse-dot loading"></span>
+              <span>Git: Consultando...</span>
+            </span>
+            <button type="button" class="btn-git-sync github-sync-btn" style="padding: 2px 7px; font-size: 0.7rem;" title="Atualizar Git" onclick="window.anorakApp.handleRefreshGit('${proj.id}', event)">
+              🔄 Atualizar Git
+            </button>
+          </div>
+          <div class="git-commit-info" style="color: var(--text-muted); font-size: 0.72rem;">
+            <span>Conectando ao repositório GitHub...</span>
+          </div>
+        </div>
+      `;
+    }
+
+    if (cached.status === 'ok') {
+      return `
+        <div class="git-telemetry-box" data-git-telemetry="${proj.id}">
+          <div class="git-telemetry-header">
+            <span class="git-status-tag">
+              <span class="git-pulse-dot"></span>
+              <span>Git Online: <strong>${this.escapeHTML(cached.owner)}/${this.escapeHTML(cached.repo)}</strong></span>
+            </span>
+            <button type="button" class="btn-git-sync github-sync-btn" title="Atualizar Git em tempo real" onclick="window.anorakApp.handleRefreshGit('${proj.id}', event)">
+              🔄 Atualizar Git
+            </button>
+          </div>
+          <div class="git-commit-info">
+            <a href="${cached.commitUrl}" target="_blank" rel="noopener" class="git-commit-sha" title="Ver commit no GitHub">${cached.shaShort}</a>
+            <span class="git-commit-msg" title="${this.escapeHTML(cached.lastCommitMessage)}">${this.escapeHTML(cached.shortMessage)}</span>
+          </div>
+          <div class="git-meta-footer">
+            <span>👤 ${this.escapeHTML(cached.author)}</span>
+            <span>⏱️ ${this.escapeHTML(cached.relativeTime)}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    // Caso de erro ou repositório privado
+    const isRateOrAuth = cached.code === 403 || cached.code === 401 || cached.code === 404;
+    return `
+      <div class="git-telemetry-box" data-git-telemetry="${proj.id}">
+        <div class="git-telemetry-header">
+          <span class="git-status-tag" style="color: #f59e0b;">
+            <span class="git-pulse-dot warning"></span>
+            <span>Git: ${this.escapeHTML(cached.message || 'Aviso')}</span>
+          </span>
+          <button type="button" class="btn-git-sync github-sync-btn" title="Tentar Novamente" onclick="window.anorakApp.handleRefreshGit('${proj.id}', event)">
+            🔄 Atualizar Git
+          </button>
+        </div>
+        <div class="git-commit-info" style="font-size: 0.72rem; color: var(--text-muted);">
+          <span>${isRateOrAuth ? 'Repositório privado ou limite de taxa. Clique em 🔄 para tentar ou verifique permissões.' : 'Não foi possível obter commits do repositório.'}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  async handleRefreshGit(projectId, event) {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+    const project = db.getById(projectId);
+    if (!project || !project.contextLinks || !project.contextLinks.githubRepo) {
+      this.showToast('Nenhum repositório GitHub configurado neste projeto.');
+      return;
+    }
+
+    const clickedBtn = event ? event.currentTarget : null;
+    if (clickedBtn) {
+      clickedBtn.classList.add('spin-animation');
+      clickedBtn.style.opacity = '0.5';
+    }
+
+    try {
+      const data = await this.fetchGitTelemetryForProject(projectId, true);
+      if (data && data.status === 'ok') {
+        this.playCyberChime(750, 'sine', 0.2);
+        this.showToast(`🐙 Git Atualizado! Último commit: "${data.shortMessage}" (${data.relativeTime})`);
+      } else if (data && data.message) {
+        this.showToast(`Aviso Git: ${data.message}`);
+      }
+    } catch (err) {
+      this.showToast(`Erro ao consultar Git: ${err.message}`);
+    } finally {
+      if (clickedBtn) {
+        clickedBtn.classList.remove('spin-animation');
+        clickedBtn.style.opacity = '1';
+      }
+    }
+  }
+
+  async fetchGitTelemetryForProject(projectId, force = false) {
+    const project = db.getById(projectId);
+    if (!project || !project.contextLinks || !project.contextLinks.githubRepo) return null;
+
+    try {
+      const data = await syncEngine.pingGitHub(project.contextLinks.githubRepo, force);
+      this.gitTelemetryCache.set(projectId, data);
+
+      // Atualiza elemento dinâmico no DOM se já estiver renderizado
+      const telemetryEl = document.querySelector(`[data-git-telemetry="${projectId}"]`);
+      if (telemetryEl) {
+        const temp = document.createElement('div');
+        temp.innerHTML = this.renderGitTelemetry(project);
+        const newEl = temp.firstElementChild;
+        if (newEl) {
+          telemetryEl.replaceWith(newEl);
+        }
+      }
+      return data;
+    } catch (e) {
+      console.warn(`[Anorak Git Telemetry] Falha para ${projectId}:`, e.message);
+      return null;
+    }
+  }
+
+  initGitAutoFetch() {
+    const projects = db.getByType(ItemType.PROJECT);
+    for (const proj of projects) {
+      if (proj.contextLinks && proj.contextLinks.githubRepo) {
+        this.fetchGitTelemetryForProject(proj.id, false);
+      }
+    }
   }
 
   handleToggleTask(projectId, taskId) {
@@ -1290,8 +1446,11 @@ class AnorakApp {
     this.playCyberChime(900, 'triangle', 0.3);
     this.showToast(`Ideia promovida com sucesso ao Projeto "${title}"!`);
 
-    // Redireciona para a visão operacional
+    // Redireciona para a visão operacional e consulta o Git se houver repositório
     this.switchMode('operational');
+    if (githubRepo) {
+      this.fetchGitTelemetryForProject(newProject.id, true);
+    }
   }
 
   // =========================================================================
@@ -1503,6 +1662,11 @@ class AnorakApp {
     document.getElementById('modalNewProject').classList.remove('active');
     this.showToast(`Projeto "${title}" criado!`);
     this.render();
+
+    // Consulta imediata do Git se houver repositório configurado
+    if (githubRepo) {
+      this.fetchGitTelemetryForProject(project.id, true);
+    }
   }
 
   openEditProjectModal(projectId) {
@@ -1562,6 +1726,11 @@ class AnorakApp {
     document.getElementById('modalEditProject').classList.remove('active');
     this.showToast(`Projeto "${title}" atualizado!`);
     this.render();
+
+    // Consulta imediata do Git se houver repositório configurado
+    if (githubRepo) {
+      this.fetchGitTelemetryForProject(project.id, true);
+    }
   }
 
   // =========================================================================
