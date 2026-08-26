@@ -647,6 +647,7 @@ class AnorakAdmin {
   updateBatchActionBar() {
     const bar = document.getElementById('batchActionsBar');
     const text = document.getElementById('batchCountText');
+    if (!bar || !text) return;
     const count = this.selectedUserIds.size;
 
     if (count > 0) {
