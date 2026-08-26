@@ -107,6 +107,10 @@
         <span class="icon">🎙️</span>
         <span>Captura por Voz</span>
       </button>
+      <button type="button" class="category-tab" data-category="git">
+        <span class="icon">🐙</span>
+        <span>Integração Git</span>
+      </button>
     </section>
 
     <!-- HELP CONTENT LAYOUT -->
@@ -251,6 +255,53 @@
               <p>Para registrar insights sem digitar, clique no botão <strong>🎙️ Capturar Ideia</strong> no topo do Hub ou pressione o atalho global <kbd style="background: rgba(255,255,255,0.1); border: 1px solid var(--border-subtle); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.8rem;">Ctrl + Espaço</kbd>.</p>
               <p>Fale sua ideia com clareza. O sistema transcreverá a fala em tempo real utilizando a API Web Speech do navegador e criará automaticamente um card na sua Incubadora (Q4). Você pode editar ou promover esse card a projeto quando desejar.</p>
               <p><em>Nota: Certifique-se de dar permissão de uso do microfone no seu navegador na primeira execução.</em></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- TÓPICO 5: Integração Git & Telemetria -->
+        <div class="faq-item" data-category="git">
+          <button type="button" class="faq-trigger">
+            <span class="faq-title">
+              <span class="badge-topic">Integração Git</span>
+              Por que aparece a mensagem "Git: Repositório privado ou limite de requisições"?
+            </span>
+            <span class="faq-arrow">▶</span>
+          </button>
+          <div class="faq-content">
+            <div class="faq-content-inner">
+              <p>Essa mensagem ocorre por dois motivos principais:</p>
+              <ol>
+                <li><strong>Limite de Requisições da API Pública do GitHub:</strong> Quando você consulta repositórios sem autenticação, o GitHub impõe um limite de <strong>60 requisições por hora por IP</strong>. Ao atingir esse limite, a API bloqueia temporariamente novas consultas anônimas.</li>
+                <li><strong>Repositório Privado (Private Repository):</strong> Repositórios privados exigem autenticação explícita. Por padrão de segurança, o GitHub responde com erro <code>404 (Não Encontrado)</code> ou <code>403 (Proibido)</code> para requisições anônimas a repositórios privados.</li>
+              </ol>
+              <p><strong>Como resolver em 1 minuto?</strong> Basta configurar um <strong>Personal Access Token (PAT)</strong> do GitHub no Anorak. Isso eleva seu limite para <strong>5.000 requisições/hora</strong> e permite monitorar repositórios privados normalmente.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-category="git">
+          <button type="button" class="faq-trigger">
+            <span class="faq-title">
+              <span class="badge-topic">Integração Git</span>
+              Passo a Passo: Como gerar um Token no GitHub e inserir no Anorak?
+            </span>
+            <span class="faq-arrow">▶</span>
+          </button>
+          <div class="faq-content">
+            <div class="faq-content-inner">
+              <p>Siga estes 4 passos simples para gerar seu token gratuito no GitHub:</p>
+              <ol style="line-height: 1.6;">
+                <li>Acesse o <a href="https://github.com/settings/tokens" target="_blank" rel="noopener" style="color: var(--primary-cyan); text-decoration: underline;">GitHub Developer Settings</a> (ou clique no seu avatar no GitHub ➔ <strong>Settings</strong> ➔ <strong>Developer settings</strong> ➔ <strong>Personal access tokens</strong> ➔ <strong>Tokens (classic)</strong>).</li>
+                <li>Clique em <strong>Generate new token ➔ Generate new token (classic)</strong>.</li>
+                <li>No campo <em>Note</em>, digite <code>Anorak Hub</code> e marque a caixinha <strong><code>repo</code></strong> (ou apenas <code>public_repo</code> se você só monitorar repositórios públicos).</li>
+                <li>Clique no botão verde <strong>Generate token</strong> no final da página e <strong>copie o código gerado</strong> (ex: <code>ghp_xxxxxxxxxxxx</code>).</li>
+              </ol>
+              <p><strong>Inserindo no Anorak:</strong></p>
+              <p>No Anorak App, no card do seu projeto que estiver com o aviso do Git, clique no botão <strong>🔑 Inserir Token</strong> (ou clique no botão 🔄 de sincronização do checklist). Cole seu token e clique em <strong>Salvar Token</strong>. Pronto! A telemetria será atualizada imediatamente.</p>
+              <div style="padding: 0.75rem 1rem; background: rgba(0, 242, 254, 0.08); border-left: 3px solid var(--primary-cyan); border-radius: 4px; margin-top: 0.75rem; font-size: 0.85rem;">
+                <strong>🛡️ Segurança e Privacidade:</strong> Seu token fica armazenado estritamente no <code>localStorage</code> do seu próprio navegador e é enviado apenas diretamente para a API oficial do GitHub (<code>api.github.com</code>). Ele nunca é exposto publicamente.
+              </div>
             </div>
           </div>
         </div>

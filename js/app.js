@@ -863,12 +863,17 @@ class AnorakApp {
             <span class="git-pulse-dot warning"></span>
             <span>Git: ${this.escapeHTML(cached.message || 'Aviso')}</span>
           </span>
-          <button type="button" class="btn-git-sync github-sync-btn" title="Tentar Novamente" onclick="window.anorakApp.handleRefreshGit('${proj.id}', event)">
-            🔄 Atualizar Git
-          </button>
+          <div style="display: flex; gap: 4px; align-items: center;">
+            <button type="button" class="btn-secondary" style="padding: 2px 7px; font-size: 0.7rem; border-color: rgba(245, 158, 11, 0.4); color: #f59e0b; background: rgba(245, 158, 11, 0.1); cursor: pointer;" title="Inserir Token de Acesso do GitHub" onclick="window.anorakApp.openGithubTokenModal('${proj.id}')">
+              🔑 Inserir Token
+            </button>
+            <button type="button" class="btn-git-sync github-sync-btn" title="Tentar Novamente" onclick="window.anorakApp.handleRefreshGit('${proj.id}', event)">
+              🔄
+            </button>
+          </div>
         </div>
-        <div class="git-commit-info" style="font-size: 0.72rem; color: var(--text-muted);">
-          <span>${isRateOrAuth ? 'Repositório privado ou limite de taxa. Clique em 🔄 para tentar ou verifique permissões.' : 'Não foi possível obter commits do repositório.'}</span>
+        <div class="git-commit-info" style="font-size: 0.72rem; color: var(--text-muted); line-height: 1.4;">
+          <span>${isRateOrAuth ? 'Repositório privado ou limite de 60 req/h atingido. <a href="help.html" target="_blank" style="color: var(--primary-cyan); text-decoration: underline;">Ver tutorial</a> ou clique em <strong>🔑 Inserir Token</strong>.' : 'Não foi possível obter commits do repositório.'}</span>
         </div>
       </div>
     `;
@@ -2213,6 +2218,17 @@ class AnorakApp {
     }
   }
 
+  openGithubTokenModal(projectId = null) {
+    this.pendingSyncProjectId = projectId;
+    const tokenModal = document.getElementById('modalGithubTokenHelp');
+    if (tokenModal) {
+      const savedToken = localStorage.getItem('anorak_github_token');
+      const tokenInput = document.getElementById('githubTokenInput');
+      if (tokenInput) tokenInput.value = savedToken || '';
+      tokenModal.classList.add('active');
+    }
+  }
+
   saveGithubToken() {
     const tokenInput = document.getElementById('githubTokenInput');
     if (!tokenInput) return;
@@ -2231,11 +2247,13 @@ class AnorakApp {
       tokenModal.classList.remove('active');
     }
 
-    // Se havia uma sincronização bloqueada pendente, reinicia agora com o token
+    // Se havia uma sincronização bloqueada ou projeto pendente, consulta o Git agora
     if (this.pendingSyncProjectId) {
       const pid = this.pendingSyncProjectId;
       this.pendingSyncProjectId = null;
-      setTimeout(() => this.syncGithubTasks(pid), 300);
+      this.fetchGitTelemetryForProject(pid, true);
+    } else {
+      this.initGitAutoFetch();
     }
   }
 
