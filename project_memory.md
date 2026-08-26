@@ -64,6 +64,11 @@
    - **Botão Manual de Atualização:** Botão `🔄 Atualizar Git` com animação de rotação (*spin*) e notificação toast no Card e no Modo Lista.
    - **Motor `AnorakSyncEngine` ([js/sync.js](file:///g:/Meu%20Drive/Dev's/Anorak/js/sync.js)):** Suporte a bypass de cache para recarga forçada, cálculo de tempo relativo e integração com token autenticado.
 
+8. **Aba de Projetos Concluídos & Reativação para Homologação (v1.7.0):**
+   - **Aba Dedicada `💎 Concluídos`:** Nova aba no HUD superior com contador dinâmico de projetos finalizados. Separação visual clara entre projetos ativos em homologação e projetos concluídos em produção.
+   - **Botão `🚀 Reativar para Homologação`:** Em cada card de projeto concluído, permite reabrir o projeto com 1 clique, alterando o status para `homologacao`, gerando registro auditável na trilha de governança e redirecionando para o Mapa de Status.
+   - **Ajuste de Botões & Telemetria:** Remoção do botão redundante no rodapé do card e tratamento sanitizado contra `undefined` em nomes de repositório e commits.
+
 ---
 
 ## 📂 Estrutura de Arquivos Criados/Modificados

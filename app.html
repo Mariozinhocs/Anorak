@@ -51,11 +51,17 @@
 
       <!-- DUAL MODE SWITCHER -->
       <nav class="dual-mode-nav" aria-label="Modo de Visualização">
-        <button type="button" class="mode-btn active" data-mode="operational" id="tabOperational" style="flex-direction: column; gap: 2px; padding: 0.35rem 1.25rem; align-items: center; justify-content: center;">
+        <button type="button" class="mode-btn active" data-mode="operational" id="tabOperational" style="flex-direction: column; gap: 2px; padding: 0.35rem 1.15rem; align-items: center; justify-content: center;">
           <span style="display: flex; align-items: center; gap: 0.5rem; white-space: nowrap;">
             <span>⚡</span> Mapa de Status
           </span>
           <span id="tabOperationalProjectCount" style="font-size: 0.72rem; opacity: 0.7; font-weight: 500; display: block; margin-top: 1px;">(0 Projetos)</span>
+        </button>
+        <button type="button" class="mode-btn" data-mode="completed" id="tabCompleted" style="flex-direction: column; gap: 2px; padding: 0.35rem 1.15rem; align-items: center; justify-content: center;">
+          <span style="display: flex; align-items: center; gap: 0.5rem; white-space: nowrap;">
+            <span>💎</span> Concluídos
+          </span>
+          <span id="tabCompletedProjectCount" style="font-size: 0.72rem; opacity: 0.7; font-weight: 500; display: block; margin-top: 1px;">(0 Concluídos)</span>
         </button>
         <button type="button" class="mode-btn" data-mode="matrix" id="tabMatrix">
           <span>🧭</span> Matriz de Tempo
@@ -167,6 +173,23 @@
         <!-- Renderizado dinamicamente via app.js -->
       </div>
     </main>
+
+    <!-- ===================================================================== -->
+    <!-- VIEW: PROJETOS CONCLUÍDOS / PRODUÇÃO -->
+    <!-- ===================================================================== -->
+    <section class="view-section" id="viewCompleted" style="display: none;">
+      <div class="view-header">
+        <div>
+          <h2><span>💎</span> Projetos Concluídos &amp; Em Produção</h2>
+          <p>Projetos finalizados que atingiram a Chave de Cristal. Reative a qualquer momento para iniciar novas fases e ciclos de evolução.</p>
+        </div>
+      </div>
+
+      <!-- GRID DE PROJETOS CONCLUÍDOS -->
+      <div class="projects-grid" id="completedProjectsContainer">
+        <!-- Renderizado dinamicamente via app.js -->
+      </div>
+    </section>
 
     <!-- ===================================================================== -->
     <!-- VIEW 2: MODO INCUBADORA (REPOSITÓRIO DE IDEIAS) -->

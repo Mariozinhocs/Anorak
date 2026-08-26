@@ -423,12 +423,18 @@ class AnorakApp {
     });
 
     const opView = document.getElementById('viewOperational');
+    const compView = document.getElementById('viewCompleted');
     const incView = document.getElementById('viewIncubator');
     const matView = document.getElementById('viewMatrix');
 
     if (opView) opView.style.display = mode === 'operational' ? 'flex' : 'none';
+    if (compView) compView.style.display = mode === 'completed' ? 'flex' : 'none';
     if (incView) incView.style.display = mode === 'incubator' ? 'flex' : 'none';
     if (matView) matView.style.display = mode === 'matrix' ? 'grid' : 'none';
+
+    if (mode === 'completed') {
+      this.renderCompletedProjects();
+    }
 
     this.playCyberChime(660, 'triangle', 0.1);
   }
@@ -436,6 +442,7 @@ class AnorakApp {
   render() {
     this.renderStatsBar();
     this.renderOperationalProjects();
+    this.renderCompletedProjects();
     this.renderIncubatorIdeas();
   }
 
@@ -444,18 +451,29 @@ class AnorakApp {
     const allProjects = items.filter(i => i.type === ItemType.PROJECT);
     const ideas = items.filter(i => i.type === ItemType.IDEA);
 
-    // 1. Topo (Aba): Total Geral de Projetos (incluindo concluídos)
-    const elTabProjCount = document.getElementById('tabOperationalProjectCount');
-    if (elTabProjCount) {
-      elTabProjCount.textContent = `(${allProjects.length} Projeto${allProjects.length === 1 ? '' : 's'})`;
-    }
+    const completedProjects = allProjects.filter(p => {
+      const st = (p.status || '').toLowerCase();
+      return st === 'concluido' || st.includes('conclui') || st.includes('produc');
+    });
 
-    // 2. Card do HUD: Apenas Projetos Abertos (Em Homologação / Planejamento)
     const openProjects = allProjects.filter(p => {
       const st = (p.status || '').toLowerCase();
       return st !== 'concluido' && !st.includes('conclui') && !st.includes('produc');
     });
 
+    // 1. Topo (Aba Mapa de Status): Projetos Ativos / Em Andamento
+    const elTabProjCount = document.getElementById('tabOperationalProjectCount');
+    if (elTabProjCount) {
+      elTabProjCount.textContent = `(${openProjects.length} Projeto${openProjects.length === 1 ? '' : 's'})`;
+    }
+
+    // 2. Topo (Aba Concluídos): Projetos Finalizados
+    const elTabCompletedCount = document.getElementById('tabCompletedProjectCount');
+    if (elTabCompletedCount) {
+      elTabCompletedCount.textContent = `(${completedProjects.length} Concluído${completedProjects.length === 1 ? '' : 's'})`;
+    }
+
+    // 3. Card do HUD: Apenas Projetos Ativos
     const elProjCount = document.getElementById('statActiveProjects');
     if (elProjCount) elProjCount.textContent = openProjects.length;
 
@@ -529,10 +547,16 @@ class AnorakApp {
         }
         return pStatus === filterKey;
       });
+    } else {
+      // Por padrão na visão operacional, exibe projetos em homologação/ativos
+      projects = projects.filter(p => {
+        const pStatus = (p.status || '').toLowerCase();
+        return pStatus !== 'concluido' && !pStatus.includes('conclui') && !pStatus.includes('produc');
+      });
     }
 
     if (projects.length === 0) {
-      container.innerHTML = `<div class="glass-panel" style="padding: 2rem; text-align: center; color: var(--text-muted);">Nenhum projeto encontrado para o filtro selecionado.</div>`;
+      container.innerHTML = `<div class="glass-panel" style="padding: 2rem; text-align: center; color: var(--text-muted); grid-column: 1/-1;">Nenhum projeto ativo em homologação no momento. Acesse a aba <strong>💎 Concluídos</strong> para ver projetos finalizados.</div>`;
       return;
     }
 
@@ -721,9 +745,6 @@ class AnorakApp {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
                 <span>GitHub</span>
               </a>
-              <button type="button" class="btn-git-sync github-sync-btn" style="padding: 0.28rem 0.65rem; font-size: 0.74rem;" title="Consultar e Atualizar Status do Git" onclick="window.anorakApp.handleRefreshGit('${proj.id}', event)">
-                🔄 Atualizar Git
-              </button>
             ` : ''}
             ${proj.contextLinks.driveFolder ? `
               <a href="${proj.contextLinks.driveFolder}" target="_blank" rel="noopener" class="context-link-btn" title="Pasta no Drive">
@@ -731,18 +752,8 @@ class AnorakApp {
                 <span>Drive</span>
               </a>
             ` : ''}
-            ${proj.contextLinks.hmlUrl ? `
-              <a href="${proj.contextLinks.hmlUrl}" target="_blank" rel="noopener" class="context-link-btn" title="Ambiente de Homologação (HML)" style="border-color: rgba(234, 179, 8, 0.4); color: #facc15;">
-                <span style="font-size: 1.1rem; line-height: 1;">🧪</span>
-                <span>HML</span>
-              </a>
-            ` : ''}
-            ${proj.contextLinks.liveUrl ? `
-              <a href="${proj.contextLinks.liveUrl}" target="_blank" rel="noopener" class="context-link-btn" title="Ambiente Live (Produção)" style="border-color: rgba(16, 185, 129, 0.4); color: #10b981;">
-                <span style="font-size: 1.1rem; line-height: 1;">🚀</span>
-                <span>Live</span>
-              </a>
-            ` : ''}
+            ${proj.contextLinks.hmlUrl ? `<a href="${proj.contextLinks.hmlUrl}" target="_blank" rel="noopener" class="context-link-btn" title="Ambiente de Homologação (HML)" style="border-color: rgba(234, 179, 8, 0.4); color: #facc15;">🧪 HML</a>` : ''}
+            ${proj.contextLinks.liveUrl ? `<a href="${proj.contextLinks.liveUrl}" target="_blank" rel="noopener" class="context-link-btn" title="Ambiente Live (Produção)" style="border-color: rgba(16, 185, 129, 0.4); color: #10b981;">🚀 Live</a>` : ''}
             
             <div style="display: flex; gap: 0.4rem; align-items: center;">
               <button class="btn-icon" style="width: 28px; height: 28px; font-size: 0.8rem;" title="Compartilhar &amp; Colaboradores" onclick="window.anorakApp.openShareModal('${proj.id}')">🤝</button>
@@ -763,14 +774,14 @@ class AnorakApp {
               ` : `
                 <div class="audit-timeline">
                   ${proj.validationHistory.map(log => `
-                    <div class="audit-timeline-item">
-                      <div class="audit-timeline-meta">
-                        <span class="audit-time">${new Date(log.timestamp).toLocaleDateString('pt-BR')} ${new Date(log.timestamp).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}</span>
-                        <span class="audit-user">@${this.escapeHTML(log.by || 'sistema')}</span>
-                      </div>
-                      <div class="audit-timeline-action">
-                        <strong>${this.escapeHTML(log.action)}</strong>: ${this.escapeHTML(log.taskTitle || '')}
-                        ${log.details ? `<div class="audit-timeline-details">${this.escapeHTML(log.details)}</div>` : ''}
+                    <div class="timeline-entry">
+                      <div class="timeline-badge">✓</div>
+                      <div class="timeline-body">
+                        <div class="timeline-header">
+                          <span class="timeline-action">${this.escapeHTML(log.action || 'Validação de Etapa')}</span>
+                          <span class="timeline-time">${new Date(log.timestamp).toLocaleString('pt-BR')}</span>
+                        </div>
+                        <p class="timeline-desc">"${this.escapeHTML(log.taskTitle || '')}" validada por <strong>${this.escapeHTML(log.by || 'Sistema')}</strong></p>
                       </div>
                     </div>
                   `).join('')}
@@ -781,27 +792,24 @@ class AnorakApp {
         </article>
       `;
     }).join('');
-
-    // Dispara a consulta autônoma de telemetria do Git em segundo plano para todos os projetos
-    this.initGitAutoFetch();
   }
 
-  // =========================================================================
-  // TELEMETRIA E AUTO-FETCH DO GIT (SQUAD A-TEAM)
-  // =========================================================================
   renderGitTelemetry(proj) {
     if (!proj.contextLinks || !proj.contextLinks.githubRepo) {
       return '';
     }
 
+    const parsed = syncEngine.parseGitHubUrl(proj.contextLinks.githubRepo);
+    const repoDisplay = parsed ? `${parsed.owner}/${parsed.repo}` : 'Repositório';
     const cached = this.gitTelemetryCache.get(proj.id);
+    
     if (!cached) {
       return `
         <div class="git-telemetry-box" data-git-telemetry="${proj.id}">
           <div class="git-telemetry-header">
             <span class="git-status-tag">
               <span class="git-pulse-dot loading"></span>
-              <span>Git: Consultando...</span>
+              <span>Git: Consultando <strong>${this.escapeHTML(repoDisplay)}</strong>...</span>
             </span>
             <button type="button" class="btn-git-sync github-sync-btn" style="padding: 2px 7px; font-size: 0.7rem;" title="Atualizar Git" onclick="window.anorakApp.handleRefreshGit('${proj.id}', event)">
               🔄 Atualizar Git
@@ -815,24 +823,32 @@ class AnorakApp {
     }
 
     if (cached.status === 'ok') {
+      const owner = cached.owner || (parsed ? parsed.owner : '');
+      const repo = cached.repo || (parsed ? parsed.repo : '');
+      const shaShort = cached.shaShort || (cached.sha ? cached.sha.substring(0, 7) : 'commit');
+      const shortMsg = cached.shortMessage || (cached.lastCommitMessage ? cached.lastCommitMessage.split('\n')[0] : 'Último commit');
+      const commitUrl = cached.commitUrl || (parsed ? `https://github.com/${parsed.owner}/${parsed.repo}/commits` : '#');
+      const author = cached.author || 'anônimo';
+      const relativeTime = cached.relativeTime || syncEngine.getRelativeTime(cached.lastCommitDate);
+
       return `
         <div class="git-telemetry-box" data-git-telemetry="${proj.id}">
           <div class="git-telemetry-header">
             <span class="git-status-tag">
               <span class="git-pulse-dot"></span>
-              <span>Git Online: <strong>${this.escapeHTML(cached.owner)}/${this.escapeHTML(cached.repo)}</strong></span>
+              <span>Git Online: <strong>${this.escapeHTML(owner)}/${this.escapeHTML(repo)}</strong></span>
             </span>
             <button type="button" class="btn-git-sync github-sync-btn" title="Atualizar Git em tempo real" onclick="window.anorakApp.handleRefreshGit('${proj.id}', event)">
               🔄 Atualizar Git
             </button>
           </div>
           <div class="git-commit-info">
-            <a href="${cached.commitUrl}" target="_blank" rel="noopener" class="git-commit-sha" title="Ver commit no GitHub">${cached.shaShort}</a>
-            <span class="git-commit-msg" title="${this.escapeHTML(cached.lastCommitMessage)}">${this.escapeHTML(cached.shortMessage)}</span>
+            <a href="${commitUrl}" target="_blank" rel="noopener" class="git-commit-sha" title="Ver commit no GitHub">${this.escapeHTML(shaShort)}</a>
+            <span class="git-commit-msg" title="${this.escapeHTML(cached.lastCommitMessage || shortMsg)}">${this.escapeHTML(shortMsg)}</span>
           </div>
           <div class="git-meta-footer">
-            <span>👤 ${this.escapeHTML(cached.author)}</span>
-            <span>⏱️ ${this.escapeHTML(cached.relativeTime)}</span>
+            <span>👤 ${this.escapeHTML(author)}</span>
+            <span>⏱️ ${this.escapeHTML(relativeTime)}</span>
           </div>
         </div>
       `;
@@ -925,6 +941,124 @@ class AnorakApp {
         this.fetchGitTelemetryForProject(proj.id, false);
       }
     }
+  }
+
+  // =========================================================================
+  // VIEW 4: PROJETOS CONCLUÍDOS / PRODUÇÃO COM REATIVAÇÃO
+  // =========================================================================
+  renderCompletedProjects() {
+    const container = document.getElementById('completedProjectsContainer');
+    if (!container) return;
+
+    const allProjects = db.getByType(ItemType.PROJECT);
+    const completedProjects = allProjects.filter(p => {
+      const st = (p.status || '').toLowerCase();
+      return st === 'concluido' || st.includes('conclui') || st.includes('produc');
+    });
+
+    if (completedProjects.length === 0) {
+      container.innerHTML = `
+        <div class="glass-panel" style="padding: 3rem 2rem; text-align: center; color: var(--text-muted); grid-column: 1/-1;">
+          <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">💎</div>
+          <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">Nenhum Projeto Concluído Ainda</h3>
+          <p style="font-size: 0.88rem; max-width: 520px; margin: 0 auto; line-height: 1.5;">Quando você finalizar 100% das etapas de homologação de um projeto ou marcar o status como Concluído, ele aparecerá aqui com seu histórico e chave de cristal garantida.</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = completedProjects.map(proj => {
+      const evo = proj.getEvolution();
+
+      return `
+        <article class="glass-panel project-card completed-card" data-project-id="${proj.id}" style="border-color: rgba(0, 242, 254, 0.35); box-shadow: 0 0 20px rgba(0, 242, 254, 0.08);">
+          <div class="project-card-header">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 6px;">
+                <span class="status-pill status-concluido" style="font-size: 0.72rem; font-weight: bold; background: rgba(0, 242, 254, 0.15); color: #00f2fe; border: 1px solid var(--primary-cyan); padding: 3px 8px; border-radius: 12px;">💎 PRODUÇÃO / CONCLUÍDO</span>
+              </div>
+              <h3 class="project-title" style="color: #fff; margin-bottom: 4px;">${this.escapeHTML(proj.title)}</h3>
+              <p class="project-desc">${this.escapeHTML(proj.description || 'Sem descrição cadastrada.')}</p>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <button type="button" class="btn-magic" style="padding: 0.35rem 0.85rem; font-size: 0.8rem; background: linear-gradient(135deg, rgba(0, 242, 254, 0.25), rgba(168, 85, 247, 0.25)); border: 1px solid var(--primary-cyan); color: #00f2fe; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer; transition: all 0.2s;" title="Reativar este projeto para Homologação e continuar evoluindo com novas tarefas" onclick="window.anorakApp.handleReopenProject('${proj.id}')">
+                🚀 Reativar para Homologação
+              </button>
+
+              <div class="halliday-keys-box" title="Conquistas de Estágio: Chave de Cristal Desbloqueada">
+                <span class="key-badge copper active">🗝️</span>
+                <span class="key-badge jade active">🗝️</span>
+                <span class="key-badge crystal active">💎</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Barra de Progresso / Conclusão -->
+          <div class="phase-progress-wrap">
+            <div class="gauge-holder" title="Progresso da Fase: 100%">
+              ${this.renderMiniGauge(100)}
+            </div>
+            <div class="progress-details">
+              <div class="progress-labels">
+                <span>Status: <strong style="color: var(--primary-cyan);">CONCLUÍDO</strong></span>
+                <span class="mono">${evo.completed}/${evo.total} etapas validadas</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: 100%; background: linear-gradient(90deg, #00f2fe, #a855f7);"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Widget Git Telemetry -->
+          ${this.renderGitTelemetry(proj)}
+
+          <!-- Footer com Links e Ações -->
+          <div class="project-footer" style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--glass-border);">
+            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              ${proj.contextLinks.githubRepo ? `
+                <a href="${proj.contextLinks.githubRepo}" target="_blank" rel="noopener" class="context-link-btn" title="Repositório GitHub">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                  <span>GitHub</span>
+                </a>
+              ` : ''}
+              ${proj.contextLinks.hmlUrl ? `<a href="${proj.contextLinks.hmlUrl}" target="_blank" rel="noopener" class="context-link-btn" title="Ambiente de Homologação (HML)" style="border-color: rgba(234, 179, 8, 0.4); color: #facc15;">🧪 HML</a>` : ''}
+              ${proj.contextLinks.liveUrl ? `<a href="${proj.contextLinks.liveUrl}" target="_blank" rel="noopener" class="context-link-btn" title="Ambiente Live (Produção)" style="border-color: rgba(16, 185, 129, 0.4); color: #10b981;">🚀 Live</a>` : ''}
+            </div>
+
+            <div style="display: flex; gap: 0.4rem; align-items: center;">
+              <button class="btn-icon" style="width: 28px; height: 28px; font-size: 0.8rem;" title="Compartilhar &amp; Colaboradores" onclick="window.anorakApp.openShareModal('${proj.id}')">🤝</button>
+              <button class="btn-icon" style="width: 28px; height: 28px; font-size: 0.8rem;" title="Editar Projeto" onclick="window.anorakApp.openEditProjectModal('${proj.id}')">✏️</button>
+              <button class="btn-icon" style="width: 28px; height: 28px; font-size: 0.8rem;" title="Exportar Relatório PDF" onclick="window.anorakApp.exportProjectReport('${proj.id}')">🖨️</button>
+            </div>
+          </div>
+        </article>
+      `;
+    }).join('');
+  }
+
+  handleReopenProject(projectId) {
+    const project = db.getById(projectId);
+    if (!project) return;
+
+    project.status = ProjectStatus.HOMOLOGATION;
+    project.updatedAt = new Date().toISOString();
+
+    const currentBy = this.currentUser ? this.currentUser.username : 'sistema';
+    if (!project.validationHistory) project.validationHistory = [];
+    project.validationHistory.unshift({
+      timestamp: new Date().toISOString(),
+      action: 'Projeto Reativado para Homologação',
+      taskTitle: 'Reabertura para Nova Fase de Evolução',
+      taskId: 'reactivate',
+      by: currentBy
+    });
+
+    db.save(project);
+    this.playCyberChime(880, 'sine', 0.25);
+    this.showToast(`🚀 Projeto "${project.title}" reativado para Homologação com sucesso!`);
+    this.render();
+    this.switchMode('operational');
   }
 
   handleToggleTask(projectId, taskId) {

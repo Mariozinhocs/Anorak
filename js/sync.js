@@ -17,10 +17,10 @@ export class AnorakSyncEngine {
    */
   parseGitHubUrl(url) {
     if (!url) return null;
-    const cleanUrl = url.trim().replace(/\.git$/, '');
-    const match = cleanUrl.match(/github\.com\/([^\/]+)\/([^\/]+)/i);
+    const cleanUrl = url.trim().replace(/\.git\/?$/i, '').replace(/\/+$/, '');
+    const match = cleanUrl.match(/github\.com[\/:]([^\/]+)\/([^\/]+)/i);
     if (match) {
-      return { owner: match[1], repo: match[2] };
+      return { owner: match[1].trim(), repo: match[2].trim() };
     }
     return null;
   }
