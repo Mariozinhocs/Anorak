@@ -539,6 +539,13 @@ class AnorakApp {
     container.innerHTML = projects.map(proj => {
       const evo = proj.getEvolution();
       const isShared = (proj.collaborators || []).length > 0;
+      
+      // Membros válidos do projeto: APENAS o usuário atual/criador e colaboradores convidados manualmente
+      const projectMembers = Array.from(new Set([
+        ...(this.currentUser ? [this.currentUser.username] : []),
+        ...(proj.collaborators || []),
+        ...(proj.assignedTo ? [proj.assignedTo] : [])
+      ])).filter(Boolean);
 
       // MODO LISTA COMPACTO ESTILO GOOGLE DRIVE
       if (this.projectLayoutMode === 'list') {
@@ -565,7 +572,7 @@ class AnorakApp {
               <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 2px;">Responsável:</span>
               <select class="responsible-select" onchange="window.anorakApp.handleSetAssignee('${proj.id}', this.value)" style="font-size: 0.8rem; padding: 3px 6px;">
                 <option value="" ${!proj.assignedTo ? 'selected' : ''}>Sem responsável</option>
-                ${(this.usersList || []).map(u => `
+                ${projectMembers.map(u => `
                   <option value="${u}" ${proj.assignedTo === u ? 'selected' : ''}>@${u}</option>
                 `).join('')}
               </select>
@@ -631,7 +638,7 @@ class AnorakApp {
               <span>Responsável:</span>
               <select class="responsible-select" onchange="window.anorakApp.handleSetAssignee('${proj.id}', this.value)">
                 <option value="" ${!proj.assignedTo ? 'selected' : ''}>Sem responsável</option>
-                ${(this.usersList || []).map(u => `
+                ${projectMembers.map(u => `
                   <option value="${u}" ${proj.assignedTo === u ? 'selected' : ''}>@${u}</option>
                 `).join('')}
               </select>
