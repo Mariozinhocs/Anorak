@@ -154,12 +154,10 @@ class AnorakAdmin {
 
     // Logout
     bindClick('btnLogout', async () => {
-      if (confirm('Deseja realmente sair da sessão administrativa?')) {
-        try {
-          await fetch('api/auth/logout.php');
-        } catch (e) {}
-        window.location.replace('login.html');
-      }
+      try {
+        await fetch('api/auth/logout.php');
+      } catch (e) {}
+      window.location.replace('login.html');
     });
   }
 
