@@ -87,6 +87,8 @@ try {
     Upload-File "$localDir\app.html" "hml/app.html"
     Upload-File "$localDir\admin.html" "hml/admin.html"
     Upload-File "$localDir\help.html" "hml/help.html"
+    Upload-File "$localDir\manifest.json" "hml/manifest.json"
+    Upload-File "$localDir\sw.js" "hml/sw.js"
     Upload-File "$localDir\assets\anorak_construction_case.png" "hml/assets/anorak_construction_case.png"
     Upload-File "$localDir\assets\anorak_creative_case.png" "hml/assets/anorak_creative_case.png"
     Upload-File "$localDir\assets\anorak_business_case.png" "hml/assets/anorak_business_case.png"

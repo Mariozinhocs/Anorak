@@ -41,6 +41,8 @@ export class Item {
     priority = 'media', // 'baixa', 'media', 'alta', 'critica'
     impact = 'medio',   // 'baixo', 'medio', 'alto'
     urgency = 'media',  // 'baixa', 'media', 'alta'
+    customOrder = 0,    // Ordem personalizada (Plano Legend Drag & Drop)
+    quadrant = null,    // Quadrante manual da Matriz Halliday (q1, q2, q3, q4)
     assignedTo = '',    // Responsável atribuído
     collaborators = [], // Lista de colaboradores convidados
     tags = [],
@@ -54,6 +56,8 @@ export class Item {
     this.type = type;
     this.title = title;
     this.description = description;
+    this.customOrder = typeof customOrder === 'number' ? customOrder : 0;
+    this.quadrant = quadrant;
     this.assignedTo = assignedTo;
     this.collaborators = Array.isArray(collaborators) ? collaborators : [];
     this.tags = Array.isArray(tags) ? tags : [];

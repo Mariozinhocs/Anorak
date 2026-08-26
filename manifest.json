@@ -1,0 +1,43 @@
+{
+  "name": "Anorak OASIS — Project Hub & Hybrid Sync",
+  "short_name": "Anorak",
+  "description": "Plataforma de gestão de projetos orientada a homologação com persistência híbrida e Matriz Halliday.",
+  "start_url": "app.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#070b14",
+  "theme_color": "#070b14",
+  "categories": ["productivity", "business", "developer"],
+  "icons": [
+    {
+      "src": "assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Abrir Hub de Projetos",
+      "url": "app.html",
+      "description": "Acessar mapa de projetos e status"
+    },
+    {
+      "name": "Painel Administrativo",
+      "url": "admin.html",
+      "description": "Gestão de planos e contas"
+    },
+    {
+      "name": "Central de Ajuda",
+      "url": "help.html",
+      "description": "Tutoriais e Matriz Halliday"
+    }
+  ]
+}

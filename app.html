@@ -15,6 +15,14 @@
   <link rel="alternate icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%200%20100%20100%22><text y=%22.9em%22 font-size=%2290%22>🧙‍♂️</text></svg>">
   <meta name="theme-color" content="#070b14">
 
+  <!-- PWA & Mobile Meta Tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Anorak">
+  <link rel="apple-touch-icon" href="assets/favicon.svg">
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,10 +35,10 @@
   </script>
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/variables.css?v=1.6">
-  <link rel="stylesheet" href="css/base.css?v=1.6">
-  <link rel="stylesheet" href="css/components.css?v=1.6">
-  <link rel="stylesheet" href="css/animations.css?v=1.6">
+  <link rel="stylesheet" href="css/variables.css?v=1.9">
+  <link rel="stylesheet" href="css/base.css?v=1.9">
+  <link rel="stylesheet" href="css/components.css?v=1.9">
+  <link rel="stylesheet" href="css/animations.css?v=1.9">
 </head>
 <body>
   <!-- Ambient Grid -->
@@ -87,6 +95,10 @@
         <a href="help.html" class="btn-icon" title="Ajuda &amp; Tutoriais" style="width: 28px; height: 28px; font-size: 0.85rem; text-decoration: none; border-color: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center;">
           ❓
         </a>
+
+        <button type="button" class="btn-pwa-install" id="btnInstallPwa" style="display: none;" title="Instalar aplicativo no seu celular ou computador">
+          <span>📲</span> <span>Instalar App</span>
+        </button>
         
         <!-- User Badge & Logout -->
         <div class="user-hud-badge" id="userHudBadge" style="display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--glass-border);">

@@ -32,6 +32,17 @@ export class AnorakDecisionMatrix {
       const evo = project.getEvolution();
       const pendingTasks = project.tasks.filter(t => !t.completed);
 
+      if (project.quadrant && quadrants[project.quadrant]) {
+        quadrants[project.quadrant].push({
+          id: project.id,
+          title: `[Projeto] ${project.title}`,
+          context: project.title,
+          badge: project.quadrant.toUpperCase(),
+          type: 'project'
+        });
+        return;
+      }
+
       if (project.status === ProjectStatus.HOMOLOGATION && pendingTasks.length > 0) {
         quadrants.q1.push({
           id: project.id,
@@ -53,6 +64,17 @@ export class AnorakDecisionMatrix {
 
     // Classifica Ideias
     ideas.forEach(idea => {
+      if (idea.quadrant && quadrants[idea.quadrant]) {
+        quadrants[idea.quadrant].push({
+          id: idea.id,
+          title: idea.title,
+          context: 'Incubadora',
+          badge: idea.quadrant.toUpperCase(),
+          type: 'idea'
+        });
+        return;
+      }
+
       if (idea.status === IdeaStatus.PRIORITIZED || (idea.impact === 'alto' && idea.urgency === 'alta')) {
         quadrants.q2.push({
           id: idea.id,

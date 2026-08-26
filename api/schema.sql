@@ -7,9 +7,11 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}items` (
     `title` VARCHAR(255) NOT NULL,
     `description` TEXT NULL,
     `status` VARCHAR(50) NOT NULL DEFAULT 'homologacao',
+    `custom_order` INT NOT NULL DEFAULT 0,
     `priority` ENUM('baixa', 'media', 'alta', 'critica') NOT NULL DEFAULT 'media',
     `impact` ENUM('baixo', 'medio', 'alto') NOT NULL DEFAULT 'medio',
     `urgency` ENUM('baixa', 'media', 'alta') NOT NULL DEFAULT 'media',
+    `quadrant` VARCHAR(10) NULL DEFAULT NULL,
     `assigned_to` VARCHAR(100) NULL,
     `collaborators_json` JSON NULL,
     `tags_json` JSON NULL,
@@ -19,6 +21,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}items` (
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX `idx_type_status` (`type`, `status`),
+    INDEX `idx_custom_order` (`custom_order`),
     INDEX `idx_priority` (`priority`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

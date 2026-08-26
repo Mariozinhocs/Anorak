@@ -60,6 +60,15 @@ try {
             $tasks_json = json_encode($input['tasks'] ?? []);
             $validation_history_json = json_encode($input['validationHistory'] ?? []);
 
+            $custom_order = isset($input['customOrder']) ? (int)$input['customOrder'] : 0;
+            $quadrant = !empty($input['quadrant']) ? $input['quadrant'] : null;
+
+            // Auto-migração preventiva das colunas custom_order e quadrant
+            try {
+                $pdo->exec("ALTER TABLE `{$items_table}` ADD COLUMN `custom_order` INT NOT NULL DEFAULT 0 AFTER `status`");
+                $pdo->exec("ALTER TABLE `{$items_table}` ADD COLUMN `quadrant` VARCHAR(10) NULL DEFAULT NULL AFTER `urgency`");
+            } catch (Exception $e) {}
+
             // Determina se é criação ou atualização para o log
             $action_type = 'item_created';
             try {
@@ -82,16 +91,18 @@ try {
 
             $stmt = $pdo->prepare("
                 INSERT INTO `{$items_table}` 
-                (id, type, title, description, status, priority, impact, urgency, assigned_to, collaborators_json, tags_json, context_links_json, tasks_json, validation_history_json, created_at, updated_at)
+                (id, type, title, description, status, custom_order, priority, impact, urgency, quadrant, assigned_to, collaborators_json, tags_json, context_links_json, tasks_json, validation_history_json, created_at, updated_at)
                 VALUES 
-                (:id, :type, :title, :description, :status, :priority, :impact, :urgency, :assigned_to, :collaborators_json, :tags_json, :context_links_json, :tasks_json, :validation_history_json, COALESCE(:created_at, NOW()), COALESCE(:updated_at, NOW()))
+                (:id, :type, :title, :description, :status, :custom_order, :priority, :impact, :urgency, :quadrant, :assigned_to, :collaborators_json, :tags_json, :context_links_json, :tasks_json, :validation_history_json, COALESCE(:created_at, NOW()), COALESCE(:updated_at, NOW()))
                 ON DUPLICATE KEY UPDATE 
                 title = VALUES(title),
                 description = VALUES(description),
                 status = VALUES(status),
+                custom_order = VALUES(custom_order),
                 priority = VALUES(priority),
                 impact = VALUES(impact),
                 urgency = VALUES(urgency),
+                quadrant = VALUES(quadrant),
                 assigned_to = VALUES(assigned_to),
                 collaborators_json = VALUES(collaborators_json),
                 tags_json = VALUES(tags_json),
@@ -107,9 +118,11 @@ try {
                 ':title' => $title,
                 ':description' => $description,
                 ':status' => $status,
+                ':custom_order' => $custom_order,
                 ':priority' => $priority,
                 ':impact' => $impact,
                 ':urgency' => $urgency,
+                ':quadrant' => $quadrant,
                 ':assigned_to' => $assigned_to,
                 ':collaborators_json' => $collaborators_json,
                 ':tags_json' => $tags_json,
@@ -184,7 +197,9 @@ function formatItemJsonFields(&$item) {
     $item['tasks'] = !empty($item['tasks_json']) ? json_decode($item['tasks_json'], true) : [];
     $item['validationHistory'] = !empty($item['validation_history_json']) ? json_decode($item['validation_history_json'], true) : [];
     $item['assignedTo'] = $item['assigned_to'] ?? '';
+    $item['customOrder'] = isset($item['custom_order']) ? (int)$item['custom_order'] : 0;
+    $item['quadrant'] = $item['quadrant'] ?? null;
     $item['createdAt'] = !empty($item['created_at']) ? date('c', strtotime($item['created_at'])) : null;
     $item['updatedAt'] = !empty($item['updated_at']) ? date('c', strtotime($item['updated_at'])) : null;
-    unset($item['collaborators_json'], $item['tags_json'], $item['context_links_json'], $item['tasks_json'], $item['validation_history_json'], $item['assigned_to'], $item['created_at'], $item['updated_at']);
+    unset($item['collaborators_json'], $item['tags_json'], $item['context_links_json'], $item['tasks_json'], $item['validation_history_json'], $item['assigned_to'], $item['custom_order'], $item['created_at'], $item['updated_at']);
 }

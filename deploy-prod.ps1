@@ -79,6 +79,8 @@ try {
     Upload-File "$localDir\app.html" "app.html"
     Upload-File "$localDir\admin.html" "admin.html"
     Upload-File "$localDir\help.html" "help.html"
+    Upload-File "$localDir\manifest.json" "manifest.json"
+    Upload-File "$localDir\sw.js" "sw.js"
     Upload-File "$localDir\assets\anorak_construction_case.png" "assets/anorak_construction_case.png"
     Upload-File "$localDir\assets\anorak_creative_case.png" "assets/anorak_creative_case.png"
     Upload-File "$localDir\assets\anorak_business_case.png" "assets/anorak_business_case.png"

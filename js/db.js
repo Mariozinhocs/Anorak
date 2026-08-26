@@ -130,7 +130,26 @@ export class AnorakDB {
   }
 
   getByType(type) {
-    return this.items.filter(item => item.type === type);
+    const list = this.items.filter(item => item.type === type);
+    // Ordena por customOrder se existir ordem personalizada, caso contrário por data de atualização
+    return list.sort((a, b) => {
+      if ((a.customOrder || 0) !== (b.customOrder || 0)) {
+        return (a.customOrder || 0) - (b.customOrder || 0);
+      }
+      return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
+    });
+  }
+
+  reorderItems(type, orderedIds) {
+    orderedIds.forEach((id, index) => {
+      const item = this.items.find(i => i.id === id);
+      if (item) {
+        item.customOrder = index;
+        item.updatedAt = new Date().toISOString();
+        this.syncItemToServer(item);
+      }
+    });
+    this.saveToStorage();
   }
 
   getById(id) {

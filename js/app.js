@@ -36,6 +36,7 @@ class AnorakApp {
     await db.init();
     this.initAudioContext();
     this.setupEventListeners();
+    this.initPwaSupport();
     this.render();
     this.renderDecisionMatrix();
     this.checkGitHubSync();
@@ -48,6 +49,36 @@ class AnorakApp {
       window.history.replaceState({}, document.title, window.location.pathname);
       this.openCheckoutModal(checkoutPlan, checkoutBilling);
     }
+  }
+
+  initPwaSupport() {
+    // 1. Registro do Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('[PWA] Service Worker ativo:', reg.scope))
+        .catch(err => console.warn('[PWA] Service Worker indisponível:', err));
+    }
+
+    // 2. Intercepta prompt de instalação nativo
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      this.deferredPwaPrompt = e;
+      const btnInstall = document.getElementById('btnInstallPwa');
+      if (btnInstall) {
+        btnInstall.style.display = 'inline-flex';
+        btnInstall.onclick = async () => {
+          if (this.deferredPwaPrompt) {
+            this.deferredPwaPrompt.prompt();
+            const choiceResult = await this.deferredPwaPrompt.userChoice;
+            if (choiceResult.outcome === 'accepted') {
+              this.showToast('🎉 Anorak instalado com sucesso no seu dispositivo!');
+              btnInstall.style.display = 'none';
+            }
+            this.deferredPwaPrompt = null;
+          }
+        };
+      }
+    });
   }
 
   async verifyAuth() {
@@ -574,10 +605,11 @@ class AnorakApp {
       // MODO LISTA COMPACTO ESTILO GOOGLE DRIVE
       if (this.projectLayoutMode === 'list') {
         return `
-          <article class="glass-panel project-list-row" data-project-id="${proj.id}">
+          <article class="glass-panel project-list-row" draggable="true" data-project-id="${proj.id}">
             <!-- Coluna 1: Título & Descrição com Links de Acesso e Git -->
             <div class="list-col-main">
               <div class="list-title-wrap" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <span class="drag-handle" title="Arraste para reordenar prioridade (Exclusivo Legend)">⋮⋮</span>
                 <h3 class="project-title" style="margin: 0; font-size: 1.05rem;">${this.escapeHTML(proj.title)}</h3>
                 <span class="status-pill status-${proj.status}" style="font-size: 0.68rem; font-weight: bold; text-transform: uppercase; padding: 2px 8px; border-radius: 12px; background: rgba(0, 242, 254, 0.1); color: var(--primary-cyan); border: 1px solid rgba(0, 242, 254, 0.3);">${proj.status}</span>
                 ${proj.contextLinks.githubRepo ? `
@@ -635,11 +667,14 @@ class AnorakApp {
 
       // MODO GRADE DE CARDS (PADRÃO)
       return `
-        <article class="glass-panel project-card" data-project-id="${proj.id}">
+        <article class="glass-panel project-card" draggable="true" data-project-id="${proj.id}">
           <div class="project-card-header">
-            <div>
-              <h3 class="project-title">${this.escapeHTML(proj.title)}</h3>
-              <p class="project-desc">${this.escapeHTML(proj.description || 'Sem descrição cadastrada.')}</p>
+            <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+              <span class="drag-handle" title="Arraste para reordenar prioridade (Exclusivo Legend)">⋮⋮</span>
+              <div>
+                <h3 class="project-title" style="margin: 0;">${this.escapeHTML(proj.title)}</h3>
+                <p class="project-desc" style="margin: 3px 0 0 0;">${this.escapeHTML(proj.description || 'Sem descrição cadastrada.')}</p>
+              </div>
             </div>
             
             <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
@@ -792,6 +827,8 @@ class AnorakApp {
         </article>
       `;
     }).join('');
+
+    this.initDragAndDrop();
   }
 
   renderGitTelemetry(proj) {
@@ -1600,16 +1637,17 @@ class AnorakApp {
   }
 
   // =========================================================================
-  // MATRIZ DE DECISÃO ("Onde investir meu tempo hoje?")
+  // MATRIZ DE DECISÃO ("Onde investir meu tempo hoje?") & DRAG & DROP
   // =========================================================================
   renderDecisionMatrix() {
     const analysis = this.decisionMatrix.analyze();
     const { quadrants, advice } = analysis;
 
-    const renderList = (items) => {
-      if (!items || items.length === 0) return '<div style="font-size: 0.75rem; color: var(--text-muted);">Nenhum item nesta zona.</div>';
+    const renderList = (items, quadKey) => {
+      if (!items || items.length === 0) return '<div style="font-size: 0.75rem; color: var(--text-muted); padding: 0.5rem 0;">Nenhum item nesta zona. Arraste cards aqui!</div>';
       return items.map(i => `
-        <div class="quadrant-item" onclick="window.anorakApp.navigateToProject('${i.id}')" title="Clique para navegar até o projeto">
+        <div class="quadrant-item" draggable="true" data-item-id="${i.id}" data-current-quadrant="${quadKey}" onclick="window.anorakApp.navigateToProject('${i.id}')" title="Arraste para mover de quadrante (Exclusivo Legend) ou clique para abrir">
+          <span class="drag-handle" style="font-size: 0.75rem; opacity: 0.6; margin-right: 4px;">⋮⋮</span>
           <strong>${this.escapeHTML(i.title)}</strong>
         </div>
       `).join('');
@@ -1620,15 +1658,193 @@ class AnorakApp {
     const q3El = document.getElementById('quadrantQ3');
     const q4El = document.getElementById('quadrantQ4');
 
-    if (q1El) q1El.innerHTML = renderList(quadrants.q1);
-    if (q2El) q2El.innerHTML = renderList(quadrants.q2);
-    if (q3El) q3El.innerHTML = renderList(quadrants.q3);
-    if (q4El) q4El.innerHTML = renderList(quadrants.q4);
+    if (q1El) {
+      if (q1El.parentElement) q1El.parentElement.dataset.quadrant = 'q1';
+      q1El.innerHTML = renderList(quadrants.q1, 'q1');
+    }
+    if (q2El) {
+      if (q2El.parentElement) q2El.parentElement.dataset.quadrant = 'q2';
+      q2El.innerHTML = renderList(quadrants.q2, 'q2');
+    }
+    if (q3El) {
+      if (q3El.parentElement) q3El.parentElement.dataset.quadrant = 'q3';
+      q3El.innerHTML = renderList(quadrants.q3, 'q3');
+    }
+    if (q4El) {
+      if (q4El.parentElement) q4El.parentElement.dataset.quadrant = 'q4';
+      q4El.innerHTML = renderList(quadrants.q4, 'q4');
+    }
 
     const adviceQuoteEl = document.getElementById('advisorQuote');
     if (adviceQuoteEl) {
       adviceQuoteEl.textContent = `"${advice.message}"`;
     }
+
+    this.initDragAndDrop();
+  }
+
+  isLegendUser() {
+    return Boolean(this.currentUser && (this.currentUser.plan === 'legend' || this.currentUser.role === 'admin'));
+  }
+
+  showLegendUpgradePrompt(customMsg) {
+    this.playCyberChime(350, 'sawtooth', 0.2);
+    const modalUpgrade = document.getElementById('modalUpgrade');
+    if (modalUpgrade) {
+      const selectPlan = document.getElementById('selectUpgradePlan');
+      if (selectPlan) selectPlan.value = 'legend';
+      this.updateCheckoutPrice();
+      modalUpgrade.classList.add('active');
+    }
+    this.showToast(`👑 Recurso Legend: ${customMsg || 'Faça upgrade para o plano Legend para desbloquear este recurso.'}`);
+  }
+
+  initDragAndDrop() {
+    const isLegend = this.isLegendUser();
+
+    // =========================================================================
+    // 1. REORDENAÇÃO DE PROJETOS (GRID / LISTA)
+    // =========================================================================
+    const projectCards = document.querySelectorAll('.project-card, .project-list-row');
+    projectCards.forEach(card => {
+      card.setAttribute('draggable', 'true');
+
+      // Feedback no manipulador de arrasto para não-Legends
+      const handle = card.querySelector('.drag-handle');
+      if (handle) {
+        handle.addEventListener('click', (e) => {
+          if (!isLegend) {
+            e.stopPropagation();
+            this.showLegendUpgradePrompt('A reorganização livre de cards por arrastar e soltar é exclusiva do plano Anorak Legend.');
+          }
+        });
+      }
+
+      card.addEventListener('dragstart', (e) => {
+        if (!isLegend) {
+          e.preventDefault();
+          this.showLegendUpgradePrompt('A reorganização livre de cards por arrastar e soltar é exclusiva do plano Anorak Legend.');
+          return false;
+        }
+        this.draggedProjectId = card.dataset.projectId;
+        card.classList.add('dragging');
+        if (e.dataTransfer) {
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', this.draggedProjectId);
+        }
+      });
+
+      card.addEventListener('dragend', () => {
+        card.classList.remove('dragging');
+        document.querySelectorAll('.project-card, .project-list-row').forEach(c => {
+          c.classList.remove('drag-over-before', 'drag-over-after');
+        });
+      });
+
+      card.addEventListener('dragover', (e) => {
+        if (!isLegend || !this.draggedProjectId) return;
+        e.preventDefault();
+        if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+        const rect = card.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
+        if (e.clientY < midY) {
+          card.classList.add('drag-over-before');
+          card.classList.remove('drag-over-after');
+        } else {
+          card.classList.add('drag-over-after');
+          card.classList.remove('drag-over-before');
+        }
+      });
+
+      card.addEventListener('dragleave', () => {
+        card.classList.remove('drag-over-before', 'drag-over-after');
+      });
+
+      card.addEventListener('drop', (e) => {
+        if (!isLegend || !this.draggedProjectId) return;
+        e.preventDefault();
+        const targetId = card.dataset.projectId;
+        const sourceId = this.draggedProjectId;
+        this.draggedProjectId = null;
+
+        if (sourceId && targetId && sourceId !== targetId) {
+          const projects = db.getByType(ItemType.PROJECT);
+          const sourceIdx = projects.findIndex(p => p.id === sourceId);
+          const targetIdx = projects.findIndex(p => p.id === targetId);
+
+          if (sourceIdx >= 0 && targetIdx >= 0) {
+            const [moved] = projects.splice(sourceIdx, 1);
+            projects.splice(targetIdx, 0, moved);
+            const orderedIds = projects.map(p => p.id);
+            db.reorderItems(ItemType.PROJECT, orderedIds);
+            this.playCyberChime(750, 'sine', 0.15);
+            this.showToast('✨ Ordem personalizada salva com sucesso!');
+            this.renderOperationalProjects();
+          }
+        }
+      });
+    });
+
+    // =========================================================================
+    // 2. MATRIZ HALLIDAY (MOVIMENTAÇÃO LIVRE ENTRE QUADRANTES)
+    // =========================================================================
+    const matrixQuadrants = document.querySelectorAll('.matrix-quadrant');
+    const quadrantItems = document.querySelectorAll('.quadrant-item');
+
+    quadrantItems.forEach(itemEl => {
+      itemEl.setAttribute('draggable', 'true');
+
+      itemEl.addEventListener('dragstart', (e) => {
+        if (!isLegend) {
+          e.preventDefault();
+          this.showLegendUpgradePrompt('A movimentação manual de itens entre quadrantes é exclusiva do plano Anorak Legend.');
+          return false;
+        }
+        this.draggedMatrixItemId = itemEl.dataset.itemId;
+        itemEl.classList.add('dragging');
+        if (e.dataTransfer) {
+          e.dataTransfer.setData('text/plain', this.draggedMatrixItemId);
+        }
+      });
+
+      itemEl.addEventListener('dragend', () => {
+        itemEl.classList.remove('dragging');
+        matrixQuadrants.forEach(q => q.classList.remove('drag-over'));
+      });
+    });
+
+    matrixQuadrants.forEach(quadEl => {
+      quadEl.addEventListener('dragover', (e) => {
+        if (!isLegend || !this.draggedMatrixItemId) return;
+        e.preventDefault();
+        quadEl.classList.add('drag-over');
+      });
+
+      quadEl.addEventListener('dragleave', () => {
+        quadEl.classList.remove('drag-over');
+      });
+
+      quadEl.addEventListener('drop', (e) => {
+        if (!isLegend || !this.draggedMatrixItemId) return;
+        e.preventDefault();
+        quadEl.classList.remove('drag-over');
+
+        const itemId = this.draggedMatrixItemId;
+        const targetQuadrant = quadEl.dataset.quadrant;
+        this.draggedMatrixItemId = null;
+
+        if (itemId && targetQuadrant) {
+          const item = db.getById(itemId);
+          if (item) {
+            item.quadrant = targetQuadrant;
+            db.save(item);
+            this.playCyberChime(820, 'sine', 0.2);
+            this.showToast(`🧭 Item movido para o quadrante ${targetQuadrant.toUpperCase()} com sucesso!`);
+            this.renderDecisionMatrix();
+          }
+        }
+      });
+    });
   }
 
   navigateToProject(projectId) {

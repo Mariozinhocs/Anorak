@@ -1463,9 +1463,94 @@
   box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
 }
 
+/* ==========================================================================
+   DRAG & DROP - REORDENAÇÃO LIVRE (PLANO LEGEND) & PWA
+   ========================================================================== */
+.drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: grab;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  user-select: none;
+  touch-action: none;
+  transition: all 0.2s ease;
+}
+
+.drag-handle:hover {
+  color: var(--primary-cyan);
+  background: rgba(0, 242, 254, 0.1);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.project-card.dragging,
+.quadrant-item.dragging {
+  opacity: 0.35 !important;
+  transform: scale(0.97) !important;
+  border: 1px dashed var(--primary-cyan) !important;
+  box-shadow: 0 0 25px rgba(0, 242, 254, 0.3) !important;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.project-card.drag-over-before {
+  border-top: 3px solid var(--primary-cyan) !important;
+  box-shadow: 0 -4px 15px rgba(0, 242, 254, 0.4);
+}
+
+.project-card.drag-over-after {
+  border-bottom: 3px solid var(--primary-cyan) !important;
+  box-shadow: 0 4px 15px rgba(0, 242, 254, 0.4);
+}
+
+.matrix-quadrant.drag-over {
+  background: rgba(0, 242, 254, 0.08) !important;
+  border-color: var(--primary-cyan) !important;
+  box-shadow: inset 0 0 20px rgba(0, 242, 254, 0.2);
+}
+
+.quadrant-item.drag-over {
+  border: 1px dashed var(--primary-cyan) !important;
+  background: rgba(0, 242, 254, 0.15) !important;
+}
+
+/* PWA Install Banner & Mobile Safe Area */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .anorak-header {
+    padding-top: max(0.85rem, env(safe-area-inset-top));
+  }
+}
+
+.btn-pwa-install {
+  background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(168, 85, 247, 0.15));
+  border: 1px solid var(--primary-cyan);
+  color: var(--primary-cyan);
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all var(--transition-fast);
+}
+
+.btn-pwa-install:hover {
+  background: linear-gradient(135deg, rgba(0, 242, 254, 0.3), rgba(168, 85, 247, 0.3));
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+  color: #ffffff;
+}
+
 /* Assinatura de Autoria nos Comentários do CSS */
 /*
   Desenvolvido por Mario Henrique (mariozinhocs) - mariozinhocs@gmail.com
   "si vis pacem para bellum"
 */
+
 
