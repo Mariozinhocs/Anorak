@@ -65,7 +65,8 @@ class AnorakAdmin {
     // Alternância de Abas
     bindClick('btnTabAccounts', () => this.switchTab('accounts'));
     bindClick('btnTabPayments', () => this.switchTab('payments'));
-    bindClick('btnTabDeploy', () => this.switchTab('deploy'));
+    bindClick('btnTabConfig', () => this.switchTab('config'));
+    bindClick('btnRefreshLogs', () => this.loadAuditLogs());
 
     // Busca e Filtros
     bindEvent('inputSearchUsers', 'input', () => {
@@ -151,14 +152,6 @@ class AnorakAdmin {
       }
     });
 
-    // Deploy & Migrações Listeners
-    bindClick('btnRunMigrations', () => this.runDatabaseMigrations());
-    bindClick('btnRunDeploy', () => this.runServerDeploy());
-    bindClick('btnClearConsole', () => {
-      const consoleOut = document.getElementById('consoleOutput');
-      if (consoleOut) consoleOut.textContent = 'Console limpo. Pronto para execução de tarefas...';
-    });
-
     // Logout
     bindClick('btnLogout', async () => {
       if (confirm('Deseja realmente sair da sessão administrativa?')) {
@@ -174,11 +167,15 @@ class AnorakAdmin {
     this.currentTab = tab;
     document.getElementById('btnTabAccounts').classList.toggle('active', tab === 'accounts');
     document.getElementById('btnTabPayments').classList.toggle('active', tab === 'payments');
-    document.getElementById('btnTabDeploy').classList.toggle('active', tab === 'deploy');
+    document.getElementById('btnTabConfig').classList.toggle('active', tab === 'config');
 
     document.getElementById('viewAccounts').style.display = tab === 'accounts' ? 'flex' : 'none';
     document.getElementById('viewPayments').style.display = tab === 'payments' ? 'flex' : 'none';
-    document.getElementById('viewDeploy').style.display = tab === 'deploy' ? 'flex' : 'none';
+    document.getElementById('viewConfig').style.display = tab === 'config' ? 'flex' : 'none';
+
+    if (tab === 'config') {
+      this.loadAuditLogs();
+    }
   }
 
   // =========================================================================
@@ -764,61 +761,72 @@ class AnorakAdmin {
   }
 
   // =========================================================================
-  // DEPLOY E MIGRAÇÕES NO SERVIDOR
+  // TRILHA GLOBAL DE AUDITORIA (M.E.L.T. / OBSERVABILIDADE)
   // =========================================================================
-  async runDatabaseMigrations() {
-    const consoleBody = document.getElementById('consoleOutput');
-    consoleBody.textContent = '⏱️ [MIGRAÇÃO] Iniciando execução das tabelas e atualizações de colunas...\n';
-    
-    try {
-      const res = await fetch('db_installer.php');
-      if (res.ok) {
-        const html = await res.text();
-        // Faz o parse do HTML retornado pelo db_installer para extrair a caixa de log
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const logBox = doc.querySelector('.log-box');
-        
-        if (logBox) {
-          consoleBody.textContent += '\n' + logBox.innerText.trim();
-        } else {
-          consoleBody.textContent += '\n⚠️ [MIGRAÇÃO] O db_installer.php rodou com sucesso, mas o formato de log não pôde ser lido.';
-        }
-        this.showToast('Tabelas de banco atualizadas!');
-        this.loadStats();
-        this.loadUsers();
-      } else {
-        consoleBody.textContent += `\n❌ [ERRO] Falha ao executar db_installer.php (HTTP ${res.status})`;
-      }
-    } catch (err) {
-      consoleBody.textContent += '\n❌ [ERRO] Falha de comunicação com o instalador de banco: ' + err.message;
-    }
-  }
+  async loadAuditLogs() {
+    const tbody = document.getElementById('tableAuditLogsBody');
+    if (!tbody) return;
 
-  async runServerDeploy() {
-    const consoleBody = document.getElementById('consoleOutput');
-    consoleBody.textContent = '⏱️ [DEPLOY HML] Conectando ao FTP do servidor local e sincronizando arquivos...\n';
-    consoleBody.textContent += 'Aguarde, este processo pode levar alguns segundos...\n';
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+          <div class="spinner"></div> Carregando registros de auditoria em tempo real...
+        </td>
+      </tr>
+    `;
 
     try {
-      const res = await fetch('api/admin/run_deploy.php');
+      const res = await fetch('api/activity_logs.php');
       if (res.ok) {
         const result = await res.json();
-        consoleBody.textContent += `\n[MENSAGEM]: ${result.message}\n\n`;
-        if (result.output) {
-          consoleBody.textContent += result.output;
-        }
         if (result.status === 'success') {
-          this.showToast('Deploy HML efetuado com sucesso!');
-        } else {
-          this.showToast('Houve um erro no deploy.');
+          const logs = result.data || [];
+          if (logs.length === 0) {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                  Nenhum registro de auditoria encontrado.
+                </td>
+              </tr>
+            `;
+            return;
+          }
+
+          tbody.innerHTML = logs.map(log => {
+            const dateStr = log.created_at ? new Date(log.created_at).toLocaleString('pt-BR') : '-';
+            let detailsText = '';
+            if (log.details) {
+              if (typeof log.details === 'object') {
+                detailsText = Object.entries(log.details)
+                  .map(([k, v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`)
+                  .join(' | ');
+              } else {
+                detailsText = String(log.details);
+              }
+            }
+
+            return `
+              <tr>
+                <td class="mono" style="font-size: 0.78rem; color: var(--text-muted);">${dateStr}</td>
+                <td>
+                  <span class="user-badge" style="font-weight: 600; color: var(--primary-cyan);">@${this.escapeHTML(log.username || 'sistema')}</span>
+                </td>
+                <td>
+                  <span class="action-tag" style="font-weight: bold; font-size: 0.8rem; color: #fff;">${this.escapeHTML(log.action || '-')}</span>
+                </td>
+                <td style="font-size: 0.8rem; color: var(--text-secondary); max-width: 320px; word-break: break-word;">
+                  ${this.escapeHTML(detailsText || '-')}
+                </td>
+                <td class="mono" style="font-size: 0.75rem; color: var(--text-muted);">${this.escapeHTML(log.ip_address || '-')}</td>
+              </tr>
+            `;
+          }).join('');
+          return;
         }
-      } else {
-        const errResult = await res.json().catch(() => ({ message: 'Erro de comunicação desconhecido.' }));
-        consoleBody.textContent += `\n❌ [ERRO] Deploy negado: ${errResult.message}`;
       }
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #f87171; padding: 2rem;">Falha ao carregar trilha de auditoria.</td></tr>`;
     } catch (err) {
-      consoleBody.textContent += '\n❌ [ERRO] Falha ao processar o deploy FTP: ' + err.message;
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #f87171; padding: 2rem;">Erro de conexão: ${this.escapeHTML(err.message)}</td></tr>`;
     }
   }
 

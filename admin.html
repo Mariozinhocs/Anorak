@@ -48,8 +48,8 @@
         <button type="button" class="mode-btn" data-tab="payments" id="btnTabPayments">
           <span>💳</span> Histórico de Pagamentos
         </button>
-        <button type="button" class="mode-btn" data-tab="deploy" id="btnTabDeploy">
-          <span>💎</span> Administrador de Planos &amp; Banco
+        <button type="button" class="mode-btn" data-tab="config" id="btnTabConfig">
+          <span>⚙️</span> Configurações Globais do SaaS
         </button>
       </nav>
 
@@ -196,33 +196,109 @@
     </section>
 
     <!-- ===================================================================== -->
-    <!-- ABA 3: BANCO & MANUTENÇÃO -->
+    <!-- ABA 3: CONFIGURAÇÕES GLOBAIS DO SAAS & AUDITORIA -->
     <!-- ===================================================================== -->
-    <section class="view-section" id="viewDeploy" style="display: none;">
+    <section class="view-section" id="viewConfig" style="display: none;">
       <div class="view-header">
         <div>
-          <h2><span>💎</span> Administrador de Planos &amp; Banco de Dados</h2>
-          <p>Gerencie permissões de assinaturas, verificação de integridade estrutural das tabelas e migrações do sistema.</p>
+          <h2><span>⚙️</span> Configurações Globais &amp; Regras do SaaS</h2>
+          <p>Visão executiva das regras comerciais dos planos, parâmetros de quota e trilha global de auditoria (Observabilidade).</p>
+        </div>
+        <button type="button" class="btn-magic" id="btnRefreshLogs" style="padding: 0.4rem 0.85rem; font-size: 0.8rem;">
+          <span>🔄</span> Atualizar Trilha de Auditoria
+        </button>
+      </div>
+
+      <!-- Grid de Parâmetros e Quotas dos Planos -->
+      <div class="saas-rules-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+        <div class="glass-panel" style="padding: 1.25rem; border-top: 3px solid #94a3b8;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <h4 style="color: #fff; margin: 0; font-size: 1rem;">Avatar Explorer</h4>
+            <span class="status-pill" style="background: rgba(148,163,184,0.15); color: #cbd5e1; border: 1px solid rgba(148,163,184,0.3);">Grátis</span>
+          </div>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem;">Para experimentação inicial do ecossistema.</p>
+          <ul style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6; padding-left: 1.1rem; margin: 0;">
+            <li>Até <strong>1 Projeto</strong> ativo em homologação</li>
+            <li>Até <strong>5 Ideias</strong> na Incubadora</li>
+            <li>Modo Grade e Lista ativados</li>
+            <li>Sem acesso a repositórios privados Git</li>
+          </ul>
+        </div>
+
+        <div class="glass-panel" style="padding: 1.25rem; border-top: 3px solid #38bdf8;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <h4 style="color: #fff; margin: 0; font-size: 1rem;">OASIS Creator</h4>
+            <span class="status-pill" style="background: rgba(56,189,248,0.15); color: #38bdf8; border: 1px solid rgba(56,189,248,0.3);">R$ 49/mês</span>
+          </div>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem;">Para desenvolvedores individuais e criadores.</p>
+          <ul style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6; padding-left: 1.1rem; margin: 0;">
+            <li>Até <strong>5 Projetos</strong> simultâneos</li>
+            <li>Ideias ilimitadas com transcrição por voz</li>
+            <li>Telemetria de Repositórios Git</li>
+            <li>Exportação de relatórios PDF executivos</li>
+          </ul>
+        </div>
+
+        <div class="glass-panel" style="padding: 1.25rem; border-top: 3px solid #a855f7;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <h4 style="color: #fff; margin: 0; font-size: 1rem;">Halliday Master</h4>
+            <span class="status-pill" style="background: rgba(168,85,247,0.15); color: #c084fc; border: 1px solid rgba(168,85,247,0.3);">R$ 119/mês</span>
+          </div>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem;">Para pequenas equipes, squads e líderes técnicos.</p>
+          <ul style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6; padding-left: 1.1rem; margin: 0;">
+            <li>Até <strong>20 Projetos</strong> em homologação</li>
+            <li>Gestão de Colaboradores e Equipes</li>
+            <li>Matriz de Decisão Heurística Halliday</li>
+            <li>Geração automática de checklists inteligentes</li>
+          </ul>
+        </div>
+
+        <div class="glass-panel" style="padding: 1.25rem; border-top: 3px solid #f59e0b;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <h4 style="color: #fff; margin: 0; font-size: 1rem;">Anorak Legend</h4>
+            <span class="status-pill" style="background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3);">R$ 199/mês</span>
+          </div>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem;">Para empresas, agências e software houses.</p>
+          <ul style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6; padding-left: 1.1rem; margin: 0;">
+            <li><strong>Projetos Ilimitados</strong></li>
+            <li>Colaboradores ilimitados por projeto</li>
+            <li>Painel de Observabilidade M.E.L.T.</li>
+            <li>Suporte prioritário e Chaves Halliday completas</li>
+          </ul>
         </div>
       </div>
 
-      <div class="deploy-controls-grid" style="grid-template-columns: 1fr;">
-        <div class="glass-panel deploy-action-card">
-          <h3>🔮 Migrações de Banco de Dados</h3>
-          <p>Roda a verificação de integridade estrutural das tabelas e migrações (incluindo seedings de administradores e tabelas).</p>
-          <button type="button" class="btn-magic" id="btnRunMigrations" style="margin-top: 1rem; width: auto; max-width: 300px;">
-            <span>🚀</span> Rodar db_installer.php
-          </button>
+      <!-- Tabela de Trilha Global de Auditoria (M.E.L.T.) -->
+      <div class="glass-panel" style="padding: 1.5rem; margin-top: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <h3 style="margin: 0; font-size: 1.1rem; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+              <span>📜</span> Trilha Global de Auditoria &amp; Segurança (M.E.L.T.)
+            </h3>
+            <p style="margin: 3px 0 0 0; font-size: 0.8rem; color: var(--text-muted);">Registro imutável de eventos críticos, alterações de planos e logins de operadores.</p>
+          </div>
         </div>
-      </div>
 
-      <!-- Terminal Output Box -->
-      <div class="glass-panel console-card" style="margin-top: 1.5rem; width: 100%;">
-        <div class="console-header">
-          <span>💻 Console de Saída do Sistema</span>
-          <button type="button" class="btn-icon" id="btnClearConsole" title="Limpar Console" style="width: 24px; height: 24px; font-size: 0.75rem;">🧹</button>
+        <div class="table-container" style="max-height: 420px; overflow-y: auto;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width: 160px;">Data / Hora</th>
+                <th>Operador / Usuário</th>
+                <th>Ação Registrada</th>
+                <th>Detalhes / Contexto</th>
+                <th>IP de Origem</th>
+              </tr>
+            </thead>
+            <tbody id="tableAuditLogsBody">
+              <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                  Carregando registros de auditoria...
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <pre class="console-body" id="consoleOutput">Console pronto para execução de tarefas...</pre>
       </div>
     </section>
 
