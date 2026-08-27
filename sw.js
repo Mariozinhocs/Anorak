@@ -4,7 +4,7 @@
  * "si vis pacem para bellum"
  */
 
-const CACHE_NAME = 'anorak-oasis-cache-v1.9.0';
+const CACHE_NAME = 'anorak-oasis-cache-v1.9.1';
 const STATIC_ASSETS = [
   './',
   'index.html',

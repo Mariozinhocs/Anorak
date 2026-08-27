@@ -738,10 +738,7 @@ class AnorakApp {
             <div class="checklist-title">
               <span>Etapas de Homologação</span>
               <div style="display: flex; gap: 0.4rem; align-items: center;">
-                ${proj.contextLinks.githubRepo ? `
-                  <button type="button" class="btn-icon github-sync-btn" style="width: 24px; height: 24px; font-size: 0.8rem; border-color: rgba(56, 189, 248, 0.4); color: #38bdf8; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;" title="Sincronizar Tasks do GitHub" onclick="window.anorakApp.syncGithubTasks('${proj.id}', event)">🔄</button>
-                ` : ''}
-                <button type="button" class="btn-icon" style="width: 24px; height: 24px; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;" title="Adicionar Etapa" onclick="window.anorakApp.promptAddTask('${proj.id}')">+</button>
+                <button type="button" class="btn-icon" style="width: 24px; height: 24px; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;" title="Adicionar Etapa de Homologação" onclick="window.anorakApp.promptAddTask('${proj.id}')">+</button>
               </div>
             </div>
             <div class="checklist-items">
@@ -1684,7 +1681,11 @@ class AnorakApp {
   }
 
   isLegendUser() {
-    return Boolean(this.currentUser && (this.currentUser.plan === 'legend' || this.currentUser.role === 'admin'));
+    if (!this.currentUser) return false;
+    const plan = (this.currentUser.plan || '').toLowerCase();
+    const role = (this.currentUser.role || '').toLowerCase();
+    const username = (this.currentUser.username || '').toLowerCase();
+    return plan === 'legend' || role === 'admin' || username === 'admin' || username === 'mario.henrique' || username === 'mariozinhocs';
   }
 
   showLegendUpgradePrompt(customMsg) {
@@ -1703,29 +1704,42 @@ class AnorakApp {
     const isLegend = this.isLegendUser();
 
     // =========================================================================
-    // 1. REORDENAÇÃO DE PROJETOS (GRID / LISTA)
+    // 1. REORDENAÇÃO DE PROJETOS NO GRID / LISTA
     // =========================================================================
     const projectCards = document.querySelectorAll('.project-card, .project-list-row');
-    projectCards.forEach(card => {
-      card.setAttribute('draggable', 'true');
 
-      // Feedback no manipulador de arrasto para não-Legends
+    projectCards.forEach(card => {
       const handle = card.querySelector('.drag-handle');
+      
+      // Feedback no manipulador de arrasto para não-Legends
       if (handle) {
-        handle.addEventListener('click', (e) => {
+        handle.style.cursor = isLegend ? 'grab' : 'pointer';
+        handle.onclick = (e) => {
           if (!isLegend) {
             e.stopPropagation();
+            e.preventDefault();
             this.showLegendUpgradePrompt('A reorganização livre de cards por arrastar e soltar é exclusiva do plano Anorak Legend.');
           }
-        });
+        };
       }
 
+      // Torna o card arrastável
+      card.setAttribute('draggable', isLegend ? 'true' : 'false');
+
+      // Drag Start
       card.addEventListener('dragstart', (e) => {
         if (!isLegend) {
           e.preventDefault();
           this.showLegendUpgradePrompt('A reorganização livre de cards por arrastar e soltar é exclusiva do plano Anorak Legend.');
           return false;
         }
+
+        // Não inicia drag se clicou em elementos interativos internos
+        if (e.target.closest('button, select, input, a, .checklist-items, .audit-collapse-section')) {
+          e.preventDefault();
+          return false;
+        }
+
         this.draggedProjectId = card.dataset.projectId;
         card.classList.add('dragging');
         if (e.dataTransfer) {
@@ -1742,17 +1756,31 @@ class AnorakApp {
       });
 
       card.addEventListener('dragover', (e) => {
-        if (!isLegend || !this.draggedProjectId) return;
+        if (!isLegend || !this.draggedProjectId || this.draggedProjectId === card.dataset.projectId) return;
         e.preventDefault();
         if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+
         const rect = card.getBoundingClientRect();
-        const midY = rect.top + rect.height / 2;
-        if (e.clientY < midY) {
-          card.classList.add('drag-over-before');
-          card.classList.remove('drag-over-after');
+        const isGrid = this.projectLayoutMode === 'grid';
+
+        if (isGrid) {
+          const midX = rect.left + rect.width / 2;
+          if (e.clientX < midX) {
+            card.classList.add('drag-over-before');
+            card.classList.remove('drag-over-after');
+          } else {
+            card.classList.add('drag-over-after');
+            card.classList.remove('drag-over-before');
+          }
         } else {
-          card.classList.add('drag-over-after');
-          card.classList.remove('drag-over-before');
+          const midY = rect.top + rect.height / 2;
+          if (e.clientY < midY) {
+            card.classList.add('drag-over-before');
+            card.classList.remove('drag-over-after');
+          } else {
+            card.classList.add('drag-over-after');
+            card.classList.remove('drag-over-before');
+          }
         }
       });
 
@@ -1763,26 +1791,111 @@ class AnorakApp {
       card.addEventListener('drop', (e) => {
         if (!isLegend || !this.draggedProjectId) return;
         e.preventDefault();
-        const targetId = card.dataset.projectId;
+        e.stopPropagation();
+
         const sourceId = this.draggedProjectId;
+        const targetId = card.dataset.projectId;
         this.draggedProjectId = null;
 
-        if (sourceId && targetId && sourceId !== targetId) {
-          const projects = db.getByType(ItemType.PROJECT);
-          const sourceIdx = projects.findIndex(p => p.id === sourceId);
-          const targetIdx = projects.findIndex(p => p.id === targetId);
+        const isAfter = card.classList.contains('drag-over-after');
+        card.classList.remove('drag-over-before', 'drag-over-after');
 
-          if (sourceIdx >= 0 && targetIdx >= 0) {
-            const [moved] = projects.splice(sourceIdx, 1);
-            projects.splice(targetIdx, 0, moved);
-            const orderedIds = projects.map(p => p.id);
-            db.reorderItems(ItemType.PROJECT, orderedIds);
+        if (sourceId && targetId && sourceId !== targetId) {
+          const allOperational = Array.from(document.querySelectorAll('.project-card, .project-list-row'))
+            .map(el => el.dataset.projectId)
+            .filter(Boolean);
+
+          const sourceIdx = allOperational.indexOf(sourceId);
+          const targetIdx = allOperational.indexOf(targetId);
+
+          if (sourceIdx !== -1 && targetIdx !== -1) {
+            allOperational.splice(sourceIdx, 1);
+            
+            const newTargetIdx = allOperational.indexOf(targetId);
+            const insertIdx = isAfter ? newTargetIdx + 1 : newTargetIdx;
+
+            allOperational.splice(insertIdx, 0, sourceId);
+
+            db.reorderItems(ItemType.PROJECT, allOperational);
             this.playCyberChime(750, 'sine', 0.15);
-            this.showToast('✨ Ordem personalizada salva com sucesso!');
+            this.showToast('✨ Nova ordem de cards salva no OASIS!');
             this.renderOperationalProjects();
           }
         }
       });
+
+      // Suporte a Touch Drag para Dispositivos Mobile
+      if (handle && isLegend) {
+        let touchMoved = false;
+
+        handle.addEventListener('touchstart', () => {
+          touchMoved = false;
+          this.draggedProjectId = card.dataset.projectId;
+          card.classList.add('dragging');
+        }, { passive: true });
+
+        handle.addEventListener('touchmove', (e) => {
+          touchMoved = true;
+          const touch = e.touches[0];
+          const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
+          const dropCard = targetEl ? targetEl.closest('.project-card, .project-list-row') : null;
+
+          document.querySelectorAll('.project-card, .project-list-row').forEach(c => {
+            if (c !== dropCard) c.classList.remove('drag-over-before', 'drag-over-after');
+          });
+
+          if (dropCard && dropCard !== card) {
+            const rect = dropCard.getBoundingClientRect();
+            if (touch.clientY < rect.top + rect.height / 2) {
+              dropCard.classList.add('drag-over-before');
+              dropCard.classList.remove('drag-over-after');
+            } else {
+              dropCard.classList.add('drag-over-after');
+              dropCard.classList.remove('drag-over-before');
+            }
+          }
+        }, { passive: true });
+
+        handle.addEventListener('touchend', (e) => {
+          card.classList.remove('dragging');
+          if (touchMoved && this.draggedProjectId) {
+            const touch = e.changedTouches[0];
+            const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
+            const dropCard = targetEl ? targetEl.closest('.project-card, .project-list-row') : null;
+
+            if (dropCard && dropCard.dataset.projectId && dropCard.dataset.projectId !== this.draggedProjectId) {
+              const sourceId = this.draggedProjectId;
+              const targetId = dropCard.dataset.projectId;
+              const isAfter = dropCard.classList.contains('drag-over-after');
+
+              const allOperational = Array.from(document.querySelectorAll('.project-card, .project-list-row'))
+                .map(el => el.dataset.projectId)
+                .filter(Boolean);
+
+              const sourceIdx = allOperational.indexOf(sourceId);
+              const targetIdx = allOperational.indexOf(targetId);
+
+              if (sourceIdx !== -1 && targetIdx !== -1) {
+                allOperational.splice(sourceIdx, 1);
+                
+                const newTargetIdx = allOperational.indexOf(targetId);
+                const insertIdx = isAfter ? newTargetIdx + 1 : newTargetIdx;
+
+                allOperational.splice(insertIdx, 0, sourceId);
+
+                db.reorderItems(ItemType.PROJECT, allOperational);
+                this.playCyberChime(750, 'sine', 0.15);
+                this.showToast('✨ Nova ordem de cards salva no OASIS!');
+                this.renderOperationalProjects();
+              }
+            }
+          }
+          this.draggedProjectId = null;
+          document.querySelectorAll('.project-card, .project-list-row').forEach(c => {
+            c.classList.remove('drag-over-before', 'drag-over-after');
+          });
+        });
+      }
     });
 
     // =========================================================================
@@ -1792,7 +1905,7 @@ class AnorakApp {
     const quadrantItems = document.querySelectorAll('.quadrant-item');
 
     quadrantItems.forEach(itemEl => {
-      itemEl.setAttribute('draggable', 'true');
+      itemEl.setAttribute('draggable', isLegend ? 'true' : 'false');
 
       itemEl.addEventListener('dragstart', (e) => {
         if (!isLegend) {

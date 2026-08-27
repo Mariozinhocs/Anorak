@@ -72,6 +72,8 @@ try {
     Upload-File "$localDir\test_get_items.php" "hml/test_get_items.php"
     Upload-File "$localDir\test_post_save.php" "hml/test_post_save.php"
     Upload-File "$localDir\test_api_integration.php" "hml/test_api_integration.php"
+    Upload-File "$localDir\test_check_order.php" "hml/test_check_order.php"
+    Upload-File "$localDir\test_post_request.php" "hml/test_post_request.php"
 
     # 4. Envio dos arquivos CSS
     Upload-File "$localDir\css\variables.css" "hml/css/variables.css"

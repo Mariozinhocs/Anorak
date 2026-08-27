@@ -131,24 +131,37 @@ export class AnorakDB {
 
   getByType(type) {
     const list = this.items.filter(item => item.type === type);
-    // Ordena por customOrder se existir ordem personalizada, caso contrário por data de atualização
+    // Ordena primariamente por customOrder (quando definido > 0), senão por data de criação / atualização
     return list.sort((a, b) => {
-      if ((a.customOrder || 0) !== (b.customOrder || 0)) {
-        return (a.customOrder || 0) - (b.customOrder || 0);
+      const orderA = typeof a.customOrder === 'number' && a.customOrder > 0 ? a.customOrder : 9999;
+      const orderB = typeof b.customOrder === 'number' && b.customOrder > 0 ? b.customOrder : 9999;
+      if (orderA !== orderB) {
+        return orderA - orderB;
       }
       return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
     });
   }
 
   reorderItems(type, orderedIds) {
-    orderedIds.forEach((id, index) => {
-      const item = this.items.find(i => i.id === id);
-      if (item) {
-        item.customOrder = index;
-        item.updatedAt = new Date().toISOString();
-        this.syncItemToServer(item);
-      }
+    const allOfType = this.items.filter(item => item.type === type);
+    const remaining = allOfType.filter(item => !orderedIds.includes(item.id));
+    const newOrder = [];
+
+    orderedIds.forEach(id => {
+      const item = allOfType.find(i => i.id === id);
+      if (item) newOrder.push(item);
     });
+
+    remaining.forEach(item => {
+      newOrder.push(item);
+    });
+
+    newOrder.forEach((item, index) => {
+      item.customOrder = (index + 1) * 10;
+      item.updatedAt = new Date().toISOString();
+      this.syncItemToServer(item);
+    });
+
     this.saveToStorage();
   }
 
