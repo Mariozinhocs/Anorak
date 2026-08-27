@@ -59,11 +59,30 @@ class AnorakApp {
         .catch(err => console.warn('[PWA] Service Worker indisponível:', err));
     }
 
-    // 2. Intercepta prompt de instalação nativo
+    const btnInstall = document.getElementById('btnInstallPwa');
+    const isIos = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+    // Se já estiver instalado e rodando em modo standalone, oculta botão
+    if (isStandalone) {
+      if (btnInstall) btnInstall.style.display = 'none';
+      return;
+    }
+
+    // No iOS (iPhone/iPad), ativa o botão que abre o guia visual de adicionar à Tela de Início
+    if (isIos && !isStandalone) {
+      if (btnInstall) {
+        btnInstall.style.display = 'inline-flex';
+        btnInstall.onclick = () => {
+          this.openIosInstallModal();
+        };
+      }
+    }
+
+    // 2. Intercepta prompt de instalação nativo no Android/Chrome/Desktop
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       this.deferredPwaPrompt = e;
-      const btnInstall = document.getElementById('btnInstallPwa');
       if (btnInstall) {
         btnInstall.style.display = 'inline-flex';
         btnInstall.onclick = async () => {
@@ -79,6 +98,14 @@ class AnorakApp {
         };
       }
     });
+  }
+
+  openIosInstallModal() {
+    const modal = document.getElementById('modalIosInstall');
+    if (modal) {
+      modal.classList.add('active');
+      this.playCyberChime(650, 'sine', 0.15);
+    }
   }
 
   async verifyAuth() {

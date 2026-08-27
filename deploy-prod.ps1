@@ -87,6 +87,9 @@ try {
     Upload-File "$localDir\assets\anorak_software_case.png" "assets/anorak_software_case.png"
     Upload-File "$localDir\assets\bg-video.mp4" "assets/bg-video.mp4"
     Upload-File "$localDir\assets\favicon.svg" "assets/favicon.svg"
+    Upload-File "$localDir\assets\apple-touch-icon.png" "assets/apple-touch-icon.png"
+    Upload-File "$localDir\assets\icon-192.png" "assets/icon-192.png"
+    Upload-File "$localDir\assets\icon-512.png" "assets/icon-512.png"
  
     # 4. Envio dos arquivos CSS
     Upload-File "$localDir\css\variables.css" "css/variables.css"
